@@ -1,0 +1,15 @@
+# Vault — not committed to this repo
+vault/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Editor
+.vscode/
+*.swp

@@ -1,0 +1,60 @@
+# Security
+
+## Threat Model
+
+Meridian is a personal knowledge system that spans employer-managed and personally-owned machines. The primary security concern is personal information exposure to an employer.
+
+### In scope
+
+- Personal notes (Life/, Northstar/) appearing on a work machine
+- Personal notes syncing to employer-accessible cloud storage
+- Work machine filesystem scans revealing personal content
+
+### Out of scope
+
+- Vault encryption at rest (Obsidian does not provide this natively)
+- Protection against a compromised personal machine
+- Network-level interception of sync traffic
+
+---
+
+## Defense Layers
+
+### Syncthing folder-level access control
+
+The sync configuration ensures Life/, Northstar/, and References/ are never configured as sync targets on the work machine. These folders are simply absent from the work laptop's Syncthing configuration.
+
+Knowledge/ is configured Send Only from the work laptop. Work-originated knowledge flows to personal machines. Personal knowledge notes never reach the work laptop.
+
+Process/ and Work/ sync bidirectionally — these are expected to be accessible on the work machine.
+
+See [sync.md](sync.md) for the full folder sync matrix.
+
+### iCloud for personal-to-phone sync
+
+Personal machine to phone sync uses iCloud, which is entirely outside the Syncthing mesh. The work laptop has no iCloud configuration for this vault.
+
+### No vault on employer cloud storage
+
+The vault is never stored in employer-managed cloud storage (OneDrive, SharePoint, Google Workspace managed accounts). Syncthing is peer-to-peer with no cloud intermediary.
+
+---
+
+## Accepted Tradeoffs
+
+| Risk | Mitigation | Residual risk | Future path |
+|------|------------|---------------|-------------|
+| Work machine is employer-controlled — anything on it is potentially visible | Keep personal folders off the work machine via Syncthing config | Work content (Process/, Work/, Knowledge/) is on an employer machine | Accept — this is the expected state |
+| Syncthing misconfiguration could expose personal folders | Document the folder sync matrix explicitly; verify config at setup | Human error in Syncthing setup | Automated config verification script (see roadmap.md) |
+| Vault is not encrypted at rest | Physical machine security | Low for typical threat model | Full-disk encryption on both machines mitigates this outside Obsidian |
+
+---
+
+## Security Checklist
+
+Before using on a new machine, verify:
+
+- [ ] Life/, Northstar/, References/ are not present in Syncthing folder list on work laptop
+- [ ] Knowledge/ is set to Send Only on work laptop
+- [ ] Vault is stored in a personally-owned storage location, not employer cloud storage
+- [ ] Full-disk encryption is enabled on both machines (FileVault on macOS)
