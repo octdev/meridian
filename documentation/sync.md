@@ -16,6 +16,8 @@ Work laptop ──Syncthing──► Personal machine ──iCloud──► Phon
 - iCloud handles personal machine ↔ phone sync
 - The phone is not part of the Syncthing mesh
 
+The work laptop is scaffolded with `--profile work`, which means `Northstar/`, `Life/`, and `References/` are never created there. Syncthing is then configured to match: those folders are absent from the work laptop's sync configuration entirely.
+
 ---
 
 ## Folder Sync Matrix
@@ -34,6 +36,16 @@ Knowledge/ is Send Only from the work laptop. Work-originated knowledge flows to
 ---
 
 ## Syncthing Setup
+
+### Prerequisites
+
+The work laptop vault must be scaffolded with `--profile work` before configuring Syncthing:
+
+```bash
+./scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
+```
+
+This ensures `Northstar/`, `Life/`, and `References/` do not exist on the work machine before Syncthing is configured. See [user-guide.md](user-guide.md#work-machine-setup) for the full work machine setup sequence.
 
 ### Install
 

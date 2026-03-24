@@ -5,17 +5,21 @@
 1. [How It Works](#how-it-works)
 2. [Prerequisites](#prerequisites)
 3. [Initial Setup](#initial-setup)
-4. [Appearance Settings](#appearance-settings)
-5. [Core Plugins](#core-plugins)
-6. [Community Plugins](#community-plugins)
-7. [Hotkeys](#hotkeys)
-8. [Verification](#verification)
-9. [Daily Workflow](#daily-workflow)
-10. [Markers and Conventions](#markers-and-conventions)
-11. [MOCs](#mocs)
-12. [Weekly Snapshots](#weekly-snapshots)
-13. [Filing Heuristics](#filing-heuristics)
-14. [Maintenance](#maintenance)
+4. [Work Machine Setup](#work-machine-setup)
+5. [Appearance Settings](#appearance-settings)
+6. [Core Plugins](#core-plugins)
+7. [Community Plugins](#community-plugins)
+8. [Hotkeys](#hotkeys)
+9. [Verification](#verification)
+10. [Daily Workflow](#daily-workflow)
+11. [Markers and Conventions](#markers-and-conventions)
+12. [MOCs](#mocs)
+13. [Weekly Snapshots](#weekly-snapshots)
+14. [Managing Companies](#managing-companies)
+15. [Managing Projects](#managing-projects)
+16. [Filing Heuristics](#filing-heuristics)
+17. [Maintenance](#maintenance)
+18. [Documentation](#documentation)
 
 ---
 
@@ -46,34 +50,72 @@ python3 --version
 
 ### Step 1: Run the scaffold script
 
+**Personal machine:**
 ```bash
 chmod +x scaffold-vault.sh
 ./scaffold-vault.sh --vault /path/to/MyVault
 ```
 
-Default path is `./vault` if `--vault` is omitted.
-
-### Step 2: Place the snapshot script
-
+**Work machine:**
 ```bash
-cp weekly-snapshot.py /path/to/MyVault/.scripts/weekly-snapshot.py
+./scaffold-vault.sh --vault /path/to/WorkVault --profile work
 ```
 
-### Step 3: Open the vault in Obsidian
+The `--profile work` flag creates only the folders appropriate for an employer-managed machine — `Process/`, `Work/`, and `Knowledge/`. `Northstar/`, `Life/`, and `References/` are never created. See [Work Machine Setup](#work-machine-setup) for the full workflow.
+
+Default path is `./vault` if `--vault` is omitted.
+
+The scaffold script automatically copies all three scripts (`weekly-snapshot.py`, `new-company.sh`, `new-project.sh`) into `.scripts/` and copies the full documentation suite into `Process/Meridian Documentation/`, including a markdown cheat sheet and a PDF of the quick reference.
+
+### Step 2: Open the vault in Obsidian
 
 Obsidian → Open folder as vault → select the vault root.
 
-### Step 4: Rename CurrentCompany
+### Step 3: Rename CurrentCompany
 
 In the file explorer, rename `Work/CurrentCompany/` to your actual company name.
 
-### Step 5: Add the Reflection template
+---
 
-Copy `vault-files/templates/Reflection.md` into `_templates/` inside your vault:
+## Work Machine Setup
+
+Meridian is designed to run on both a personal machine and a work machine simultaneously, with different vault content on each. The `--profile work` flag is the starting point for work machine setup.
+
+### What the work profile includes
+
+| Folder | Personal vault | Work vault |
+|--------|---------------|------------|
+| `Process/` | Yes | Yes |
+| `Work/` | Yes | Yes |
+| `Knowledge/` | Yes | Yes |
+| `_templates/` | Yes | Yes |
+| `.scripts/` | Yes | Yes |
+| `Northstar/` | Yes | **No** |
+| `Life/` | Yes | **No** |
+| `References/` | Yes | **No** |
+
+The three omitted folders are intentionally absent — not excluded by a setting, not gitignored, not hidden. They simply do not exist on the work machine. Syncthing is then configured to never introduce them.
+
+### Work machine scaffold
 
 ```bash
-cp vault-files/templates/Reflection.md /path/to/MyVault/_templates/Reflection.md
+./scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
 ```
+
+Then follow the standard setup from [Step 1: Run the scaffold script](#initial-setup) → [Appearance Settings](#appearance-settings) onward. The plugin stack, hotkeys, and daily workflow are identical between profiles — the only difference is which folders exist.
+
+### Syncthing configuration for the work machine
+
+| Folder | Mode |
+|--------|------|
+| `Process/` | Send & Receive |
+| `Work/` | Send & Receive |
+| `Knowledge/` | Send Only |
+| `Life/` | Not configured |
+| `Northstar/` | Not configured |
+| `References/` | Not configured |
+
+`Knowledge/` is Send Only from the work machine so work-originated knowledge flows to all devices, but personal knowledge notes never reach the work machine. See [sync.md](sync.md) for the full Syncthing setup.
 
 ---
 
@@ -218,6 +260,8 @@ Scroller moves the cursor to the bottom of a note on open and after tab title re
 
 Search "Shell commands" → Install → Enable
 
+#### Command 1: Weekly Outtake (automatic)
+
 1. Click **New command**
 2. Enter: `python3 {{vault_path}}/.scripts/weekly-snapshot.py {{vault_path}}`
 3. Click gear icon → **Events** tab:
@@ -227,6 +271,29 @@ Search "Shell commands" → Install → Enable
 5. Set alias: "Generate Weekly Outtake"
 
 If Python 3 is not in PATH, use the full path: `/usr/bin/python3`
+
+#### Command 2: New Company (palette)
+
+1. Click **New command**
+2. Enter: `bash "{{vault_path}}/.scripts/new-company.sh"`
+3. No events — palette access only
+4. **Output** tab → set to your Shell Commands terminal mode (see note below)
+5. Set alias: "New Company"
+
+#### Command 3: New Project (palette)
+
+1. Click **New command**
+2. Enter: `bash "{{vault_path}}/.scripts/new-project.sh"`
+3. No events — palette access only
+4. **Output** tab → set to your Shell Commands terminal mode (see note below)
+5. Set alias: "New Project"
+
+**Note on interactive scripts:** `new-company.sh` and `new-project.sh` prompt for input. Shell Commands versions that support a terminal panel (open in terminal output mode) handle this directly. If your version does not, run these scripts from a system terminal opened to the vault directory:
+```bash
+bash .scripts/new-company.sh
+bash .scripts/new-project.sh
+```
+The command palette entries still serve as a reminder that the commands exist.
 
 ### Restart Obsidian
 
@@ -285,7 +352,7 @@ The core rule: things that *happen to you* go in the daily note. Things you *int
 
 - Final comms sweep
 - Quick scan: any `!!` items missed?
-- Optional: insert the Reflection template into today's daily note via command palette → "Templates: Insert template" → Reflection (or assign a hotkey such as `Cmd+Shift+T`). The template adds structured prompts for what went well, what was hard, what you'd do differently, and what to carry forward.
+- Optional: insert the Reflection template via `Cmd+Shift+T`. The template adds structured prompts for what went well, what was hard, what you'd do differently, and what to carry forward.
 
 ### Weekly review (~15–20 minutes)
 
@@ -399,6 +466,64 @@ python3 .scripts/weekly-snapshot.py /path/to/vault --force
 
 ---
 
+## Managing Companies
+
+Run `new-company.sh` when you start a new job or add a client. It creates the standard folder structure under `Work/`.
+
+Run from the command palette (**New Company**) or from a terminal in the vault directory:
+
+```bash
+bash .scripts/new-company.sh
+```
+
+The script prompts for vault root and company name, checks for collisions, and creates:
+
+```
+Work/[Company]/
+  Incidents/
+  People/
+  Projects/
+  Reference/
+  Vendors/
+```
+
+No content files are seeded — notes are added individually as work begins. Run `new-project.sh` afterward to add a project under the new company's `Projects/` folder.
+
+---
+
+## Managing Projects
+
+Run `new-project.sh` when starting a new project. It scaffolds the standard project structure under any `Projects/` directory — either `Work/[Company]/Projects/` or `Life/Projects/`.
+
+Run from the command palette (**New Project**) or from a terminal in the vault directory:
+
+```bash
+bash .scripts/new-project.sh
+```
+
+The script prompts for project name, vault root, and target Projects directory, then creates:
+
+```
+[ProjectName]/
+  [ProjectName].md        ← project MOC (scoped Tasks + Dataview queries)
+  Design/
+    architecture.md
+    design-decisions.md
+    security.md
+  Requirements/
+    brd.md
+    user-guide.md
+    roadmap.md
+  Prompts/
+    scratch.md
+```
+
+All files are seeded with frontmatter (`title`, `created`, `modified`) and starter structure. The MOC queries are scoped to the project folder using vault-relative paths — the same convention the Process MOCs use for `Process/Daily`.
+
+The script warns if the Projects directory you provide doesn't match the expected vault conventions (`Work/[Company]/Projects/` or `Life/Projects/`) and prompts for confirmation before proceeding.
+
+---
+
 ## Filing Heuristics
 
 | Question | Destination |
@@ -430,3 +555,29 @@ Check that the query uses `sort by filename reverse` (Tasks syntax), not `sort b
 ### Python not found
 
 Use the full path in the Shell Commands entry: `/usr/bin/python3`
+
+---
+
+## Documentation
+
+The full documentation suite is copied into `Process/Meridian Documentation/` in your vault when you run the scaffold script. All files are searchable and linkable from inside Obsidian.
+
+| File | Purpose |
+|------|---------|
+| `user-guide.md` | This file — full setup and operational manual |
+| `reference-guide.md` | Quick command and convention lookup |
+| `cheat-sheet.md` | Condensed quick reference (see below) |
+| `architecture.md` | System structure, data flows, and plugin stack |
+| `design-decisions.md` | Design decision log with rationale |
+| `security.md` | Threat model and work/personal boundary |
+| `sync.md` | Syncthing setup and folder sync matrix |
+| `roadmap.md` | Deferred features |
+| `Meridian System.pdf` | Printable quick reference |
+
+### Cheat Sheet
+
+`meridian-system.html` is an HTML source file used to generate the PDF and is not copied to the vault.  It is designed to be printed as one double-sided hardcopy: one side covers conventions and structure (vault layout, markers, filing heuristics, task lifecycle), the other covers daily and weekly workflow.
+
+`Meridian System.pdf` is the formatted print-ready version — open it and print directly.
+
+`cheat-sheet.md` is the markdown version.  It is not as dense and is less suitable for printing.

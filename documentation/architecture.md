@@ -26,13 +26,19 @@ The daily note is the only capture surface for incoming events. Intentional work
 ```
 meridian/
   README.md                       repo landing page and quick start
-  scaffold-vault.sh               vault scaffolding script
-  weekly-snapshot.py              weekly task report generator
+  scaffold-vault.sh               vault scaffolding script (personal + work profiles)
+  meridian-system.html            printable 2-sided quick reference (source for PDF)
+  Meridian System.pdf             quick reference PDF
   .gitignore
+  scripts/
+    weekly-snapshot.py            weekly task report generator
+    new-company.sh                scaffolds a new employer/client under Work/
+    new-project.sh                scaffolds a new project under any Projects/ folder
   vault-files/                    reference copies of vault seed files
     templates/
       Daily Note.md
       Generic Note.md
+      Reflection.md               end-of-day reflection template
     mocs/
       Action Items.md
       Active Projects.md
@@ -46,6 +52,7 @@ meridian/
   documentation/
     user-guide.md
     reference-guide.md
+    cheat-sheet.md                markdown version of the quick reference
     architecture.md               this file
     design-decisions.md
     security.md
@@ -53,11 +60,37 @@ meridian/
     roadmap.md
 ```
 
-The `vault-files/` directory contains the canonical source for all seed files. The scaffold script generates these into the vault at setup time. The vault itself is not committed to this repo.
+The `scripts/` directory contains all runnable scripts. `scaffold-vault.sh` copies them into the vault's `.scripts/` directory at setup time. The `documentation/` directory contains all user-facing docs — these are also copied into the vault at `Process/Meridian Documentation/` with frontmatter injected. The vault itself is not committed to this repo.
+
+---
+
+## Scaffold Profiles
+
+The scaffold script supports two profiles via `--profile personal|work`.
+
+### Personal profile (default)
+
+Full vault. All folders and seed files are created.
+
+```bash
+./scaffold-vault.sh --vault ~/Documents/MyVault
+```
+
+### Work profile
+
+Work-only vault. Creates `Process/`, `Work/`, `Knowledge/`, `_templates/`, and `.scripts/`. Omits `Northstar/`, `Life/`, and `References/` entirely — they are never written to disk and cannot be accidentally synced to an employer machine.
+
+```bash
+./scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
+```
+
+The daily note template, all MOCs, and the Reflection template are identical between profiles. The plugin stack, hotkeys, and workflow are the same. Only the knowledge layer folders differ.
 
 ---
 
 ## Vault Structure (generated)
+
+### Personal vault
 
 ```
 vault/
@@ -66,23 +99,36 @@ vault/
     templates.json
   .scripts/
     weekly-snapshot.py
+    new-company.sh
+    new-project.sh
   _templates/
     Daily Note.md
     Generic Note.md
+    Reflection.md
   Northstar/
     Purpose.md  Vision.md  Mission.md
     Principles.md  Values.md  Goals.md  Career.md
   Process/
-    Daily/                  YYYY-MM-DD.md files
-    Weekly/                 YYYY-MM-DD–DD Weekly Outtake.md files
-    Active Projects.md      Dataview MOC
-    Action Items.md         Tasks MOC
-    Open Loops.md           Tasks MOC
-    Review Queue.md         Tasks MOC
-    Weekly Outtake.md       Tasks MOC (rolling 7-day)
-    Current Priorities.md   Manual MOC
-    email.md                source tag note
-    teams.md                source tag note
+    Daily/                        YYYY-MM-DD.md files
+    Weekly/                       YYYY-MM-DD–DD Weekly Outtake.md files
+    Active Projects.md            Dataview MOC
+    Action Items.md               Tasks MOC
+    Open Loops.md                 Tasks MOC
+    Review Queue.md               Tasks MOC
+    Weekly Outtake.md             Tasks MOC (rolling 7-day)
+    Current Priorities.md         Manual MOC
+    email.md                      source tag note
+    teams.md                      source tag note
+    Meridian Documentation/
+      user-guide.md
+      reference-guide.md
+      cheat-sheet.md
+      architecture.md
+      design-decisions.md
+      security.md
+      sync.md
+      roadmap.md
+      Meridian System.pdf
   Knowledge/
     Technical/  Leadership/  Industry/  General/
   Work/
@@ -93,6 +139,42 @@ vault/
     Social/  Development/  Fun/
   References/
 ```
+
+### Work vault (`--profile work`)
+
+```
+vault/
+  .obsidian/
+    daily-notes.json
+    templates.json
+  .scripts/
+    weekly-snapshot.py
+    new-company.sh
+    new-project.sh
+  _templates/
+    Daily Note.md
+    Generic Note.md
+    Reflection.md
+  Process/
+    Daily/                        YYYY-MM-DD.md files
+    Weekly/                       YYYY-MM-DD–DD Weekly Outtake.md files
+    Active Projects.md            Dataview MOC
+    Action Items.md               Tasks MOC
+    Open Loops.md                 Tasks MOC
+    Review Queue.md               Tasks MOC
+    Weekly Outtake.md             Tasks MOC (rolling 7-day)
+    Current Priorities.md         Manual MOC
+    email.md                      source tag note
+    teams.md                      source tag note
+    Meridian Documentation/       (same docs as personal vault)
+  Knowledge/
+    Technical/  Leadership/  Industry/  General/
+  Work/
+    CurrentCompany/
+      Projects/  People/  Reference/  Incidents/  Vendors/
+```
+
+`Northstar/`, `Life/`, and `References/` are absent — not excluded, not hidden. They do not exist. `Process/Meridian Documentation/` is present in both profiles.
 
 ---
 
@@ -108,7 +190,7 @@ vault/
 | 6 | Linter | Community | Frontmatter | Writes `title` frontmatter from H1 on save |
 | 7 | Front Matter Timestamps | Community | Frontmatter | Auto-inserts and maintains `created` and `modified` |
 | 8 | Scroller | Community | UX | Moves cursor to bottom of note on open and title rename |
-| 9 | Shell Commands | Community | Automation | Triggers weekly snapshot script |
+| 9 | Shell Commands | Community | Automation | Triggers weekly snapshot; palette entries for new-company and new-project |
 
 ---
 
@@ -164,9 +246,10 @@ The script runs on vault open and every 4 hours via Shell Commands. It scans `Pr
 
 ```
 Work laptop ──Syncthing──► Personal machine ──iCloud──► Phone
-  Send Only (Knowledge/)     Send & Receive              full vault
-  Not synced (Life/,
-    Northstar/, References/)
+  Process/: Send & Receive   Send & Receive              full vault
+  Work/:    Send & Receive
+  Knowledge/: Send Only
+  (Life/, Northstar/, References/ not configured on work laptop)
 ```
 
 See [sync.md](sync.md) for full configuration.

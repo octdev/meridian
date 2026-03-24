@@ -60,6 +60,36 @@
 
 ---
 
+## DD-08: Work profile flag omits personal folders at scaffold time
+
+**Decision:** A `--profile work` flag on `scaffold-vault.sh` creates only `Process/`, `Work/`, `Knowledge/`, `_templates/`, and `.scripts/`. `Northstar/`, `Life/`, and `References/` are never written to disk on a work machine.
+
+**Rationale:** The most reliable way to keep personal content off an employer machine is to never create it there. Relying on Syncthing exclusions alone means the folders could exist briefly or be created by other means. With `--profile work`, the personal folders are structurally absent — there is nothing to accidentally sync, expose, or misconfigure. The work and personal vault structures remain in sync for work-relevant folders while enforcing a hard boundary at the filesystem level.
+
+**Tradeoff:** A user who runs the wrong profile has to re-scaffold or manually remove folders. Mitigated by the profile warning in the scaffold output and the explicit documentation of which profile to use on each machine type.
+
+---
+
+## DD-09: scripts/ directory in the project repo
+
+**Decision:** All runnable scripts (`weekly-snapshot.py`, `new-company.sh`, `new-project.sh`) live in a `scripts/` subdirectory of the Meridian project. The scaffold script copies them from there into the vault's `.scripts/` directory.
+
+**Rationale:** Keeping scripts at the project root mixed them with configuration files (README, scaffold-vault.sh, gitignore). As the number of scripts grew beyond one, a subdirectory makes the repo navigable and makes the scaffold copy step systematic — one directory to copy from rather than individual root-level files.
+
+**Tradeoff:** The scaffold script must know its own location (`SCRIPT_DIR`) to resolve relative paths. This is handled with `$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)` at script startup.
+
+---
+
+## DD-10: Documentation distributed into the vault at scaffold time
+
+**Decision:** The full documentation suite is copied into `Process/Meridian Documentation/` in the vault at scaffold time, with frontmatter injected. This includes the cheat sheet in markdown form and the PDF. The HTML source for the cheat sheet stays in the project only.
+
+**Rationale:** Documentation that only exists in the project repo requires switching out of Obsidian to read. Putting it in the vault means it is searchable, linkable, and readable in the same context where you are working. The frontmatter injection ensures Linter and Front Matter Timestamps see the files as properly formed notes from first open.
+
+**Tradeoff:** The vault copies diverge from the project source as the project evolves. Re-running the scaffold skips existing files, so documentation updates do not auto-propagate. Users who want the latest docs must manually copy or delete and re-scaffold. This is acceptable: the vault docs are a snapshot at setup time, not a live mirror.
+
+---
+
 ## DD-07: Syncthing for work/personal boundary enforcement
 
 **Decision:** Syncthing with folder-level Send Only / Receive Only modes enforces the personal/work content boundary between machines.

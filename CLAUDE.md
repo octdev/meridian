@@ -1,0 +1,78 @@
+# Meridian — Agent Working Guide
+
+Meridian is a personal knowledge management system built on Obsidian. It consists of a scaffold script that creates a vault folder structure and seeds files, a set of utility scripts for ongoing vault management, and a documentation suite distributed into the vault at setup time. The deliverable for users is a configured Obsidian vault, not an app.
+
+---
+
+## Read First for Each Task Type
+
+| Task | Read first | Skip |
+|------|-----------|------|
+| Modify `scaffold-vault.sh` | `scaffold-vault.sh`, `architecture.md` (vault structure) | `sync.md`, `security.md`, `work-scaffold.md` |
+| Add or change a script in `scripts/` | The script itself, `user-guide.md` (Shell Commands section) | `sync.md`, `security.md` |
+| Update documentation | The specific doc file, `architecture.md` (repo structure) | `sync.md`, `security.md`, `STATUS.md` |
+| Add a vault MOC or seed file | `scaffold-vault.sh`, `architecture.md` (vault structure) | Everything else |
+| Understand the plugin stack or frontmatter chain | `architecture.md` | `sync.md`, `security.md` |
+| Understand sync or machine boundary | `sync.md`, `security.md` | Everything else |
+| Understand why something is designed a certain way | `design-decisions.md` | Everything else |
+
+`work-scaffold.md` and `STATUS.md` are internal project working notes. They are almost never needed for code changes.
+
+---
+
+## Non-Obvious Constraints
+
+**Two `scripts` directories — do not confuse them:**
+- `scripts/` — source scripts in the project repo
+- `.scripts/` — scripts as deployed inside the vault
+- `scaffold-vault.sh` copies from `scripts/` → `.scripts/` at setup time using `copy_if_new`
+
+**Vault documentation is a scaffold-time snapshot:**
+- `documentation/` in the project is the source of truth
+- `Process/Meridian Documentation/` in the vault is a copy, injected with frontmatter at scaffold time via `copy_doc_with_frontmatter`
+- Re-running scaffold skips existing files — vault docs do not auto-update
+
+**`_templates/` must be excluded in Linter and Filename Heading Sync:**
+- Without this exclusion, both plugins corrupt template files on save
+- This is not optional — templates break silently if excluded is missing
+
+**The frontmatter chain is timing-dependent, not event-driven:**
+- Front Matter Timestamps fires after 100ms → triggers save → Linter populates `title` → Filename Heading Sync syncs filename
+- The 100ms delay is a workaround for a race condition
+- If `title` stops populating after plugin changes, increase delay in 50ms increments
+
+**Tasks ≠ Dataview query syntax:**
+- Tasks plugin: `sort by filename reverse`
+- Dataview: `sort by file.name ASC`
+- These are not interchangeable; mixing them causes silent query failures
+
+**`new-company.sh` and `new-project.sh` are interactive:**
+- Both use `read -rp` for prompts — they require a terminal
+- Shell Commands palette entries work only if the plugin is configured for terminal mode
+- Otherwise they must be run from a system terminal
+
+**Work profile omits exactly three folders:**
+- `Northstar/`, `Life/`, and `References/` are never created under `--profile work`
+- Everything else — including `Process/Meridian Documentation/` — is identical between profiles
+
+---
+
+## Conventions
+
+**scaffold-vault.sh helpers:**
+- `write_if_new <path> <content>` — writes a text file; skips if it already exists (idempotent)
+- `copy_if_new <src> <dest>` — copies a file (binary-safe); skips if dest exists; warns if src missing
+- `copy_doc_with_frontmatter <src> <dest> <title> <date>` — prepends `title/created/modified` frontmatter, then copies; skips if dest exists
+- `SCRIPT_DIR` is set at startup via `$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)` — use it for all relative path resolution
+
+**Documentation files have no frontmatter in the project:**
+- Frontmatter is injected only when copying to the vault
+- Do not add frontmatter to files in `documentation/` — it would be doubled on copy
+
+**Design decisions:**
+- Numbered DD-01, DD-02... sequentially; never renumber
+- If a decision changes, add a new entry that supersedes — do not edit the old one
+
+**Vault structure is the source of truth in `architecture.md`:**
+- Both the project repo layout and the generated vault layout are documented there
+- Keep both diagrams current when adding files or folders

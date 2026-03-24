@@ -10,16 +10,6 @@
 
 ---
 
-## Work-only vault scaffold mode
-
-**Current:** `scaffold-vault.sh` generates the full vault including Life/, Northstar/, and References/. Work machines must manually avoid syncing those folders.
-
-**Future:** A `--profile work` flag generates only Process/, Work/, and Knowledge/ — the subset appropriate for a work machine. Personal folders are never created, eliminating any risk of accidental sync.
-
-**Notes:** Requires splitting the scaffold into profile-aware folder and file sets. The `--vault` flag pattern is already in place.
-
----
-
 ## Syncthing config verification script
 
 **Current:** Syncthing folder sync modes (Send Only, Receive Only, Send & Receive) are configured manually and verified by inspection.

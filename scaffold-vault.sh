@@ -3,11 +3,18 @@
 # scaffold-vault.sh — Creates the Meridian vault folder structure and seed files.
 #
 # Usage:
-#   scaffold-vault.sh [--vault <path>]
+#   scaffold-vault.sh [--vault <path>] [--profile personal|work]
 #   scaffold-vault.sh -h | --help
 #
 # Options:
-#   --vault <path>   Path to vault root. Default: ./vault
+#   --vault <path>           Path to vault root. Default: ./vault
+#   --profile personal|work  Scaffold profile. Default: personal
+#
+# Profiles:
+#   personal  Full vault: Process, Work, Knowledge, Northstar, Life, References
+#   work      Work vault: Process, Work, Knowledge only.
+#             Northstar, Life, and References are intentionally omitted so
+#             personal content never exists on a work machine.
 #
 # Safe to re-run: skips files that already exist.
 #
@@ -16,6 +23,8 @@
 #   1 — failure
 
 set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # --- color setup ---
 
@@ -47,18 +56,28 @@ die() {
 
 usage() {
   cat <<EOF
-Usage: scaffold-vault.sh [--vault <path>]
+Usage: scaffold-vault.sh [--vault <path>] [--profile personal|work]
        scaffold-vault.sh -h | --help
 
 Creates the Meridian vault folder structure and seed files.
 
 Options:
-  --vault <path>   Path to vault root directory. Default: ./vault
+  --vault <path>           Path to vault root directory. Default: ./vault
+  --profile personal|work  Scaffold profile. Default: personal
+
+Profiles:
+  personal  Full vault including Northstar, Life, and References.
+            Use for your personal machine.
+
+  work      Work-only vault: Process, Work, and Knowledge only.
+            Northstar, Life, and References are intentionally omitted.
+            Use for employer-managed or work machines. Personal content
+            is never created and therefore cannot be accidentally synced.
 
 Examples:
   scaffold-vault.sh
   scaffold-vault.sh --vault ~/Documents/MyVault
-  scaffold-vault.sh --vault ~/Documents/WorkVault
+  scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
 
 Safe to re-run: existing files are skipped, new files are created.
 
@@ -68,12 +87,19 @@ EOF
 # --- argument parsing ---
 
 VAULT_ROOT="./vault"
+PROFILE="personal"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --vault)
       [[ -n "${2:-}" ]] || { echo "[meridian] Error: --vault requires a path." >&2; usage >&2; exit 1; }
       VAULT_ROOT="$2"; shift 2 ;;
+    --profile)
+      [[ -n "${2:-}" ]] || { echo "[meridian] Error: --profile requires a value (personal or work)." >&2; usage >&2; exit 1; }
+      case "$2" in
+        personal|work) PROFILE="$2"; shift 2 ;;
+        *) echo "[meridian] Error: --profile must be 'personal' or 'work'." >&2; usage >&2; exit 1 ;;
+      esac ;;
     -h|--help)
       usage; exit 0 ;;
     *)
@@ -94,10 +120,45 @@ write_if_new() {
   fi
 }
 
+copy_if_new() {
+  local src="$1"
+  local dest="$2"
+  if [[ ! -f "$src" ]]; then
+    _warn "Source not found, skipping: $(basename "$src")"
+    return
+  fi
+  if [[ ! -f "$dest" ]]; then
+    cp "$src" "$dest" || die "copy-file" "Could not copy to: $dest"
+    _pass "Created: ${dest#$VAULT_ROOT/}"
+  else
+    echo "  — Skipped (exists): ${dest#$VAULT_ROOT/}"
+  fi
+}
+
+copy_doc_with_frontmatter() {
+  local src="$1"
+  local dest="$2"
+  local title="$3"
+  local today_date="$4"
+  if [[ ! -f "$src" ]]; then
+    _warn "Source not found, skipping: $(basename "$src")"
+    return
+  fi
+  if [[ ! -f "$dest" ]]; then
+    {
+      printf -- '---\ntitle: %s\ncreated: %s\nmodified: %s\n---\n\n' "$title" "$today_date" "$today_date"
+      cat "$src"
+    } > "$dest" || die "copy-doc" "Could not write: $dest"
+    _pass "Created: ${dest#$VAULT_ROOT/}"
+  else
+    echo "  — Skipped (exists): ${dest#$VAULT_ROOT/}"
+  fi
+}
+
 # --- main ---
 
 echo ""
-echo "[meridian] Scaffolding vault at: $VAULT_ROOT"
+echo "[meridian] Scaffolding vault at: $VAULT_ROOT (profile: $PROFILE)"
 echo ""
 
 # --- folders ---
@@ -105,9 +166,9 @@ echo ""
 echo "[meridian] Creating folders..."
 
 dirs=(
-  "Northstar"
   "Process/Daily"
   "Process/Weekly"
+  "Process/Meridian Documentation"
   "Knowledge/Technical"
   "Knowledge/Leadership"
   "Knowledge/Industry"
@@ -117,17 +178,23 @@ dirs=(
   "Work/CurrentCompany/Reference"
   "Work/CurrentCompany/Incidents"
   "Work/CurrentCompany/Vendors"
-  "Life/Projects"
-  "Life/People"
-  "Life/Health"
-  "Life/Finances"
-  "Life/Social"
-  "Life/Development"
-  "Life/Fun"
-  "References"
   "_templates"
   ".scripts"
 )
+
+if [[ "$PROFILE" == "personal" ]]; then
+  dirs+=(
+    "Northstar"
+    "Life/Projects"
+    "Life/People"
+    "Life/Health"
+    "Life/Finances"
+    "Life/Social"
+    "Life/Development"
+    "Life/Fun"
+    "References"
+  )
+fi
 
 for d in "${dirs[@]}"; do
   mkdir -p "$VAULT_ROOT/$d" || die "mkdir" "Could not create directory: $VAULT_ROOT/$d"
@@ -149,9 +216,9 @@ modified:
 # {{date:YYYY-MM-DD}}
 
 ## Top 3 Goals
-1. 
-2. 
-3. 
+1.
+2.
+3.
 
 ## Log
 "
@@ -164,9 +231,25 @@ modified:
 
 # "
 
+write_if_new "$VAULT_ROOT/_templates/Reflection.md" "## Reflection
+
+**What went well today?**
+
+
+**What was hard or draining?**
+
+
+**What would I do differently?**
+
+
+**Anything worth carrying forward?**
+"
+
 echo ""
 
-# --- northstar notes ---
+# --- northstar notes (personal profile only) ---
+
+if [[ "$PROFILE" == "personal" ]]; then
 
 echo "[meridian] Writing Northstar notes..."
 
@@ -236,7 +319,7 @@ Concrete targets with timelines, flowing from the mission.
 
 ## 12-Month
 
-- 
+-
 
 ## 3-Year
 
@@ -253,6 +336,8 @@ modified:
 Career trajectory, positioning, and professional development notes."
 
 echo ""
+
+fi  # end personal-only Northstar section
 
 # --- process MOCs ---
 
@@ -381,10 +466,10 @@ modified:
 # Current Priorities
 
 ## Annual
-- 
+-
 
 ## Quarterly
-- 
+-
 
 ## Sprint
 - "
@@ -489,15 +574,52 @@ write_if_new "$VAULT_ROOT/.obsidian/templates.json" '{
 
 echo ""
 
+# --- scripts ---
+
+echo "[meridian] Copying scripts..."
+
+copy_if_new "$SCRIPT_DIR/scripts/weekly-snapshot.py" "$VAULT_ROOT/.scripts/weekly-snapshot.py"
+copy_if_new "$SCRIPT_DIR/scripts/new-company.sh"     "$VAULT_ROOT/.scripts/new-company.sh"
+copy_if_new "$SCRIPT_DIR/scripts/new-project.sh"     "$VAULT_ROOT/.scripts/new-project.sh"
+
+chmod +x "$VAULT_ROOT/.scripts/new-company.sh" 2>/dev/null || true
+chmod +x "$VAULT_ROOT/.scripts/new-project.sh" 2>/dev/null || true
+
+echo ""
+
+# --- documentation ---
+
+echo "[meridian] Copying documentation..."
+
+_today="$(date +%Y-%m-%d)"
+DOCS_SRC="$SCRIPT_DIR/documentation"
+DOCS_DEST="$VAULT_ROOT/Process/Meridian Documentation"
+
+copy_doc_with_frontmatter "$DOCS_SRC/user-guide.md"       "$DOCS_DEST/user-guide.md"       "User Guide"       "$_today"
+copy_doc_with_frontmatter "$DOCS_SRC/reference-guide.md"  "$DOCS_DEST/reference-guide.md"  "Reference Guide"  "$_today"
+copy_doc_with_frontmatter "$DOCS_SRC/architecture.md"     "$DOCS_DEST/architecture.md"     "Architecture"     "$_today"
+copy_doc_with_frontmatter "$DOCS_SRC/design-decisions.md" "$DOCS_DEST/design-decisions.md" "Design Decisions" "$_today"
+copy_doc_with_frontmatter "$DOCS_SRC/security.md"         "$DOCS_DEST/security.md"         "Security"         "$_today"
+copy_doc_with_frontmatter "$DOCS_SRC/sync.md"             "$DOCS_DEST/sync.md"             "Sync Architecture" "$_today"
+copy_doc_with_frontmatter "$DOCS_SRC/roadmap.md"          "$DOCS_DEST/roadmap.md"          "Roadmap"          "$_today"
+copy_if_new "$SCRIPT_DIR/Meridian System.pdf"             "$DOCS_DEST/Meridian System.pdf"
+
+echo ""
+
 # --- summary ---
 
 printf "${_C_GREEN}[meridian] Vault scaffolded successfully.${_C_RESET}\n"
 echo ""
+
+if [[ "$PROFILE" == "work" ]]; then
+  _warn "Work profile: Northstar/, Life/, and References/ were not created."
+  _hint "These folders are intentionally absent — never add them to Syncthing on this machine."
+  echo ""
+fi
+
 echo "Next steps:"
-_hint "1. Copy the snapshot script:"
-_cmd  "cp weekly-snapshot.py '$VAULT_ROOT/.scripts/weekly-snapshot.py'"
-_hint "2. Open Obsidian → Open folder as vault → $VAULT_ROOT"
-_hint "3. Follow documentation/user-guide.md from Step 4 (Appearance Settings)"
+_hint "1. Open Obsidian → Open folder as vault → $VAULT_ROOT"
+_hint "2. Follow Process/Meridian Documentation/user-guide.md from Step 3 (Rename CurrentCompany)"
 echo ""
 _warn "Rename Work/CurrentCompany/ to your actual company name after opening the vault."
 echo ""
