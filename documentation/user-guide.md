@@ -243,6 +243,9 @@ Settings → Hotkeys → search for each command and assign:
 | Daily Notes: Open today's daily note | `Cmd+D` |
 | Daily Notes: Open previous daily note | `Cmd+-` |
 | Daily Notes: Open next daily note | `Cmd+=` |
+| Templates: Insert template | `Cmd+Shift+T` |
+
+Assign the Templates hotkey to quickly insert the Reflection template at end of day: Settings → Hotkeys → search "Templates: Insert template" → assign `Cmd+Shift+T`.
 
 ---
 

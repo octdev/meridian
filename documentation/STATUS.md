@@ -12,7 +12,7 @@ meridian/
   README.md
   scaffold-vault.sh           -- profile work flag not yet built
   weekly-snapshot.py
-  cheat-sheet.html            -- printable 2-sided reference sheet
+  meridian-system.html        -- printable 2-sided reference sheet
   vault-files/
     templates/
       Daily Note.md
@@ -55,7 +55,7 @@ meridian/
 
 2. **Assign Reflection template hotkey** — `Cmd+Shift+T` is documented as suggested but must be assigned manually in Obsidian: Settings → Hotkeys → "Templates: Insert template"
 
-3. **Print cheat-sheet** — open `cheat-sheet.html` in Safari → Export as PDF. Verify page 1 fits after Filing Heuristics row removal.
+3. **Print cheat-sheet** — open `meridian-system.html` in Safari → Export as PDF. Verify page 1 fits after Filing Heuristics row removal.
 
 ### Near-term
 
