@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Obsidian System</title>
+<style>
+  @media print {
+    .page { margin: 0 !important; padding: 0.25in 0.5in 0 0.5in; overflow: hidden; }
+    .page + .page { page-break-before: always; }
+    .no-print { display: none !important; }
+    body { margin: 0; background: #fff; }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 11px; line-height: 1.4; color: #1a1a1a; background: #fff; }
+  .no-print { display: none; }
+  .page { width: 7.5in; margin: 0 auto; padding: 0.25in 0.5in 0 0.5in; background: #fff; box-shadow: none; }
+  h1 { font-size: 18px; font-weight: 700; margin: 0 0 2px 0; color: #1a1a1a; }
+  .subtitle { font-size: 10px; color: #888; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  h2 { font-size: 12px; font-weight: 700; margin: 7px 0 3px 0; color: #2d2d2d; text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 1px solid #ccc; padding-bottom: 2px; }
+  h3 { font-size: 11px; font-weight: 600; margin: 6px 0 2px 0; color: #444; }
+  table { width: 100%; border-collapse: collapse; margin: 3px 0 6px 0; font-size: 10.5px; }
+  th { text-align: left; font-weight: 600; padding: 3px 6px; background: #f0f0f0; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.3px; color: #555; }
+  td { padding: 2.5px 6px; border-bottom: 1px solid #eee; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; background: #f0f0f0; padding: 1px 4px; border-radius: 3px; font-size: 10.5px; color: #c7254e; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 0; }
+  .callout { background: #f8f8f8; border-left: 3px solid #5b6abf; padding: 6px 10px; margin: 4px 0; font-size: 10.5px; }
+  .callout strong { color: #5b6abf; }
+  .step-list { list-style: none; counter-reset: step; padding: 0; margin: 4px 0; }
+  .step-list li { counter-increment: step; padding: 3px 0 3px 24px; position: relative; font-size: 10.5px; }
+  .step-list li::before { content: counter(step); position: absolute; left: 0; width: 17px; height: 17px; background: #5b6abf; color: #fff; border-radius: 50%; text-align: center; line-height: 17px; font-size: 9px; font-weight: 700; top: 3px; }
+  .compact-list { padding-left: 16px; font-size: 10.5px; margin: 2px 0; }
+  .compact-list li { padding: 1px 0; }
+  .filing-row td:first-child { font-style: italic; width: 55%; }
+  .time-badge { display: inline-block; background: #5b6abf; color: #fff; padding: 1px 6px; border-radius: 8px; font-size: 9px; font-weight: 600; margin-left: 4px; }
+  .code-block { font-family: 'SF Mono', 'Fira Code', monospace; white-space: pre; line-height: 1.5; background: #f8f8f8; padding: 6px 10px; margin: 3px 0; font-size: 10px; border-left: 2px solid #ddd; }
+  .folder { font-size: 10.5px; font-family: 'SF Mono', 'Fira Code', monospace; line-height: 1.6; }
+  .folder .dir { color: #5b6abf; font-weight: 600; }
+  .folder .file { color: #555; padding-left: 16px; display: block; }
+  .folder .comment { color: #999; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="no-print"><strong>Meridian</strong> — <button onclick="window.print()">Print</button></div>
+
+<!-- PAGE 1: Conventions & Structure -->
+<div class="page">
+  <h1>Conventions & Structure</h1>
+
+  <div class="two-col">
+    <div>
+      <h2>Vault Layout</h2>
+      <div class="folder">
+        <span class="dir">Northstar/</span>
+        <span class="file"><span class="comment">Purpose · Vision · Mission · Principles · Values · Goals · Career</span></span>
+        <span class="dir">Process/</span>
+        <span class="file">Daily/ &nbsp;<span class="comment">← one file per day</span></span>
+        <span class="file">Weekly/ &nbsp;<span class="comment">← auto-generated snapshots</span></span>
+        <span class="file"><span class="comment">MOC: </span>Active Projects · Action Items · Open Loops · Review Queue · Weekly Outtake · Current Priorities</span>
+        <span class="dir">Knowledge/</span>
+        <span class="file"><span class="comment">Technical/ · Leadership/ · Industry/ · General/</span></span>
+        <span class="dir">Work/</span>
+        <span class="file">{{Current Company}}/ &nbsp;<span class="comment">Projects/ · People/ · Reference/ · Incidents/ · Vendors/</span></span>
+        <span class="file">{{Previous Company}}/ &nbsp;<span class="comment">(archived)</span></span>
+        <span class="dir">Life/</span>
+        <span class="file"><span class="comment">Projects/ · People/ · Health/ · Finances/ · Social/ · Development/ · Fun/</span></span>
+        <span class="dir">References/</span> &nbsp;<span class="comment">external artifacts, source material</span>
+      </div>
+    </div>
+    <div>
+      <h2>Daily Note Template</h2>
+      <div class="code-block"># YYYY-MM-DD
+## Top 3 Goals
+1. 
+2. 
+3. 
+## Log
+  ### HH:MM — Meeting Title
+  - [ ] ! Action item [[source]]
+  - ? Decision made
+  - [[Person Name]] observation</div>
+      <h2>Task Lifecycle</h2>
+      <div class="code-block">Create:  - [ ] ! Task description
+Check:   Tasks auto-stamps ✅ YYYY-MM-DD
+View:    MOC "Recently Completed" for 2 days
+Age:     Drops from active MOC after 2 days
+Record:  Always in Weekly Outtake (7 days)
+Archive: Static snapshot in Process/Weekly/</div>
+    </div>
+  </div>
+
+  <h2>Markers</h2>
+  <table>
+    <tr><th>Marker</th><th>Meaning</th><th>Shows in MOC</th><th>Example</th></tr>
+    <tr><td><code>!</code></td><td>Action item</td><td>Action Items (Standard)</td><td><code>- [ ] ! Schedule 1:1 with [[Jane Doe]]</code></td></tr>
+    <tr><td><code>!!</code></td><td>Urgent action</td><td>Action Items (Urgent)</td><td><code>- [ ] !! Fix prod alert {{2026-03-12}}</code></td></tr>
+    <tr><td><code>~</code></td><td>Waiting on someone</td><td>Open Loops</td><td><code>- [ ] ~ [[Bob Smith]] owes API spec</code></td></tr>
+    <tr><td><code>>></code></td><td>Process later</td><td>Review Queue</td><td><code>- [ ] >> interesting SRE article to read</code></td></tr>
+    <tr><td><code>?</code></td><td>Decision made</td><td>— (searchable)</td><td><code>- ? Chose Kafka over SQS for event bus</code></td></tr>
+    <tr><td><code>&</code></td><td>Insight / realization</td><td>— (searchable)</td><td><code>- & Team velocity drops when PRs > 3 days</code></td></tr>
+    <tr><td><code>^</code></td><td>Risk / concern</td><td>— (searchable)</td><td><code>- ^ Migration timeline assumes no Q2 freeze</code></td></tr>
+    <tr><td><code>*</code></td><td>Feedback given/received</td><td>— (searchable)</td><td><code>- * Told [[Jane Doe]] her RFC was strong</code></td></tr>
+  </table>
+  <div class="callout"><strong>Key rule:</strong> Markers go at the start of a bullet, after the checkbox if present. Actionable items (<code>!</code> <code>!!</code> <code>~</code> <code>>></code>) use checkboxes. Observations (<code>?</code> <code>&</code> <code>^</code> <code>*</code>) are plain bullets.</div>
+
+  <div class="two-col">
+    <div>
+      <h2>Links & Source Tags</h2>
+      <table>
+        <tr><th>Syntax</th><th>Use</th></tr>
+        <tr><td><code>[[First Last]]</code></td><td>Person</td></tr>
+        <tr><td><code>[[Project Name]]</code></td><td>Project</td></tr>
+        <tr><td><code>[[Topic]]</code></td><td>Knowledge topic</td></tr>
+        <tr><td><code>[[email]]</code></td><td>Originated from email</td></tr>
+        <tr><td><code>[[teams]]</code></td><td>Originated from Teams</td></tr>
+      </table>
+      <h2>Status Tags</h2>
+      <table>
+        <tr><th>Tag</th><th>Meaning</th></tr>
+        <tr><td><code>#open</code></td><td>Unresolved</td></tr>
+        <tr><td><code>#done</code></td><td>Resolved</td></tr>
+        <tr><td><code>#cancelled</code></td><td>No longer relevant</td></tr>
+      </table>
+    </div>
+    <div>
+      <h2>Due Dates</h2>
+      <div class="callout">Only add when there's a <em>real</em> deadline.<br>Format: <code>{{YYYY-MM-DD}}</code><br>Example: <code>- [ ] !! Ship v2 API {{2026-03-15}}</code></div>
+      <h2>Filing Heuristics</h2>
+      <table>
+        <tr class="filing-row"><td>Care across companies?</td><td><code>Knowledge/</code></td></tr>
+        <tr class="filing-row"><td>Someone else's artifact?</td><td><code>References/</code></td></tr>
+        <tr class="filing-row"><td>About a colleague?</td><td><code>Work/People/</code></td></tr>
+        <tr class="filing-row"><td>Personal relationship?</td><td><code>Life/People/</code></td></tr>
+        <tr class="filing-row"><td>Active scoped effort?</td><td><code>*/Projects/</code></td></tr>
+        <tr class="filing-row"><td>Incident-related?</td><td><code>Work/Incidents/</code></td></tr>
+        <tr class="filing-row"><td>Not sure?</td><td>Leave in Daily, mark <code>>></code></td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2: Daily & Weekly Workflow -->
+<div class="page">
+  <h1>Daily & Weekly Workflow</h1>
+  <div class="subtitle">Side 2 — Your rhythm</div>
+  <h2>Morning Triage <span class="time-badge">~2 min</span></h2>
+  <ol class="step-list">
+    <li>Open today's daily note via <code>Cmd+D</code> or ribbon icon — located at <code>Process/Daily/YYYY-MM-DD.md</code></li>
+    <li>Glance at calendar → drop meeting headings into Log section</li>
+    <li>Fill in <strong>Top 3 Goals</strong></li>
+    <li>First comms sweep — scan email + Teams, capture actionable items with markers</li>
+  </ol>
+  <h2>Throughout the Day</h2>
+  <div class="two-col">
+    <div>
+      <h3>In Meetings</h3>
+      <ul class="compact-list">
+        <li>Capture under time-stamped <code>###</code> headings</li>
+        <li>Use markers inline — don't organize</li>
+        <li>Link people: <code>[[First Last]]</code></li>
+        <li>Link projects: <code>[[Project Name]]</code></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Between Meetings</h3>
+      <ul class="compact-list">
+        <li>Comms items → inline bullets with source tags</li>
+        <li>Prefix interruptions: <code>— [[teams]]</code> or <code>— [[email]]</code></li>
+        <li>Intentional work → write directly in Knowledge, Work, or Life (not the daily note)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout"><strong>The core rule:</strong> Things that <em>happen to you</em> go in the daily note. Things you <em>intentionally create</em> go directly where they belong.</div>
+  <h2>End of Day <span class="time-badge">~5 min</span></h2>
+  <ol class="step-list">
+    <li>Final comms sweep — catch anything that came in late</li>
+    <li>Quick scan: any <code>!!</code> urgent items missed?</li>
+    <li>Optional: insert Reflection template (<code>Cmd+Shift+T</code>) for structured end-of-day notes</li>
+  </ol>
+  <h2>Weekly Review <span class="time-badge">~15-20 min</span></h2>
+  <ol class="step-list">
+    <li><strong>Weekly Outtake</strong> — scan what shipped this week. Note patterns, wins, gaps.</li>
+    <li><strong>Action Items MOC</strong> — anything overdue or stale? Close it or re-date it.</li>
+    <li><strong>Open Loops MOC</strong> — follow up or mark done</li>
+    <li><strong>Review Queue MOC</strong> — process <code>>></code> items: promote to Knowledge/Work/Life or check off</li>
+    <li><strong>Current Priorities</strong> — update if anything shifted this week</li>
+    <li>Scan the week's daily notes for <code>&</code> insights worth promoting to Knowledge</li>
+  </ol>
+  <h2>The Seven MOCs</h2>
+  <table>
+    <tr><th>MOC</th><th>Engine</th><th>Pulls From</th><th>When to Check</th></tr>
+    <tr><td><strong>Active Projects</strong></td><td>Dataview</td><td>Work + Life Projects folders</td><td>Weekly review</td></tr>
+    <tr><td><strong>Action Items</strong></td><td>Tasks</td><td><code>!</code> and <code>!!</code> markers</td><td>Daily + weekly</td></tr>
+    <tr><td><strong>Open Loops</strong></td><td>Tasks</td><td><code>~</code> markers</td><td>Weekly review</td></tr>
+    <tr><td><strong>Review Queue</strong></td><td>Tasks</td><td><code>>></code> markers</td><td>Weekly review</td></tr>
+    <tr><td><strong>Weekly Outtake</strong></td><td>Tasks</td><td>All completed (rolling 7 days)</td><td>Anytime</td></tr>
+    <tr><td><strong>Weekly Snapshots</strong></td><td>Script</td><td>Static Mon–Sun archives in <code>Process/Weekly/</code></td><td>Auto-generated Mondays</td></tr>
+    <tr><td><strong>Current Priorities</strong></td><td>Manual</td><td>You write it</td><td>Weekly review</td></tr>
+  </table>
+  <div class="callout"><strong>Task lifecycle:</strong> Check a box → ✅ timestamp auto-added → item shows as completed in MOC for 2 days → ages out → always visible in Weekly Outtake for that week.</div>
+  <h2>Guiding Principles</h2>
+  <div class="two-col">
+    <div>
+      <ul class="compact-list">
+        <li><strong>Capture fast, file later.</strong> If unsure where it goes, mark <code>>></code> and move on.</li>
+        <li><strong>Links over tags.</strong> Use <code>[[wikilinks]]</code> for people, projects, topics.</li>
+      </ul>
+    </div>
+    <div>
+      <ul class="compact-list">
+        <li><strong>Don't create notes preemptively.</strong> Let structure emerge from real content.</li>
+        <li><strong>MOCs emerge naturally.</strong> When you have enough notes on a topic, create an entry point then.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</body>
+</html>

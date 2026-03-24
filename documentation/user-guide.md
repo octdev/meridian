@@ -67,6 +67,14 @@ Obsidian → Open folder as vault → select the vault root.
 
 In the file explorer, rename `Work/CurrentCompany/` to your actual company name.
 
+### Step 5: Add the Reflection template
+
+Copy `vault-files/templates/Reflection.md` into `_templates/` inside your vault:
+
+```bash
+cp vault-files/templates/Reflection.md /path/to/MyVault/_templates/Reflection.md
+```
+
 ---
 
 ## Appearance Settings
@@ -242,7 +250,7 @@ Settings → Hotkeys → search for each command and assign:
 
 Work through these checks after setup.
 
-1. Press `Cmd+D` — a note should appear in `Process/Daily/` with today's date, template populated, and `created`/`modified` timestamps filled in.
+1. Press `Cmd+D` — a note should appear in `Process/Daily/YYYY-MM-DD.md` (today's date) with the template populated and `created`/`modified` timestamps filled in.
 2. Add a test task: `- [ ] !! Test urgent action item`
 3. Open `Process/Action Items.md` — the task should appear under Urgent.
 4. Check the task — it should show `✅ YYYY-MM-DD` and move to Recently Completed — Urgent.
@@ -274,7 +282,7 @@ The core rule: things that *happen to you* go in the daily note. Things you *int
 
 - Final comms sweep
 - Quick scan: any `!!` items missed?
-- Optional: 3–4 sentence reflection under a `## Reflection` heading
+- Optional: insert the Reflection template into today's daily note via command palette → "Templates: Insert template" → Reflection (or assign a hotkey such as `Cmd+Shift+T`). The template adds structured prompts for what went well, what was hard, what you'd do differently, and what to carry forward.
 
 ### Weekly review (~15–20 minutes)
 
