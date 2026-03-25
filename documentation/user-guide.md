@@ -7,19 +7,20 @@
 3. [Initial Setup](#initial-setup)
 4. [Work Machine Setup](#work-machine-setup)
 5. [Appearance Settings](#appearance-settings)
-6. [Core Plugins](#core-plugins)
-7. [Community Plugins](#community-plugins)
-8. [Hotkeys](#hotkeys)
-9. [Verification](#verification)
-10. [Daily Workflow](#daily-workflow)
-11. [Markers and Conventions](#markers-and-conventions)
-12. [MOCs](#mocs)
-13. [Weekly Snapshots](#weekly-snapshots)
-14. [Managing Companies](#managing-companies)
-15. [Managing Projects](#managing-projects)
-16. [Filing Heuristics](#filing-heuristics)
-17. [Maintenance](#maintenance)
-18. [Documentation](#documentation)
+6. [Files and Links](#files-and-links)
+7. [Core Plugins](#core-plugins)
+8. [Community Plugins](#community-plugins)
+9. [Hotkeys](#hotkeys)
+10. [Verification](#verification)
+11. [Daily Workflow](#daily-workflow)
+12. [Markers and Conventions](#markers-and-conventions)
+13. [MOCs](#mocs)
+14. [Weekly Snapshots](#weekly-snapshots)
+15. [Managing Companies](#managing-companies)
+16. [Managing Projects](#managing-projects)
+17. [Filing Heuristics](#filing-heuristics)
+18. [Maintenance](#maintenance)
+19. [Documentation](#documentation)
 
 ---
 
@@ -126,8 +127,8 @@ Configure these before enabling plugins. Order matters.
 1. **Settings → Appearance → Inline title → OFF**
    The H1 heading is the visible title. Inline title duplicates it.
 
-2. **Settings → Appearance → Show tab title bar → OFF**
-   Reduces editor chrome.
+2. **Settings → Appearance → Show tab title bar → ON**
+   Shows the tab bar for navigating open notes.
 
 3. **Settings → Editor → Default editing mode → Source mode**
    Required for frontmatter to render as raw YAML. Live Preview collapses the frontmatter block.
@@ -135,6 +136,19 @@ Configure these before enabling plugins. Order matters.
 4. **Settings → Editor → Properties in document → Source**
    Renders frontmatter as editable YAML inline.
    **Important:** this setting must remain Source. Changing it to Visible breaks the Front Matter Timestamps → Linter chain. If frontmatter stops populating after changing this setting, revert to Source.
+
+---
+
+## Files and Links
+
+Settings → Files and Links
+
+| Setting | Value |
+|---------|-------|
+| Default location for new notes | Same as current file |
+| Default location for new attachments | In the folder specified below |
+| Attachment folder path | `References` |
+| Confirm file deletion | OFF |
 
 ---
 
@@ -149,7 +163,6 @@ Settings → Core Plugins → Daily Notes → ON
 | Date format | `YYYY-MM-DD` |
 | New file location | `Process/Daily` |
 | Template file location | `_templates/Daily Note` |
-| Open daily note on startup | ON (recommended first month) |
 
 ### Templates
 
@@ -165,7 +178,7 @@ Settings → Core Plugins → Templates → ON
 
 ## Community Plugins
 
-Settings → Community Plugins → Turn off Restricted Mode → Browse
+Settings → Community Plugins → Enable community plugins → Browse
 
 Install in this order.
 
@@ -177,7 +190,6 @@ Search "Tasks" → Install → Enable
 |---------|-------|
 | Set created date on every added task | ON |
 | Auto-suggest | ON |
-| Date format | `YYYY-MM-DD` |
 
 ### 2. Dataview
 
@@ -200,7 +212,7 @@ Search "Filename Heading Sync" → Install → Enable
 | New Heading Style | Prefix |
 | Replace Heading Style | OFF |
 | Rename Debounce Timeout | `1000` |
-| Excluded folders | `_templates` |
+| Ignore Regex Rule | `_templates/*` |
 
 The `_templates` exclusion is required. Without it, Filename Heading Sync renames template files to match their placeholder H1 content, corrupting them.
 
@@ -208,26 +220,28 @@ The `_templates` exclusion is required. Without it, Filename Heading Sync rename
 
 Search "Linter" → Install → Enable
 
-**Settings → Linter → YAML tab:**
-
-| Setting | Value |
-|---------|-------|
-| YAML Title | ON |
-| Title Key | `title` |
-| Mode | `First Heading or Filename` |
-| Add Blank Line After YAML | ON |
-| Insert YAML Attributes | ON |
-| Text to insert | `title: ` |
-
 **Settings → Linter → General tab:**
 
 | Setting | Value |
 |---------|-------|
 | Lint on Save | ON |
-| Lint on File Open | ON |
-| Excluded folders | `_templates` |
+| Lint on Focused File Change | ON |
+| Display message on lint | OFF |
+| Display Lint on File Change Message | OFF |
+| Folders to Ignore | `_templates` |
 
 The `_templates` exclusion is required. Without it, Linter resolves placeholder syntax in templates on save.
+
+**Settings → Linter → YAML tab:**
+
+| Setting | Value |
+|---------|-------|
+| Add Blank Line After YAML | ON |
+| Insert YAML Attributes | ON |
+| Text to insert | `title: `<br>`created: `<br>`modified: ` |
+| YAML Title | ON |
+| Title Key | `title` |
+| Mode | `First Heading or Filename` |
 
 ### 5. Front Matter Timestamps
 
@@ -245,18 +259,23 @@ Search "Front Matter Timestamps" → Install → Enable
 
 The 100ms delay gives Obsidian time to initialize the new file before timestamps are written. The "Save current file" command triggers Linter to populate the `title` field. This chain is timing-dependent. If `title` stops populating after plugin changes, increase the delay in 50ms increments until it stabilizes.
 
-### 6. Scroller
+**Note:** "Save current file" may not appear in the Execute command dropdown in all plugin versions. Search the dropdown for "save" — if it is absent, leave the field blank and trigger Linter manually (`Ctrl+Alt+L`) until the issue is resolved.
 
-Search "Scroller" → Install → Enable
+### 6. Editing Toolbar
+
+Search "Editing Toolbar" → Install → Enable
+
+No additional configuration required.
+
+### 7. Hider
+
+Search "Hider" → Install → Enable
 
 | Setting | Value |
 |---------|-------|
-| Enable typewriter mode | OFF |
-| Auto-scroll on mode change | OFF |
+| Hide properties in Reading view | ON |
 
-Scroller moves the cursor to the bottom of a note on open and after tab title rename — placing it at the Log section ready to capture.
-
-### 7. Shell Commands
+### 8. Shell Commands
 
 Search "Shell commands" → Install → Enable
 
@@ -277,23 +296,34 @@ If Python 3 is not in PATH, use the full path: `/usr/bin/python3`
 1. Click **New command**
 2. Enter: `bash "{{vault_path}}/.scripts/new-company.sh"`
 3. No events — palette access only
-4. **Output** tab → set to your Shell Commands terminal mode (see note below)
-5. Set alias: "New Company"
+4. Set alias: "New Company"
 
 #### Command 3: New Project (palette)
 
 1. Click **New command**
 2. Enter: `bash "{{vault_path}}/.scripts/new-project.sh"`
 3. No events — palette access only
-4. **Output** tab → set to your Shell Commands terminal mode (see note below)
-5. Set alias: "New Project"
+4. Set alias: "New Project"
 
-**Note on interactive scripts:** `new-company.sh` and `new-project.sh` prompt for input. Shell Commands versions that support a terminal panel (open in terminal output mode) handle this directly. If your version does not, run these scripts from a system terminal opened to the vault directory:
+**Note:** `new-company.sh` and `new-project.sh` require interactive terminal input and do not work reliably from the Obsidian command palette. Run them from a system terminal opened to the vault directory:
 ```bash
 bash .scripts/new-company.sh
 bash .scripts/new-project.sh
 ```
-The command palette entries still serve as a reminder that the commands exist.
+The palette entries serve as a reminder that the commands exist.
+
+### 9. Scroller
+
+Search "Scroller" → Install → Enable
+
+| Setting | Value |
+|---------|-------|
+| Auto-scroll on mode change | OFF |
+| Enable typewriter mode | OFF |
+
+Scroller moves the cursor to the bottom of a note on open and after tab title rename — placing it at the Log section ready to capture.
+
+**Note:** Install Scroller last. Installing other plugins afterward can interfere with it — if auto-scroll stops working, disable and re-enable Scroller to restore it.
 
 ### Restart Obsidian
 
@@ -301,7 +331,7 @@ Restart once after all plugins are installed.
 
 ---
 
-## Hotkeys
+## Hotkey Setup
 
 Settings → Hotkeys → search for each command and assign:
 
@@ -313,6 +343,8 @@ Settings → Hotkeys → search for each command and assign:
 | Templates: Insert template | `Cmd+Shift+T` |
 
 Assign the Templates hotkey to quickly insert the Reflection template at end of day: Settings → Hotkeys → search "Templates: Insert template" → assign `Cmd+Shift+T`.
+
+**Conflict:** macOS and most browsers assign `Cmd+Shift+T` to "Reopen closed tab." If the hotkey doesn't fire inside Obsidian, remove that system or browser assignment, or choose an alternate hotkey.
 
 ---
 
