@@ -1,7 +1,7 @@
 ---
-title:
-created:
-modified:
+title: {{date:YYYY-MM-DD}}
+created: {{date:YYYY-MM-DD HH:mm:ss}}
+modified: {{date:YYYY-MM-DD HH:mm:ss}}
 ---
 
 # {{date:YYYY-MM-DD}}
@@ -12,3 +12,5 @@ modified:
 3. 
 
 ## Log
+
+* [ ]

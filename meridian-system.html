@@ -25,7 +25,7 @@
   tr:last-child td { border-bottom: none; }
   code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; background: #f0f0f0; padding: 1px 4px; border-radius: 3px; font-size: 10.5px; color: #c7254e; }
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 0; }
-  .callout { background: #f8f8f8; border-left: 3px solid #5b6abf; padding: 6px 10px; margin: 4px 0; font-size: 10.5px; }
+  .callout { background: #f8f8f8; border-left: 3px solid #5b6abf; padding: 6px 10px; margin: 2px 0; font-size: 10.5px; }
   .callout strong { color: #5b6abf; }
   .step-list { list-style: none; counter-reset: step; padding: 0; margin: 4px 0; }
   .step-list li { counter-increment: step; padding: 3px 0 3px 24px; position: relative; font-size: 10.5px; }
@@ -57,12 +57,13 @@
         <span class="dir">Process/</span>
         <span class="file">Daily/ &nbsp;<span class="comment">← one file per day</span></span>
         <span class="file">Weekly/ &nbsp;<span class="comment">← auto-generated snapshots</span></span>
+        <span class="file">Drafts/ &nbsp;<span class="comment">← new notes land here by default</span></span>
         <span class="file"><span class="comment">MOC: </span>Active Projects · Action Items · Open Loops · Review Queue · Weekly Outtake · Current Priorities</span>
         <span class="dir">Knowledge/</span>
         <span class="file"><span class="comment">Technical/ · Leadership/ · Industry/ · General/</span></span>
         <span class="dir">Work/</span>
-        <span class="file">{{Current Company}}/ &nbsp;<span class="comment">Projects/ · People/ · Reference/ · Incidents/ · Vendors/</span></span>
-        <span class="file">{{Previous Company}}/ &nbsp;<span class="comment">(archived)</span></span>
+        <span class="file">{{Current}}/ <span class="comment">Projects/ · People/ · Reference/ · Incidents/ · Vendors/</span></span>
+        <span class="file">{{Previous}}/ <span class="comment">(archived)</span></span>
         <span class="dir">Life/</span>
         <span class="file"><span class="comment">Projects/ · People/ · Health/ · Finances/ · Social/ · Development/ · Fun/</span></span>
         <span class="dir">References/</span> &nbsp;<span class="comment">external artifacts, source material</span>
@@ -92,7 +93,7 @@ Archive: Static snapshot in Process/Weekly/</div>
 
   <h2>Markers</h2>
   <table>
-    <tr><th>Marker</th><th>Meaning</th><th>Shows in MOC</th><th>Example</th></tr>
+    <tr><th>Marker</th><th>Meaning</th><th>Shows in MOC</th><th>Usage</th></tr>
     <tr><td><code>!</code></td><td>Action item</td><td>Action Items (Standard)</td><td><code>- [ ] ! Schedule 1:1 with [[Jane Doe]]</code></td></tr>
     <tr><td><code>!!</code></td><td>Urgent action</td><td>Action Items (Urgent)</td><td><code>- [ ] !! Fix prod alert {{2026-03-12}}</code></td></tr>
     <tr><td><code>~</code></td><td>Waiting on someone</td><td>Open Loops</td><td><code>- [ ] ~ [[Bob Smith]] owes API spec</code></td></tr>
@@ -102,7 +103,7 @@ Archive: Static snapshot in Process/Weekly/</div>
     <tr><td><code>^</code></td><td>Risk / concern</td><td>— (searchable)</td><td><code>- ^ Migration timeline assumes no Q2 freeze</code></td></tr>
     <tr><td><code>*</code></td><td>Feedback given/received</td><td>— (searchable)</td><td><code>- * Told [[Jane Doe]] her RFC was strong</code></td></tr>
   </table>
-  <div class="callout"><strong>Key rule:</strong> Markers go at the start of a bullet, after the checkbox if present. Actionable items (<code>!</code> <code>!!</code> <code>~</code> <code>>></code>) use checkboxes. Observations (<code>?</code> <code>&</code> <code>^</code> <code>*</code>) are plain bullets.</div>
+  <div class="callout"><strong>Key rule:</strong> Markers go at the start of a bullet. Actionable items (<code>!</code> <code>!!</code> <code>~</code> <code>>></code>) use checkboxes.</div>
 
   <div class="two-col">
     <div>
@@ -149,7 +150,7 @@ Archive: Static snapshot in Process/Weekly/</div>
     <li>Open today's daily note via <code>Cmd+D</code> or ribbon icon — located at <code>Process/Daily/YYYY-MM-DD.md</code></li>
     <li>Glance at calendar → drop meeting headings into Log section</li>
     <li>Fill in <strong>Top 3 Goals</strong></li>
-    <li>First comms sweep — scan email + Teams, capture actionable items with markers</li>
+    <li>First comms sweep — scan email + Teams, capture actionable items with markers, check Open Loops MOC</li>
   </ol>
   <h2>Throughout the Day</h2>
   <div class="two-col">
@@ -167,16 +168,15 @@ Archive: Static snapshot in Process/Weekly/</div>
       <ul class="compact-list">
         <li>Comms items → inline bullets with source tags</li>
         <li>Prefix interruptions: <code>— [[teams]]</code> or <code>— [[email]]</code></li>
-        <li>Intentional work → write directly in Knowledge, Work, or Life (not the daily note)</li>
+        <li>Intentional work → file notes in <code>Process/Drafts/</code></li>
       </ul>
     </div>
   </div>
-  <div class="callout"><strong>The core rule:</strong> Things that <em>happen to you</em> go in the daily note. Things you <em>intentionally create</em> go directly where they belong.</div>
   <h2>End of Day <span class="time-badge">~5 min</span></h2>
   <ol class="step-list">
-    <li>Final comms sweep — catch anything that came in late</li>
-    <li>Quick scan: any <code>!!</code> urgent items missed?</li>
-    <li>Optional: insert Reflection template (<code>Cmd+Shift+T</code>) for structured end-of-day notes</li>
+    <li><strong>Final Comms Sweep</strong> — catch anything that came in late</li>
+    <li><strong>Quick Scan</strong> — any <code>!!</code> urgent items missed?</li>
+    <li><strong>Optional:</strong> insert Reflection template (<code>Cmd+Shift+T</code>) for structured end-of-day notes</li>
   </ol>
   <h2>Weekly Review <span class="time-badge">~15-20 min</span></h2>
   <ol class="step-list">
@@ -185,7 +185,8 @@ Archive: Static snapshot in Process/Weekly/</div>
     <li><strong>Open Loops MOC</strong> — follow up or mark done</li>
     <li><strong>Review Queue MOC</strong> — process <code>>></code> items: promote to Knowledge/Work/Life or check off</li>
     <li><strong>Current Priorities</strong> — update if anything shifted this week</li>
-    <li>Scan the week's daily notes for <code>&</code> insights worth promoting to Knowledge</li>
+    <li><strong>Scan</strong> the week's daily notes for <code>&</code> insights worth promoting to Knowledge</li>
+    <li><strong>Drafts</strong> — file or delete any notes remaining in <code>Process/Drafts/</code></li>
   </ol>
   <h2>The Seven MOCs</h2>
   <table>

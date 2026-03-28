@@ -168,6 +168,7 @@ echo "[meridian] Creating folders..."
 dirs=(
   "Process/Daily"
   "Process/Weekly"
+  "Process/Drafts"
   "Process/Meridian Documentation"
   "Knowledge/Technical"
   "Knowledge/Leadership"
@@ -208,9 +209,9 @@ echo ""
 echo "[meridian] Writing templates..."
 
 write_if_new "$VAULT_ROOT/_templates/Daily Note.md" "---
-title:
-created:
-modified:
+title: {{date:YYYY-MM-DD}}
+created: {{date:YYYY-MM-DD HH:mm:ss}}
+modified: {{date:YYYY-MM-DD HH:mm:ss}}
 ---
 
 # {{date:YYYY-MM-DD}}
@@ -539,7 +540,10 @@ modified:
 
 # email
 
-Source tag for action items originating from email."
+
+*Source tag for action items originating from email.*
+
+Tag a task with \`— [[email]]\` in your daily note to link it here. Open this file and check Backlinks to see all email-sourced items across your vault."
 
 write_if_new "$VAULT_ROOT/Process/teams.md" "---
 title:
@@ -549,7 +553,10 @@ modified:
 
 # teams
 
-Source tag for action items originating from Teams."
+
+*Source tag for action items originating from Teams.*
+
+Tag a task with \`— [[teams]]\` in your daily note to link it here. Open this file and check Backlinks to see all Teams-sourced items across your vault."
 
 echo ""
 

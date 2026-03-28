@@ -111,6 +111,7 @@ vault/
   Process/
     Daily/                        YYYY-MM-DD.md files
     Weekly/                       YYYY-MM-DD–DD Weekly Outtake.md files
+    Drafts/                       default location for new notes
     Active Projects.md            Dataview MOC
     Action Items.md               Tasks MOC
     Open Loops.md                 Tasks MOC
@@ -158,6 +159,7 @@ vault/
   Process/
     Daily/                        YYYY-MM-DD.md files
     Weekly/                       YYYY-MM-DD–DD Weekly Outtake.md files
+    Drafts/                       default location for new notes
     Active Projects.md            Dataview MOC
     Action Items.md               Tasks MOC
     Open Loops.md                 Tasks MOC
@@ -263,8 +265,8 @@ See [sync.md](sync.md) for full configuration.
 ```yaml
 ---
 title:      string — note title, synced with H1 and filename
-created:    YYYY-MM-DD HH:mm — set once on creation
-modified:   YYYY-MM-DD HH:mm — updated on every save
+created:    YYYY-MM-DD HH:mm:ss — set once on creation
+modified:   YYYY-MM-DD HH:mm:ss — updated on every save
 ---
 ```
 

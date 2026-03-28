@@ -2,25 +2,25 @@
 
 ## Table of Contents
 
-1. [How It Works](#how-it-works)
-2. [Prerequisites](#prerequisites)
-3. [Initial Setup](#initial-setup)
-4. [Work Machine Setup](#work-machine-setup)
-5. [Appearance Settings](#appearance-settings)
-6. [Files and Links](#files-and-links)
-7. [Core Plugins](#core-plugins)
-8. [Community Plugins](#community-plugins)
-9. [Hotkeys](#hotkeys)
-10. [Verification](#verification)
-11. [Daily Workflow](#daily-workflow)
-12. [Markers and Conventions](#markers-and-conventions)
-13. [MOCs](#mocs)
-14. [Weekly Snapshots](#weekly-snapshots)
-15. [Managing Companies](#managing-companies)
-16. [Managing Projects](#managing-projects)
-17. [Filing Heuristics](#filing-heuristics)
-18. [Maintenance](#maintenance)
-19. [Documentation](#documentation)
+1. [[#How It Works]]
+2. [[#Prerequisites]]
+3. [[#Initial Setup]]
+4. [[#Work Machine Setup]]
+5. [[#Appearance Settings]]
+6. [[#Files and Links]]
+7. [[#Core Plugins]]
+8. [[#Community Plugins]]
+9. [[#Hotkey Setup]]
+10. [[#Verification]]
+11. [[#Daily Workflow]]
+12. [[#Markers and Conventions]]
+13. [[#MOCs]]
+14. [[#Weekly Snapshots]]
+15. [[#Managing Companies]]
+16. [[#Managing Projects]]
+17. [[#Filing Heuristics]]
+18. [[#Maintenance]]
+19. [[#Documentation]]
 
 ---
 
@@ -145,7 +145,8 @@ Settings → Files and Links
 
 | Setting | Value |
 |---------|-------|
-| Default location for new notes | Same as current file |
+| Default file to open | Daily note |
+| Default location for new notes | `Process/Drafts` |
 | Default location for new attachments | In the folder specified below |
 | Attachment folder path | `References` |
 | Confirm file deletion | OFF |
@@ -394,6 +395,7 @@ The core rule: things that *happen to you* go in the daily note. Things you *int
 4. **Review Queue MOC** — process `>>` items: promote to Knowledge/Work/Life or check off.
 5. **Current Priorities** — update if anything shifted.
 6. Scan the week's daily notes for `&` insights worth promoting to Knowledge.
+7. **Drafts** — file or delete any notes left in `Process/Drafts/`.
 
 ---
 

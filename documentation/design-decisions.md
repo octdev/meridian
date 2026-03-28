@@ -90,6 +90,16 @@
 
 ---
 
+## DD-11: Process/Drafts/ as default new note location
+
+**Decision:** Obsidian's "Default location for new notes" is set to `In the folder specified below` with the path `Process/Drafts/`, rather than "Same folder as current file."
+
+**Rationale:** "Same folder as current file" places new notes wherever Obsidian's focus happens to be — almost always `Process/Daily/` during normal use, since that is where the primary capture surface lives. This contaminates the Daily folder with standalone notes and requires immediate manual relocation. `Process/Drafts/` is a neutral creation point: notes land there predictably regardless of context, and are filed to their intended destination immediately after creation. The folder is not an inbox for uncertain items — it is a workaround for Obsidian's default behavior.
+
+**Tradeoff:** New notes require one extra filing step even when the destination is already known. The cost is low: the draft state is seconds long in normal use, and the alternative (notes scattered across wrong folders) is worse.
+
+---
+
 ## DD-07: Syncthing for work/personal boundary enforcement
 
 **Decision:** Syncthing with folder-level Send Only / Receive Only modes enforces the personal/work content boundary between machines.

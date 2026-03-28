@@ -9,8 +9,12 @@ modified:
 ## Annual
 - 
 
-## Quarterly
+## Quarter
 - 
 
-## Sprint
+## Month
 - 
+
+## Week
+- 
+
