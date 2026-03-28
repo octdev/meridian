@@ -53,12 +53,8 @@ echo ""
 
 # Prompt: vault root
 echo "  Where is your vault?"
-read -rp "  Vault root path: " vault_root
-
-if [[ -z "$vault_root" ]]; then
-    _fail "Vault root cannot be empty."
-    exit 1
-fi
+read -rp "  Vault root path [.]: " vault_root
+vault_root="${vault_root:-.}"
 
 # Strip trailing slash
 vault_root="${vault_root%/}"
