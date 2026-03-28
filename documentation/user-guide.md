@@ -65,9 +65,9 @@ chmod +x scaffold-vault.sh
 
 The `--profile work` flag creates only the folders appropriate for an employer-managed machine — `Process/`, `Work/`, and `Knowledge/`. `Northstar/`, `Life/`, and `References/` are never created. See [Work Machine Setup](#work-machine-setup) for the full workflow.
 
-Default path is `./vault` if `--vault` is omitted.
+Default path is `~/Documents/Meridian` if `--vault` is omitted (the script will prompt to confirm).
 
-The scaffold script automatically copies all three scripts (`weekly-snapshot.py`, `new-company.sh`, `new-project.sh`) into `.scripts/` and copies the full documentation suite into `Process/Meridian Documentation/`, including a markdown cheat sheet and a PDF of the quick reference.
+The scaffold script automatically copies all three scripts (`weekly-snapshot.py`, `new-company.sh`, `new-project.sh`) into `.scripts/` and copies the full documentation suite into `Process/Meridian Documentation/`, including a PDF of the quick reference.
 
 ### Step 2: Open the vault in Obsidian
 
@@ -599,7 +599,6 @@ The full documentation suite is copied into `Process/Meridian Documentation/` in
 |------|---------|
 | `user-guide.md` | This file — full setup and operational manual |
 | `reference-guide.md` | Quick command and convention lookup |
-| `cheat-sheet.md` | Condensed quick reference (see below) |
 | `architecture.md` | System structure, data flows, and plugin stack |
 | `design-decisions.md` | Design decision log with rationale |
 | `security.md` | Threat model and work/personal boundary |
@@ -607,10 +606,8 @@ The full documentation suite is copied into `Process/Meridian Documentation/` in
 | `roadmap.md` | Deferred features |
 | `Meridian System.pdf` | Printable quick reference |
 
-### Cheat Sheet
+### Quick Reference PDF
 
 `meridian-system.html` is an HTML source file used to generate the PDF and is not copied to the vault.  It is designed to be printed as one double-sided hardcopy: one side covers conventions and structure (vault layout, markers, filing heuristics, task lifecycle), the other covers daily and weekly workflow.
 
 `Meridian System.pdf` is the formatted print-ready version — open it and print directly.
-
-`cheat-sheet.md` is the markdown version.  It is not as dense and is less suitable for printing.

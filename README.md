@@ -62,7 +62,6 @@ Meridian is designed to keep personal knowledge off employer-managed machines. T
 |------|---------|
 | [documentation/user-guide.md](documentation/user-guide.md) | Full setup and operational manual |
 | [documentation/reference-guide.md](documentation/reference-guide.md) | Quick command and convention lookup |
-| [documentation/cheat-sheet.md](documentation/cheat-sheet.md) | Markdown quick reference (also copied to vault) |
 | [documentation/architecture.md](documentation/architecture.md) | System structure and data flows |
 | [documentation/sync.md](documentation/sync.md) | Syncthing setup and migration path |
 | [documentation/design-decisions.md](documentation/design-decisions.md) | Design decision log |
