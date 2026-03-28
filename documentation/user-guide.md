@@ -11,16 +11,17 @@
 7. [[#Core Plugins]]
 8. [[#Community Plugins]]
 9. [[#Hotkey Setup]]
-10. [[#Verification]]
-11. [[#Daily Workflow]]
-12. [[#Markers and Conventions]]
-13. [[#MOCs]]
-14. [[#Weekly Snapshots]]
-15. [[#Managing Companies]]
-16. [[#Managing Projects]]
-17. [[#Filing Heuristics]]
-18. [[#Maintenance]]
-19. [[#Documentation]]
+10. [[#Vault Updates]]
+11. [[#Verification]]
+12. [[#Daily Workflow]]
+13. [[#Markers and Conventions]]
+14. [[#MOCs]]
+15. [[#Weekly Snapshots]]
+16. [[#Managing Companies]]
+17. [[#Managing Projects]]
+18. [[#Filing Heuristics]]
+19. [[#Maintenance]]
+20. [[#Documentation]]
 
 ---
 
@@ -292,27 +293,6 @@ Search "Shell commands" → Install → Enable
 
 If Python 3 is not in PATH, use the full path: `/usr/bin/python3`
 
-#### Command 2: New Company (palette)
-
-1. Click **New command**
-2. Enter: `bash "{{vault_path}}/.scripts/new-company.sh"`
-3. No events — palette access only
-4. Set alias: "New Company"
-
-#### Command 3: New Project (palette)
-
-1. Click **New command**
-2. Enter: `bash "{{vault_path}}/.scripts/new-project.sh"`
-3. No events — palette access only
-4. Set alias: "New Project"
-
-**Note:** `new-company.sh` and `new-project.sh` require interactive terminal input and do not work reliably from the Obsidian command palette. Run them from a system terminal opened to the vault directory:
-```bash
-bash .scripts/new-company.sh
-bash .scripts/new-project.sh
-```
-The palette entries serve as a reminder that the commands exist.
-
 ### 9. Scroller
 
 Search "Scroller" → Install → Enable
@@ -346,6 +326,23 @@ Settings → Hotkeys → search for each command and assign:
 Assign the Templates hotkey to quickly insert the Reflection template at end of day: Settings → Hotkeys → search "Templates: Insert template" → assign `Cmd+Shift+T`.
 
 **Conflict:** macOS and most browsers assign `Cmd+Shift+T` to "Reopen closed tab." If the hotkey doesn't fire inside Obsidian, remove that system or browser assignment, or choose an alternate hotkey.
+
+---
+
+## Vault Updates
+
+### Rename CurrentCompany
+
+The scaffold creates a placeholder folder at `Work/CurrentCompany/`. Rename it to your actual company name before you start using the vault.
+
+1. In Obsidian, open the file explorer
+2. Right-click `Work/CurrentCompany` → **Rename**
+3. Enter your company name exactly as you want it to appear (e.g. `Acme Corp`) and press Enter
+
+Alternatively, open a terminal in the vault directory:
+```bash
+mv Work/CurrentCompany "Work/Your Company Name"
+```
 
 ---
 
@@ -430,6 +427,8 @@ Examples:
 
 ### Source tags
 
+Source tags record where an action item came from. Add one at the end of a bullet when the origin matters for follow-up or context.
+
 ```
 — [[email]]   action item originated from email
 — [[teams]]   action item originated from Teams
@@ -504,7 +503,7 @@ python3 .scripts/weekly-snapshot.py /path/to/vault --force
 
 Run `new-company.sh` when you start a new job or add a client. It creates the standard folder structure under `Work/`.
 
-Run from the command palette (**New Company**) or from a terminal in the vault directory:
+Open a terminal in the vault directory and run:
 
 ```bash
 bash .scripts/new-company.sh
@@ -529,7 +528,7 @@ No content files are seeded — notes are added individually as work begins. Run
 
 Run `new-project.sh` when starting a new project. It scaffolds the standard project structure under any `Projects/` directory — either `Work/[Company]/Projects/` or `Life/Projects/`.
 
-Run from the command palette (**New Project**) or from a terminal in the vault directory:
+Open a terminal in the vault directory and run:
 
 ```bash
 bash .scripts/new-project.sh

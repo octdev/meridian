@@ -87,13 +87,14 @@ EOF
 # --- argument parsing ---
 
 VAULT_ROOT="./vault"
+VAULT_ROOT_SET=false
 PROFILE="personal"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --vault)
       [[ -n "${2:-}" ]] || { echo "[meridian] Error: --vault requires a path." >&2; usage >&2; exit 1; }
-      VAULT_ROOT="$2"; shift 2 ;;
+      VAULT_ROOT="$2"; VAULT_ROOT_SET=true; shift 2 ;;
     --profile)
       [[ -n "${2:-}" ]] || { echo "[meridian] Error: --profile requires a value (personal or work)." >&2; usage >&2; exit 1; }
       case "$2" in
@@ -158,6 +159,17 @@ copy_doc_with_frontmatter() {
 # --- main ---
 
 echo ""
+echo "[meridian] New Vault"
+echo ""
+
+if [[ "$VAULT_ROOT_SET" == false ]]; then
+  read -rp "  Vault path [./vault]: " _vault_input
+  if [[ -n "$_vault_input" ]]; then
+    VAULT_ROOT="$_vault_input"
+  fi
+  echo ""
+fi
+
 echo "[meridian] Scaffolding vault at: $VAULT_ROOT (profile: $PROFILE)"
 echo ""
 
