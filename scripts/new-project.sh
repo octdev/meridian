@@ -62,12 +62,17 @@ if [[ -z "$project_name" ]]; then
     _fail "Project name cannot be empty."
     exit 1
 fi
+if [[ "$project_name" == */* || "$project_name" == *\"* ]]; then
+    _fail "Project name may not contain / or \" characters."
+    exit 1
+fi
 echo ""
 
 # Prompt: vault root
 echo "  Where is your vault?"
 read -rp "  Vault root path [.]: " vault_root
 vault_root="${vault_root:-.}"
+vault_root="${vault_root/#\~/$HOME}"
 
 # Strip trailing slash
 vault_root="${vault_root%/}"
@@ -85,6 +90,7 @@ _cmd "${vault_root}/Work/[COMPANY]/Projects/"
 _cmd "${vault_root}/Life/Projects/"
 echo ""
 read -rp "  Full path to Projects directory: " projects_dir
+projects_dir="${projects_dir/#\~/$HOME}"
 
 if [[ -z "$projects_dir" ]]; then
     _fail "Projects directory cannot be empty."
@@ -107,7 +113,8 @@ fi
 
 # Warn if path does not match expected patterns
 life_pattern="${vault_root}/Life/Projects"
-work_pattern_re="^${vault_root}/Work/[^/]+/Projects$"
+vault_root_re=$(printf '%s\n' "$vault_root" | sed 's/[.[\*^$()+?{}|]/\\&/g')
+work_pattern_re="^${vault_root_re}/Work/[^/]+/Projects$"
 
 if [[ "$projects_dir" != "$life_pattern" ]] && \
    [[ ! "$projects_dir" =~ $work_pattern_re ]]; then
@@ -153,7 +160,7 @@ _pass "Directories created."
 
 # --- project index (MOC) ---
 write_file "${project_dir}/${project_name}.md" "---
-title: ${project_name}
+title: \"${project_name}\"
 created: ${today}
 modified: ${today}
 ---
@@ -206,7 +213,7 @@ _pass "Project index (MOC) created."
 
 # --- Design/architecture.md ---
 write_file "${project_dir}/Design/architecture.md" "---
-title: Architecture — ${project_name}
+title: \"Architecture — ${project_name}\"
 created: ${today}
 modified: ${today}
 ---
@@ -227,7 +234,7 @@ _pass "Design/architecture.md created."
 
 # --- Design/design-decisions.md ---
 write_file "${project_dir}/Design/design-decisions.md" "---
-title: Design Decisions — ${project_name}
+title: \"Design Decisions — ${project_name}\"
 created: ${today}
 modified: ${today}
 ---
@@ -246,7 +253,7 @@ _pass "Design/design-decisions.md created."
 
 # --- Design/security.md ---
 write_file "${project_dir}/Design/security.md" "---
-title: Security — ${project_name}
+title: \"Security — ${project_name}\"
 created: ${today}
 modified: ${today}
 ---
@@ -267,7 +274,7 @@ _pass "Design/security.md created."
 
 # --- Requirements/brd.md ---
 write_file "${project_dir}/Requirements/brd.md" "---
-title: BRD — ${project_name}
+title: \"BRD — ${project_name}\"
 created: ${today}
 modified: ${today}
 ---
@@ -300,7 +307,7 @@ _pass "Requirements/brd.md created."
 
 # --- Requirements/user-guide.md ---
 write_file "${project_dir}/Requirements/user-guide.md" "---
-title: User Guide — ${project_name}
+title: \"User Guide — ${project_name}\"
 created: ${today}
 modified: ${today}
 ---
@@ -323,7 +330,7 @@ _pass "Requirements/user-guide.md created."
 
 # --- Requirements/roadmap.md ---
 write_file "${project_dir}/Requirements/roadmap.md" "---
-title: Roadmap — ${project_name}
+title: \"Roadmap — ${project_name}\"
 created: ${today}
 modified: ${today}
 ---
@@ -342,7 +349,7 @@ _pass "Requirements/roadmap.md created."
 
 # --- Prompts/scratch.md ---
 write_file "${project_dir}/Prompts/scratch.md" "---
-title: Scratch — ${project_name}
+title: \"Scratch — ${project_name}\"
 created: ${today}
 modified: ${today}
 ---

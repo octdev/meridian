@@ -55,6 +55,7 @@ echo ""
 echo "  Where is your vault?"
 read -rp "  Vault root path [.]: " vault_root
 vault_root="${vault_root:-.}"
+vault_root="${vault_root/#\~/$HOME}"
 
 # Strip trailing slash
 vault_root="${vault_root%/}"

@@ -165,7 +165,7 @@ echo ""
 if [[ "$VAULT_ROOT_SET" == false ]]; then
   read -rp "  Vault path [~/Documents/Meridian]: " _vault_input
   if [[ -n "$_vault_input" ]]; then
-    VAULT_ROOT="$_vault_input"
+    VAULT_ROOT="${_vault_input/#\~/$HOME}"
   fi
   echo ""
 fi
