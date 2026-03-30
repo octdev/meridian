@@ -13,33 +13,17 @@
 
 set -euo pipefail
 
-# --- color setup ---
-if [[ -t 1 ]]; then
-    _C_GREEN='\033[0;32m'
-    _C_RED='\033[0;31m'
-    _C_AMBER='\033[0;33m'
-    _C_CYAN='\033[0;96m'
-    _C_RESET='\033[0m'
-else
-    _C_GREEN='' _C_RED='' _C_AMBER='' _C_CYAN='' _C_RESET=''
-fi
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# --- helper functions ---
-_pass()   { printf "  ${_C_GREEN}✓ %s${_C_RESET}\n" "$*"; }
-_fail()   { printf "  ${_C_RED}✗ %s${_C_RESET}\n" "$*" >&2; }
-_warn()   { printf "  ${_C_AMBER}⚠ %s${_C_RESET}\n" "$*"; }
-_hint()   { echo "       $*"; }
-_detail() { echo "       $*"; }
-_cmd()    { printf "         ${_C_CYAN}%s${_C_RESET}\n" "$*" >&2; }
+# --- libraries ---
+# In-repo: src/bin/../lib/ = src/lib/  |  In vault: .scripts/../lib/ falls back to .scripts/lib/
 
-die() {
-    local step="$1"
-    local hint="$2"
-    echo "" >&2
-    _fail "Step failed: ${step}"
-    _hint "${hint}"
-    exit 1
-}
+LIB_DIR="${SCRIPT_DIR}/../lib"
+[[ -d "$LIB_DIR" ]] || LIB_DIR="${SCRIPT_DIR}/lib"
+
+source "$LIB_DIR/colors.sh"
+source "$LIB_DIR/logging.sh"
+source "$LIB_DIR/errors.sh"
 
 # --- write a file, aborting if it already exists ---
 write_file() {

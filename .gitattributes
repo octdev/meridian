@@ -1,0 +1,9 @@
+* text=auto
+
+*.sh text eol=lf
+*.py text eol=lf
+
+src/bin/*.sh eol=lf
+src/bin/*.sh diff=shell
+
+scripts/ci/*.sh eol=lf

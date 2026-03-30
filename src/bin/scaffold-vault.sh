@@ -26,34 +26,13 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
-# --- color setup ---
+# --- libraries ---
 
-if [[ -t 1 ]]; then
-  _C_GREEN='\033[0;32m'
-  _C_RED='\033[0;31m'
-  _C_AMBER='\033[0;33m'
-  _C_CYAN='\033[0;96m'
-  _C_RESET='\033[0m'
-else
-  _C_GREEN='' _C_RED='' _C_AMBER='' _C_CYAN='' _C_RESET=''
-fi
-
-# --- helpers ---
-
-_pass()   { printf "  ${_C_GREEN}✓ %s${_C_RESET}\n" "$*"; }
-_fail()   { printf "  ${_C_RED}✗ %s${_C_RESET}\n" "$*" >&2; }
-_warn()   { printf "  ${_C_AMBER}⚠ %s${_C_RESET}\n" "$*"; }
-_hint()   { echo "       $*"; }
-_cmd()    { printf "         ${_C_CYAN}%s${_C_RESET}\n" "$*" >&2; }
-
-die() {
-  local step="$1" hint="$2"
-  echo "" >&2
-  printf "${_C_RED}[meridian] ✗ Step failed: %s${_C_RESET}\n" "$step" >&2
-  echo "  $hint" >&2
-  exit 1
-}
+source "$REPO_DIR/src/lib/colors.sh"
+source "$REPO_DIR/src/lib/logging.sh"
+source "$REPO_DIR/src/lib/errors.sh"
 
 usage() {
   cat <<EOF
@@ -207,6 +186,7 @@ dirs=(
   "Work/CurrentCompany/General"
   "_templates"
   ".scripts"
+  ".scripts/lib"
 )
 
 if [[ "$PROFILE" == "personal" ]]; then
@@ -371,12 +351,12 @@ fi  # end personal-only Northstar section
 
 echo "[meridian] Writing Process MOCs..."
 
-copy_if_new "$SCRIPT_DIR/vault-files/mocs/Active Projects.md" "$VAULT_ROOT/Process/Active Projects.md"
-copy_if_new "$SCRIPT_DIR/vault-files/mocs/Action Items.md" "$VAULT_ROOT/Process/Action Items.md"
-copy_if_new "$SCRIPT_DIR/vault-files/mocs/Open Loops.md" "$VAULT_ROOT/Process/Open Loops.md"
-copy_if_new "$SCRIPT_DIR/vault-files/mocs/Review Queue.md" "$VAULT_ROOT/Process/Review Queue.md"
-copy_if_new "$SCRIPT_DIR/vault-files/mocs/Current Priorities.md" "$VAULT_ROOT/Process/Current Priorities.md"
-copy_if_new "$SCRIPT_DIR/vault-files/mocs/Weekly Outtake.md" "$VAULT_ROOT/Process/Weekly Outtake.md"
+copy_if_new "$REPO_DIR/src/templates/mocs/active-projects.md"    "$VAULT_ROOT/Process/Active Projects.md"
+copy_if_new "$REPO_DIR/src/templates/mocs/action-items.md"       "$VAULT_ROOT/Process/Action Items.md"
+copy_if_new "$REPO_DIR/src/templates/mocs/open-loops.md"         "$VAULT_ROOT/Process/Open Loops.md"
+copy_if_new "$REPO_DIR/src/templates/mocs/review-queue.md"       "$VAULT_ROOT/Process/Review Queue.md"
+copy_if_new "$REPO_DIR/src/templates/mocs/current-priorities.md" "$VAULT_ROOT/Process/Current Priorities.md"
+copy_if_new "$REPO_DIR/src/templates/mocs/weekly-outtake.md"     "$VAULT_ROOT/Process/Weekly Outtake.md"
 
 echo ""
 
@@ -437,9 +417,13 @@ echo ""
 
 echo "[meridian] Copying scripts..."
 
-copy_if_new "$SCRIPT_DIR/scripts/weekly-snapshot.py" "$VAULT_ROOT/.scripts/weekly-snapshot.py"
-copy_if_new "$SCRIPT_DIR/scripts/new-company.sh"     "$VAULT_ROOT/.scripts/new-company.sh"
-copy_if_new "$SCRIPT_DIR/scripts/new-project.sh"     "$VAULT_ROOT/.scripts/new-project.sh"
+copy_if_new "$REPO_DIR/src/bin/weekly-snapshot.py" "$VAULT_ROOT/.scripts/weekly-snapshot.py"
+copy_if_new "$REPO_DIR/src/bin/new-company.sh"     "$VAULT_ROOT/.scripts/new-company.sh"
+copy_if_new "$REPO_DIR/src/bin/new-project.sh"     "$VAULT_ROOT/.scripts/new-project.sh"
+
+copy_if_new "$REPO_DIR/src/lib/colors.sh"  "$VAULT_ROOT/.scripts/lib/colors.sh"
+copy_if_new "$REPO_DIR/src/lib/logging.sh" "$VAULT_ROOT/.scripts/lib/logging.sh"
+copy_if_new "$REPO_DIR/src/lib/errors.sh"  "$VAULT_ROOT/.scripts/lib/errors.sh"
 
 chmod +x "$VAULT_ROOT/.scripts/new-company.sh" 2>/dev/null || true
 chmod +x "$VAULT_ROOT/.scripts/new-project.sh" 2>/dev/null || true
@@ -451,7 +435,7 @@ echo ""
 echo "[meridian] Copying documentation..."
 
 _today="$(date +%Y-%m-%d)"
-DOCS_SRC="$SCRIPT_DIR/documentation"
+DOCS_SRC="$REPO_DIR/documentation"
 DOCS_DEST="$VAULT_ROOT/Process/Meridian Documentation"
 
 copy_doc_with_frontmatter "$DOCS_SRC/user-setup.md"      "$DOCS_DEST/user-setup.md"      "User Setup"       "$_today"
@@ -462,7 +446,7 @@ copy_doc_with_frontmatter "$DOCS_SRC/design-decisions.md" "$DOCS_DEST/design-dec
 copy_doc_with_frontmatter "$DOCS_SRC/security.md"         "$DOCS_DEST/security.md"         "Security"         "$_today"
 copy_doc_with_frontmatter "$DOCS_SRC/sync.md"             "$DOCS_DEST/sync.md"             "Sync Architecture" "$_today"
 copy_doc_with_frontmatter "$DOCS_SRC/roadmap.md"          "$DOCS_DEST/roadmap.md"          "Roadmap"          "$_today"
-copy_if_new "$SCRIPT_DIR/Meridian System.pdf"   "$DOCS_DEST/Meridian System.pdf"
+copy_if_new "$REPO_DIR/Meridian System.pdf"   "$DOCS_DEST/Meridian System.pdf"
 
 echo ""
 

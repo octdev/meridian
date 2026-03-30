@@ -8,13 +8,12 @@ A personal knowledge management system built on Obsidian. Designed for executive
 ```bash
 git clone https://github.com/your-username/meridian.git
 cd meridian
-chmod +x scaffold-vault.sh
-./scaffold-vault.sh
+src/bin/scaffold-vault.sh
 ```
 
 **Work machine:**
 ```bash
-./scaffold-vault.sh --profile work
+src/bin/scaffold-vault.sh --profile work
 ```
 
 The script prompts for a vault path and defaults to `~/Documents/Meridian`. The `--profile work` flag creates only the folders appropriate for a work machine — `Process/`, `Work/`, and `Knowledge/`. `Northstar/`, `Life/`, and `References/` are never created, so personal content cannot exist on the work machine.

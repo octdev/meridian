@@ -26,34 +26,46 @@ The daily note is the only capture surface for incoming events. Intentional work
 ```
 meridian/
   README.md                       repo landing page and quick start
-  scaffold-vault.sh               vault scaffolding script (personal + work profiles)
   meridian-system.html            printable 2-sided quick reference (source for PDF)
   Meridian System.pdf             quick reference PDF
+  .gitattributes
   .gitignore
-  scripts/
-    weekly-snapshot.py            weekly task report generator
-    new-company.sh                scaffolds a new employer/client under Work/
-    new-project.sh                scaffolds a new project under any Projects/ folder
-  vault-files/                    reference copies of vault seed files
+  src/
+    bin/
+      scaffold-vault.sh           vault scaffolding script (personal + work profiles)
+      new-company.sh              scaffolds a new employer/client under Work/
+      new-project.sh              scaffolds a new project under any Projects/ folder
+      weekly-snapshot.py          weekly task report generator
+    lib/
+      colors.sh                   TTY-aware color variable definitions
+      logging.sh                  output helpers: _pass, _fail, _warn, _hint, _detail, _cmd
+      errors.sh                   die function and shared error handling
     templates/
-      Daily Note.md
-      Generic Note.md
-      Reflection.md               end-of-day reflection template
-    mocs/
-      Action Items.md
-      Active Projects.md
-      Open Loops.md
-      Review Queue.md
-      Weekly Outtake.md
-      Current Priorities.md
-    northstar/
-      Purpose.md  Vision.md  Mission.md
-      Principles.md  Values.md  Goals.md  Career.md
+      obsidian-templates/
+        daily-note.md
+        generic-note.md
+        reflection.md             end-of-day reflection template
+      mocs/
+        action-items.md
+        active-projects.md
+        open-loops.md
+        review-queue.md
+        weekly-outtake.md
+        current-priorities.md
+      northstar/
+        purpose.md  vision.md  mission.md
+        principles.md  values.md  goals.md  career.md
+  scripts/
+    ci/
+      release.sh                  version tagging and README update script
+    local/                        (empty — reserved for local dev scripts)
+  config/
+    base/
+      version.json                semver source of truth
   documentation/
     user-setup.md
     user-handbook.md
     reference-guide.md
-    cheat-sheet.md                markdown version of the quick reference
     architecture.md               this file
     design-decisions.md
     security.md
@@ -61,7 +73,7 @@ meridian/
     roadmap.md
 ```
 
-The `scripts/` directory contains all runnable scripts. `scaffold-vault.sh` copies them into the vault's `.scripts/` directory at setup time. The `documentation/` directory contains all user-facing docs — these are also copied into the vault at `Process/Meridian Documentation/` with frontmatter injected. The vault itself is not committed to this repo.
+`src/bin/` contains all product scripts. `scaffold-vault.sh` copies them — and the `src/lib/` shared libraries — into the vault's `.scripts/` directory at setup time. `src/templates/` holds vault seed files; filenames are kebab-case in the repo and retain their display-case names when written into the vault. The `documentation/` directory contains all user-facing docs — these are copied into the vault at `Process/Meridian Documentation/` with frontmatter injected. The vault itself is not committed to this repo.
 
 ---
 
@@ -74,7 +86,7 @@ The scaffold script supports two profiles via `--profile personal|work`.
 Full vault. All folders and seed files are created.
 
 ```bash
-./scaffold-vault.sh --vault ~/Documents/MyVault
+src/bin/scaffold-vault.sh --vault ~/Documents/MyVault
 ```
 
 ### Work profile
@@ -82,7 +94,7 @@ Full vault. All folders and seed files are created.
 Work-only vault. Creates `Process/`, `Work/`, `Knowledge/`, `_templates/`, and `.scripts/`. Omits `Northstar/`, `Life/`, and `References/` entirely — they are never written to disk and cannot be accidentally synced to an employer machine.
 
 ```bash
-./scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
+src/bin/scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
 ```
 
 The daily note template, all MOCs, and the Reflection template are identical between profiles. The plugin stack, hotkeys, and workflow are the same. Only the knowledge layer folders differ.
@@ -102,6 +114,10 @@ vault/
     weekly-snapshot.py
     new-company.sh
     new-project.sh
+    lib/
+      colors.sh
+      logging.sh
+      errors.sh
   _templates/
     Daily Note.md
     Generic Note.md
@@ -155,6 +171,10 @@ vault/
     weekly-snapshot.py
     new-company.sh
     new-project.sh
+    lib/
+      colors.sh
+      logging.sh
+      errors.sh
   _templates/
     Daily Note.md
     Generic Note.md
