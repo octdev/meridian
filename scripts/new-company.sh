@@ -3,6 +3,9 @@
 #
 # Creates the standard company folder structure:
 #   Work/[Company]/
+#     Finances/
+#     General/
+#     Goals/
 #     Incidents/
 #     People/
 #     Projects/
@@ -101,12 +104,18 @@ echo "[Meridian] Scaffolding company..."
 echo ""
 
 # --- create directories ---
+mkdir -p "${company_dir}/Finances"
+mkdir -p "${company_dir}/General"
+mkdir -p "${company_dir}/Goals"
 mkdir -p "${company_dir}/Incidents"
 mkdir -p "${company_dir}/People"
 mkdir -p "${company_dir}/Projects"
 mkdir -p "${company_dir}/Reference"
 mkdir -p "${company_dir}/Vendors"
 
+_pass "Finances/ created."
+_pass "General/ created."
+_pass "Goals/ created."
 _pass "Incidents/ created."
 _pass "People/ created."
 _pass "Projects/ created."

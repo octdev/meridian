@@ -1,6 +1,6 @@
 # Reference Guide
 
-See [user-guide.md](user-guide.md) for full details on any item.
+See [user-setup.md](user-setup.md) for installation and configuration details. See [user-handbook.md](user-handbook.md) for concepts and daily workflow.
 
 ---
 

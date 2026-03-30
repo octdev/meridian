@@ -20,7 +20,7 @@ chmod +x scaffold-vault.sh
 The script prompts for a vault path and defaults to `~/Documents/Meridian`. The `--profile work` flag creates only the folders appropriate for a work machine — `Process/`, `Work/`, and `Knowledge/`. `Northstar/`, `Life/`, and `References/` are never created, so personal content cannot exist on the work machine.
 
 Open Obsidian → "Open folder as vault" → select your vault path.
-Then follow `Process/Meridian Documentation/user-guide.md` in the vault from Step 3 (Rename CurrentCompany) onward.
+Then follow `Process/Meridian Documentation/user-setup.md` in the vault from Step 3 (Rename CurrentCompany) onward. See `user-handbook.md` for an introduction to the system's concepts and daily workflow.
 
 ## Daily Operation
 
@@ -43,11 +43,11 @@ Then follow `Process/Meridian Documentation/user-guide.md` in the vault from Ste
 
 ## Features
 
-- **Marker-based capture** — 8 inline markers (`!`, `!!`, `~`, `>>`, `?`, `&`, `^`, `*`) replace folders and tags for action items, decisions, risks, and insights. See [documentation/user-guide.md](documentation/user-guide.md).
-- **Automated MOCs** — 7 Maps of Content powered by Tasks and Dataview query the vault live. See [documentation/user-guide.md](documentation/user-guide.md#mocs).
+- **Marker-based capture** — 8 inline markers (`!`, `!!`, `~`, `>>`, `?`, `&`, `^`, `*`) replace folders and tags for action items, decisions, risks, and insights. See [documentation/user-setup.md](documentation/user-setup.md).
+- **Automated MOCs** — 7 Maps of Content powered by Tasks and Dataview query the vault live. See [documentation/user-setup.md](documentation/user-setup.md#mocs).
 - **Frontmatter automation** — `title`, `created`, and `modified` fields populate automatically on every note. See [documentation/architecture.md](documentation/architecture.md#frontmatter-chain).
-- **Weekly snapshots** — a Python script generates static Mon–Sun completed-task reports automatically. See [documentation/user-guide.md](documentation/user-guide.md#weekly-snapshots).
-- **Work machine profile** — `--profile work` scaffolds a work-only vault that omits all personal folders. Personal content is never created and cannot be accidentally synced to an employer machine. See [documentation/user-guide.md](documentation/user-guide.md#work-machine-setup).
+- **Weekly snapshots** — a Python script generates static Mon–Sun completed-task reports automatically. See [documentation/user-setup.md](documentation/user-setup.md#weekly-snapshots).
+- **Work machine profile** — `--profile work` scaffolds a work-only vault that omits all personal folders. Personal content is never created and cannot be accidentally synced to an employer machine. See [documentation/user-setup.md](documentation/user-setup.md#work-machine-setup).
 - **Sync architecture** — Syncthing enforces the work/personal boundary at the filesystem level across machines. See [documentation/sync.md](documentation/sync.md).
 - **Vault management scripts** — `new-company.sh` scaffolds a new employer or client under `Work/`. `new-project.sh` scaffolds a new project with a full MOC, Design, Requirements, and Prompts structure. Both are accessible from the Obsidian command palette.
 - **Documentation in vault** — the full documentation suite is copied into `Process/Meridian Documentation/` at scaffold time, including a markdown cheat sheet and the quick-reference PDF.
@@ -60,7 +60,8 @@ Meridian is designed to keep personal knowledge off employer-managed machines. T
 
 | File | Purpose |
 |------|---------|
-| [documentation/user-guide.md](documentation/user-guide.md) | Full setup and operational manual |
+| [documentation/user-setup.md](documentation/user-setup.md) | Installation, plugin configuration, and operational reference |
+| [documentation/user-handbook.md](documentation/user-handbook.md) | Concepts, mindset, and daily workflow |
 | [documentation/reference-guide.md](documentation/reference-guide.md) | Quick command and convention lookup |
 | [documentation/architecture.md](documentation/architecture.md) | System structure and data flows |
 | [documentation/sync.md](documentation/sync.md) | Syncthing setup and migration path |

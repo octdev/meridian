@@ -81,8 +81,7 @@ In the file explorer, rename `Work/CurrentCompany/` to your actual company name.
 
 ## Work Machine Setup
 
-Meridian is designed to run on both a personal machine and a work machine simultaneously, with different vault content on each. The `--profile work` flag is the starting point for work machine setup.
-
+Meridian is designed to run on both personal and work machines simultaneously, with the full vault on your personal machines and a subset of that vault on your work machines.  The `--profile work` flag is the starting point for work machine setup.  This allows the Meridian capture system to be used across your personal and work time, while keeping your personal knowledge management separate from your work systems and intellectual property.
 ### What the work profile includes
 
 | Folder | Personal vault | Work vault |
@@ -513,6 +512,9 @@ The script prompts for vault root and company name, checks for collisions, and c
 
 ```
 Work/[Company]/
+  Finances/
+  General/
+  Goals/
   Incidents/
   People/
   Projects/
@@ -597,7 +599,8 @@ The full documentation suite is copied into `Process/Meridian Documentation/` in
 
 | File | Purpose |
 |------|---------|
-| `user-guide.md` | This file — full setup and operational manual |
+| `user-setup.md` | This file — installation, plugin configuration, and operational reference |
+| `user-handbook.md` | Concepts, mindset, and how to use the system day-to-day |
 | `reference-guide.md` | Quick command and convention lookup |
 | `architecture.md` | System structure, data flows, and plugin stack |
 | `design-decisions.md` | Design decision log with rationale |

@@ -16,7 +16,8 @@
 #             Northstar, Life, and References are intentionally omitted so
 #             personal content never exists on a work machine.
 #
-# Safe to re-run: skips files that already exist.
+# Creates a new vault only. Target directory must not already exist.
+# To upgrade an existing vault, create a new vault and migrate manually.
 #
 # Exit codes:
 #   0 — success
@@ -79,7 +80,8 @@ Examples:
   scaffold-vault.sh --vault ~/Documents/MyVault
   scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
 
-Safe to re-run: existing files are skipped, new files are created.
+Target directory must not already exist. To upgrade an existing vault,
+create a new vault and migrate manually.
 
 EOF
 }
@@ -156,6 +158,7 @@ copy_doc_with_frontmatter() {
   fi
 }
 
+
 # --- main ---
 
 echo ""
@@ -172,6 +175,14 @@ fi
 
 echo "[meridian] Scaffolding vault at: $VAULT_ROOT (profile: $PROFILE)"
 echo ""
+
+if [[ -d "$VAULT_ROOT" ]]; then
+  printf "${_C_RED}[meridian] ✗ Target directory already exists: %s${_C_RESET}\n" "$VAULT_ROOT" >&2
+  echo "" >&2
+  echo "  To upgrade an existing vault, create a new vault and migrate manually." >&2
+  echo "" >&2
+  exit 1
+fi
 
 # --- folders ---
 
@@ -191,6 +202,9 @@ dirs=(
   "Work/CurrentCompany/Reference"
   "Work/CurrentCompany/Incidents"
   "Work/CurrentCompany/Vendors"
+  "Work/CurrentCompany/Goals"
+  "Work/CurrentCompany/Finances"
+  "Work/CurrentCompany/General"
   "_templates"
   ".scripts"
 )
@@ -205,6 +219,7 @@ if [[ "$PROFILE" == "personal" ]]; then
     "Life/Social"
     "Life/Development"
     "Life/Fun"
+    "Life/General"
     "References"
   )
 fi
@@ -356,187 +371,12 @@ fi  # end personal-only Northstar section
 
 echo "[meridian] Writing Process MOCs..."
 
-write_if_new "$VAULT_ROOT/Process/Active Projects.md" "---
-title:
-created:
-modified:
----
-
-# Active Projects
-
-## Work Projects
-\`\`\`dataview
-LIST FROM \"Work\" AND \"Projects\"
-SORT file.name ASC
-\`\`\`
-
-## Personal Projects
-\`\`\`dataview
-LIST FROM \"Life/Projects\"
-SORT file.name ASC
-\`\`\`"
-
-write_if_new "$VAULT_ROOT/Process/Action Items.md" "---
-title:
-created:
-modified:
----
-
-# Action Items
-
-## Urgent
-\`\`\`tasks
-not done
-description includes !!
-path includes Process/Daily
-sort by filename reverse
-\`\`\`
-
-### Recently Completed — Urgent
-\`\`\`tasks
-done
-done after 2 days ago
-description includes !!
-path includes Process/Daily
-sort by done reverse
-\`\`\`
-
-## Standard
-\`\`\`tasks
-not done
-description includes !
-description does not include !!
-path includes Process/Daily
-sort by filename reverse
-\`\`\`
-
-### Recently Completed — Standard
-\`\`\`tasks
-done
-done after 2 days ago
-description includes !
-description does not include !!
-path includes Process/Daily
-sort by done reverse
-\`\`\`"
-
-write_if_new "$VAULT_ROOT/Process/Open Loops.md" "---
-title:
-created:
-modified:
----
-
-# Open Loops
-
-## Waiting
-\`\`\`tasks
-not done
-description includes ~
-path includes Process/Daily
-sort by filename reverse
-\`\`\`
-
-## Recently Closed
-\`\`\`tasks
-done
-done after 2 days ago
-description includes ~
-path includes Process/Daily
-sort by done reverse
-\`\`\`"
-
-write_if_new "$VAULT_ROOT/Process/Review Queue.md" "---
-title:
-created:
-modified:
----
-
-# Review Queue
-
-## To Process
-\`\`\`tasks
-not done
-description includes >>
-path includes Process/Daily
-sort by filename reverse
-\`\`\`
-
-## Recently Processed
-\`\`\`tasks
-done
-done after 2 days ago
-description includes >>
-path includes Process/Daily
-sort by done reverse
-\`\`\`"
-
-write_if_new "$VAULT_ROOT/Process/Current Priorities.md" "---
-title:
-created:
-modified:
----
-
-# Current Priorities
-
-## Annual
--
-
-## Quarterly
--
-
-## Sprint
-- "
-
-write_if_new "$VAULT_ROOT/Process/Weekly Outtake.md" "---
-title:
-created:
-modified:
----
-
-# Weekly Outtake
-
-Rolling 7-day view of completed tasks. For permanent weekly records, see \`Process/Weekly/\`.
-
-## Action Items — Urgent
-\`\`\`tasks
-done
-done after 7 days ago
-description includes !!
-path includes Process/Daily
-group by done
-sort by done
-\`\`\`
-
-## Action Items — Standard
-\`\`\`tasks
-done
-done after 7 days ago
-description includes !
-description does not include !!
-path includes Process/Daily
-group by done
-sort by done
-\`\`\`
-
-## Open Loops Closed
-\`\`\`tasks
-done
-done after 7 days ago
-description includes ~
-path includes Process/Daily
-group by done
-sort by done
-\`\`\`
-
-## Review Items Processed
-\`\`\`tasks
-done
-done after 7 days ago
-description includes >>
-path includes Process/Daily
-group by done
-sort by done
-\`\`\`"
+copy_if_new "$SCRIPT_DIR/vault-files/mocs/Active Projects.md" "$VAULT_ROOT/Process/Active Projects.md"
+copy_if_new "$SCRIPT_DIR/vault-files/mocs/Action Items.md" "$VAULT_ROOT/Process/Action Items.md"
+copy_if_new "$SCRIPT_DIR/vault-files/mocs/Open Loops.md" "$VAULT_ROOT/Process/Open Loops.md"
+copy_if_new "$SCRIPT_DIR/vault-files/mocs/Review Queue.md" "$VAULT_ROOT/Process/Review Queue.md"
+copy_if_new "$SCRIPT_DIR/vault-files/mocs/Current Priorities.md" "$VAULT_ROOT/Process/Current Priorities.md"
+copy_if_new "$SCRIPT_DIR/vault-files/mocs/Weekly Outtake.md" "$VAULT_ROOT/Process/Weekly Outtake.md"
 
 echo ""
 
@@ -614,14 +454,15 @@ _today="$(date +%Y-%m-%d)"
 DOCS_SRC="$SCRIPT_DIR/documentation"
 DOCS_DEST="$VAULT_ROOT/Process/Meridian Documentation"
 
-copy_doc_with_frontmatter "$DOCS_SRC/user-guide.md"       "$DOCS_DEST/user-guide.md"       "User Guide"       "$_today"
+copy_doc_with_frontmatter "$DOCS_SRC/user-setup.md"      "$DOCS_DEST/user-setup.md"      "User Setup"       "$_today"
+copy_doc_with_frontmatter "$DOCS_SRC/user-handbook.md"   "$DOCS_DEST/user-handbook.md"   "User Handbook"    "$_today"
 copy_doc_with_frontmatter "$DOCS_SRC/reference-guide.md"  "$DOCS_DEST/reference-guide.md"  "Reference Guide"  "$_today"
 copy_doc_with_frontmatter "$DOCS_SRC/architecture.md"     "$DOCS_DEST/architecture.md"     "Architecture"     "$_today"
 copy_doc_with_frontmatter "$DOCS_SRC/design-decisions.md" "$DOCS_DEST/design-decisions.md" "Design Decisions" "$_today"
 copy_doc_with_frontmatter "$DOCS_SRC/security.md"         "$DOCS_DEST/security.md"         "Security"         "$_today"
 copy_doc_with_frontmatter "$DOCS_SRC/sync.md"             "$DOCS_DEST/sync.md"             "Sync Architecture" "$_today"
 copy_doc_with_frontmatter "$DOCS_SRC/roadmap.md"          "$DOCS_DEST/roadmap.md"          "Roadmap"          "$_today"
-copy_if_new "$SCRIPT_DIR/Meridian System.pdf"             "$DOCS_DEST/Meridian System.pdf"
+copy_if_new "$SCRIPT_DIR/Meridian System.pdf"   "$DOCS_DEST/Meridian System.pdf"
 
 echo ""
 
@@ -638,7 +479,7 @@ fi
 
 echo "Next steps:"
 _hint "1. Open Obsidian → Open folder as vault → $VAULT_ROOT"
-_hint "2. Follow Process/Meridian Documentation/user-guide.md from Step 3 (Rename CurrentCompany)"
+_hint "2. Follow Process/Meridian Documentation/user-setup.md from Step 3 (Rename CurrentCompany)"
 echo ""
 _warn "Rename Work/CurrentCompany/ to your actual company name after opening the vault."
 echo ""

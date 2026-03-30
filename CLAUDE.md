@@ -9,7 +9,7 @@ Meridian is a personal knowledge management system built on Obsidian. It consist
 | Task | Read first | Skip |
 |------|-----------|------|
 | Modify `scaffold-vault.sh` | `scaffold-vault.sh`, `architecture.md` (vault structure) | `sync.md`, `security.md`, `work-scaffold.md` |
-| Add or change a script in `scripts/` | The script itself, `user-guide.md` (Shell Commands section) | `sync.md`, `security.md` |
+| Add or change a script in `scripts/` | The script itself, `user-setup.md` (Shell Commands section) | `sync.md`, `security.md` |
 | Update documentation | The specific doc file, `architecture.md` (repo structure) | `sync.md`, `security.md`, `STATUS.md` |
 | Add a vault MOC or seed file | `scaffold-vault.sh`, `architecture.md` (vault structure) | Everything else |
 | Understand the plugin stack or frontmatter chain | `architecture.md` | `sync.md`, `security.md` |

@@ -50,7 +50,8 @@ meridian/
       Purpose.md  Vision.md  Mission.md
       Principles.md  Values.md  Goals.md  Career.md
   documentation/
-    user-guide.md
+    user-setup.md
+    user-handbook.md
     reference-guide.md
     cheat-sheet.md                markdown version of the quick reference
     architecture.md               this file
@@ -121,7 +122,8 @@ vault/
     email.md                      source tag note
     teams.md                      source tag note
     Meridian Documentation/
-      user-guide.md
+      user-setup.md
+      user-handbook.md
       reference-guide.md
       cheat-sheet.md
       architecture.md
@@ -135,9 +137,10 @@ vault/
   Work/
     CurrentCompany/
       Projects/  People/  Reference/  Incidents/  Vendors/
+      Goals/  Finances/  General/
   Life/
     Projects/  People/  Health/  Finances/
-    Social/  Development/  Fun/
+    Social/  Development/  Fun/  General/
   References/
 ```
 
@@ -174,6 +177,7 @@ vault/
   Work/
     CurrentCompany/
       Projects/  People/  Reference/  Incidents/  Vendors/
+      Goals/  Finances/  General/
 ```
 
 `Northstar/`, `Life/`, and `References/` are absent — not excluded, not hidden. They do not exist. `Process/Meridian Documentation/` is present in both profiles.

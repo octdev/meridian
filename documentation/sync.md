@@ -45,7 +45,7 @@ The work laptop vault must be scaffolded with `--profile work` before configurin
 ./scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
 ```
 
-This ensures `Northstar/`, `Life/`, and `References/` do not exist on the work machine before Syncthing is configured. See [user-guide.md](user-guide.md#work-machine-setup) for the full work machine setup sequence.
+This ensures `Northstar/`, `Life/`, and `References/` do not exist on the work machine before Syncthing is configured. See [user-setup.md](user-setup.md#work-machine-setup) for the full work machine setup sequence.
 
 ### Install
 
