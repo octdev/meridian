@@ -121,16 +121,36 @@ copy_doc_with_frontmatter() {
   local src="$1"
   local dest="$2"
   local title="$3"
-  local today_date="$4"
+  local ts="$4"
   if [[ ! -f "$src" ]]; then
     _warn "Source not found, skipping: $(basename "$src")"
     return
   fi
   if [[ ! -f "$dest" ]]; then
     {
-      printf -- '---\ntitle: %s\ncreated: %s\nmodified: %s\n---\n\n' "$title" "$today_date" "$today_date"
+      printf -- '---\ntitle: %s\ncreated: %s\nmodified: %s\n---\n\n' "$title" "$ts" "$ts"
       cat "$src"
     } > "$dest" || die "copy-doc" "Could not write: $dest"
+    _pass "Created: ${dest#$VAULT_ROOT/}"
+  else
+    echo "  — Skipped (exists): ${dest#$VAULT_ROOT/}"
+  fi
+}
+
+copy_with_timestamps() {
+  local src="$1"
+  local dest="$2"
+  local ts="$3"
+  if [[ ! -f "$src" ]]; then
+    _warn "Source not found, skipping: $(basename "$src")"
+    return
+  fi
+  if [[ ! -f "$dest" ]]; then
+    awk -v ts="$ts" '
+      /^created:[[:space:]]*$/ { print "created: " ts; next }
+      /^modified:[[:space:]]*$/ { print "modified: " ts; next }
+      { print }
+    ' "$src" > "$dest" || die "copy-with-timestamps" "Could not write: $dest"
     _pass "Created: ${dest#$VAULT_ROOT/}"
   else
     echo "  — Skipped (exists): ${dest#$VAULT_ROOT/}"
@@ -211,6 +231,10 @@ done
 
 echo ""
 
+# --- timestamp ---
+
+_now="$(date '+%Y-%m-%d %H:%M:%S')"
+
 # --- templates ---
 
 echo "[meridian] Writing templates..."
@@ -263,8 +287,8 @@ echo "[meridian] Writing Northstar notes..."
 
 write_if_new "$VAULT_ROOT/Northstar/Purpose.md" "---
 title:
-created:
-modified:
+created: $_now
+modified: $_now
 ---
 
 # Purpose
@@ -273,8 +297,8 @@ Why I do what I do — the underlying reason behind the work and the life."
 
 write_if_new "$VAULT_ROOT/Northstar/Vision.md" "---
 title:
-created:
-modified:
+created: $_now
+modified: $_now
 ---
 
 # Vision
@@ -283,8 +307,8 @@ The future state I'm building toward — what the world looks like when I'm succ
 
 write_if_new "$VAULT_ROOT/Northstar/Mission.md" "---
 title:
-created:
-modified:
+created: $_now
+modified: $_now
 ---
 
 # Mission
@@ -293,8 +317,8 @@ The work I'm doing right now to move toward the vision."
 
 write_if_new "$VAULT_ROOT/Northstar/Principles.md" "---
 title:
-created:
-modified:
+created: $_now
+modified: $_now
 ---
 
 # Principles
@@ -305,8 +329,8 @@ Rules I operate by — the non-negotiables that guide decisions.
 
 write_if_new "$VAULT_ROOT/Northstar/Values.md" "---
 title:
-created:
-modified:
+created: $_now
+modified: $_now
 ---
 
 # Values
@@ -317,8 +341,8 @@ What I optimize for — the qualities that matter most.
 
 write_if_new "$VAULT_ROOT/Northstar/Goals.md" "---
 title:
-created:
-modified:
+created: $_now
+modified: $_now
 ---
 
 # Goals
@@ -335,8 +359,8 @@ Concrete targets with timelines, flowing from the mission.
 
 write_if_new "$VAULT_ROOT/Northstar/Career.md" "---
 title:
-created:
-modified:
+created: $_now
+modified: $_now
 ---
 
 # Career
@@ -351,12 +375,12 @@ fi  # end personal-only Northstar section
 
 echo "[meridian] Writing Process MOCs..."
 
-copy_if_new "$REPO_DIR/src/templates/mocs/active-projects.md"    "$VAULT_ROOT/Process/Active Projects.md"
-copy_if_new "$REPO_DIR/src/templates/mocs/action-items.md"       "$VAULT_ROOT/Process/Action Items.md"
-copy_if_new "$REPO_DIR/src/templates/mocs/open-loops.md"         "$VAULT_ROOT/Process/Open Loops.md"
-copy_if_new "$REPO_DIR/src/templates/mocs/review-queue.md"       "$VAULT_ROOT/Process/Review Queue.md"
-copy_if_new "$REPO_DIR/src/templates/mocs/current-priorities.md" "$VAULT_ROOT/Process/Current Priorities.md"
-copy_if_new "$REPO_DIR/src/templates/mocs/weekly-outtake.md"     "$VAULT_ROOT/Process/Weekly Outtake.md"
+copy_with_timestamps "$REPO_DIR/src/templates/mocs/active-projects.md"    "$VAULT_ROOT/Process/Active Projects.md"      "$_now"
+copy_with_timestamps "$REPO_DIR/src/templates/mocs/action-items.md"       "$VAULT_ROOT/Process/Action Items.md"         "$_now"
+copy_with_timestamps "$REPO_DIR/src/templates/mocs/open-loops.md"         "$VAULT_ROOT/Process/Open Loops.md"           "$_now"
+copy_with_timestamps "$REPO_DIR/src/templates/mocs/review-queue.md"       "$VAULT_ROOT/Process/Review Queue.md"         "$_now"
+copy_with_timestamps "$REPO_DIR/src/templates/mocs/current-priorities.md" "$VAULT_ROOT/Process/Current Priorities.md"  "$_now"
+copy_with_timestamps "$REPO_DIR/src/templates/mocs/weekly-outtake.md"     "$VAULT_ROOT/Process/Weekly Outtake.md"       "$_now"
 
 echo ""
 
@@ -366,8 +390,8 @@ echo "[meridian] Writing source tag notes..."
 
 write_if_new "$VAULT_ROOT/Process/email.md" "---
 title:
-created:
-modified:
+created: $_now
+modified: $_now
 ---
 
 # email
@@ -379,8 +403,8 @@ Tag a task with \`— [[email]]\` in your daily note to link it here. Open this 
 
 write_if_new "$VAULT_ROOT/Process/teams.md" "---
 title:
-created:
-modified:
+created: $_now
+modified: $_now
 ---
 
 # teams
@@ -434,18 +458,17 @@ echo ""
 
 echo "[meridian] Copying documentation..."
 
-_today="$(date +%Y-%m-%d)"
 DOCS_SRC="$REPO_DIR/documentation"
 DOCS_DEST="$VAULT_ROOT/Process/Meridian Documentation"
 
-copy_doc_with_frontmatter "$DOCS_SRC/user-setup.md"      "$DOCS_DEST/user-setup.md"      "User Setup"       "$_today"
-copy_doc_with_frontmatter "$DOCS_SRC/user-handbook.md"   "$DOCS_DEST/user-handbook.md"   "User Handbook"    "$_today"
-copy_doc_with_frontmatter "$DOCS_SRC/reference-guide.md"  "$DOCS_DEST/reference-guide.md"  "Reference Guide"  "$_today"
-copy_doc_with_frontmatter "$DOCS_SRC/architecture.md"     "$DOCS_DEST/architecture.md"     "Architecture"     "$_today"
-copy_doc_with_frontmatter "$DOCS_SRC/design-decisions.md" "$DOCS_DEST/design-decisions.md" "Design Decisions" "$_today"
-copy_doc_with_frontmatter "$DOCS_SRC/security.md"         "$DOCS_DEST/security.md"         "Security"         "$_today"
-copy_doc_with_frontmatter "$DOCS_SRC/sync.md"             "$DOCS_DEST/sync.md"             "Sync Architecture" "$_today"
-copy_doc_with_frontmatter "$DOCS_SRC/roadmap.md"          "$DOCS_DEST/roadmap.md"          "Roadmap"          "$_today"
+copy_doc_with_frontmatter "$DOCS_SRC/user-setup.md"      "$DOCS_DEST/user-setup.md"      "User Setup"        "$_now"
+copy_doc_with_frontmatter "$DOCS_SRC/user-handbook.md"   "$DOCS_DEST/user-handbook.md"   "User Handbook"     "$_now"
+copy_doc_with_frontmatter "$DOCS_SRC/reference-guide.md"  "$DOCS_DEST/reference-guide.md"  "Reference Guide"  "$_now"
+copy_doc_with_frontmatter "$DOCS_SRC/architecture.md"     "$DOCS_DEST/architecture.md"     "Architecture"     "$_now"
+copy_doc_with_frontmatter "$DOCS_SRC/design-decisions.md" "$DOCS_DEST/design-decisions.md" "Design Decisions" "$_now"
+copy_doc_with_frontmatter "$DOCS_SRC/security.md"         "$DOCS_DEST/security.md"         "Security"         "$_now"
+copy_doc_with_frontmatter "$DOCS_SRC/sync.md"             "$DOCS_DEST/sync.md"             "Sync Architecture" "$_now"
+copy_doc_with_frontmatter "$DOCS_SRC/roadmap.md"          "$DOCS_DEST/roadmap.md"          "Roadmap"          "$_now"
 copy_if_new "$REPO_DIR/Meridian System.pdf"   "$DOCS_DEST/Meridian System.pdf"
 
 echo ""

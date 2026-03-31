@@ -130,10 +130,14 @@ Configure these before enabling plugins. Order matters.
 2. **Settings → Appearance → Show tab title bar → ON**
    Shows the tab bar for navigating open notes.
 
-3. **Settings → Editor → Default editing mode → Source mode**
+---
+
+## Editor Settings
+
+1. **Settings → Editor → Default editing mode → Source mode**
    Required for frontmatter to render as raw YAML. Live Preview collapses the frontmatter block.
 
-4. **Settings → Editor → Properties in document → Source**
+2. **Settings → Editor → Properties in document → Source**
    Renders frontmatter as editable YAML inline.
    **Important:** this setting must remain Source. Changing it to Visible breaks the Front Matter Timestamps → Linter chain. If frontmatter stops populating after changing this setting, revert to Source.
 
@@ -147,8 +151,7 @@ Settings → Files and Links
 |---------|-------|
 | Default file to open | Daily note |
 | Default location for new notes | `Process/Drafts` |
-| Default location for new attachments | In the folder specified below |
-| Attachment folder path | `References` |
+| Default location for new attachments | `References` |
 | Confirm file deletion | OFF |
 
 ---
@@ -254,6 +257,7 @@ Search "Front Matter Timestamps" → Install → Enable
 | Automatic timestamps | ON |
 | Created property name | `created` |
 | Modified property name | `modified` |
+| Date and time format | YYYY-MM-DD HH:mm:ss |
 | Delay adding timestamps to new files | `100` |
 | Excluded folders | `_templates` |
 | Execute command after update | Save current file |
@@ -287,7 +291,7 @@ Search "Shell commands" → Install → Enable
 3. Click gear icon → **Events** tab:
    - Enable **Obsidian starts**
    - Enable **Every n seconds** → `14400`
-4. **Output** tab → **Ignore**
+4. **Output** tab → Output channel for stdout : **Ignore**
 5. Set alias: "Generate Weekly Outtake"
 
 If Python 3 is not in PATH, use the full path: `/usr/bin/python3`

@@ -17,7 +17,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-SCAFFOLD="$REPO_DIR/scaffold-vault.sh"
+SCAFFOLD="$REPO_DIR/src/bin/scaffold-vault.sh"
 
 VERBOSE=false
 if [[ "${1:-}" == "--verbose" ]]; then
