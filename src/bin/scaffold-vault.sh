@@ -239,43 +239,10 @@ _now="$(date '+%Y-%m-%d %H:%M:%S')"
 
 echo "[meridian] Writing templates..."
 
-write_if_new "$VAULT_ROOT/_templates/Daily Note.md" "---
-title: {{date:YYYY-MM-DD}}
-created: {{date:YYYY-MM-DD HH:mm:ss}}
-modified: {{date:YYYY-MM-DD HH:mm:ss}}
----
+copy_if_new "$REPO_DIR/src/templates/obsidian-templates/daily-note.md" "$VAULT_ROOT/_templates/Daily Note.md"
 
-# {{date:YYYY-MM-DD}}
-
-## Top 3 Goals
-1.
-2.
-3.
-
-## Log
-"
-
-write_if_new "$VAULT_ROOT/_templates/Generic Note.md" "---
-title:
-created:
-modified:
----
-
-# "
-
-write_if_new "$VAULT_ROOT/_templates/Reflection.md" "## Reflection
-
-**What went well today?**
-
-
-**What was hard or draining?**
-
-
-**What would I do differently?**
-
-
-**Anything worth carrying forward?**
-"
+copy_if_new "$REPO_DIR/src/templates/obsidian-templates/generic-note.md" "$VAULT_ROOT/_templates/Generic Note.md"
+copy_if_new "$REPO_DIR/src/templates/obsidian-templates/reflection.md"   "$VAULT_ROOT/_templates/Reflection.md"
 
 echo ""
 
@@ -285,87 +252,13 @@ if [[ "$PROFILE" == "personal" ]]; then
 
 echo "[meridian] Writing Northstar notes..."
 
-write_if_new "$VAULT_ROOT/Northstar/Purpose.md" "---
-title:
-created: $_now
-modified: $_now
----
-
-# Purpose
-
-Why I do what I do — the underlying reason behind the work and the life."
-
-write_if_new "$VAULT_ROOT/Northstar/Vision.md" "---
-title:
-created: $_now
-modified: $_now
----
-
-# Vision
-
-The future state I'm building toward — what the world looks like when I'm succeeding."
-
-write_if_new "$VAULT_ROOT/Northstar/Mission.md" "---
-title:
-created: $_now
-modified: $_now
----
-
-# Mission
-
-The work I'm doing right now to move toward the vision."
-
-write_if_new "$VAULT_ROOT/Northstar/Principles.md" "---
-title:
-created: $_now
-modified: $_now
----
-
-# Principles
-
-Rules I operate by — the non-negotiables that guide decisions.
-
-- "
-
-write_if_new "$VAULT_ROOT/Northstar/Values.md" "---
-title:
-created: $_now
-modified: $_now
----
-
-# Values
-
-What I optimize for — the qualities that matter most.
-
-- "
-
-write_if_new "$VAULT_ROOT/Northstar/Goals.md" "---
-title:
-created: $_now
-modified: $_now
----
-
-# Goals
-
-Concrete targets with timelines, flowing from the mission.
-
-## 12-Month
-
--
-
-## 3-Year
-
-- "
-
-write_if_new "$VAULT_ROOT/Northstar/Career.md" "---
-title:
-created: $_now
-modified: $_now
----
-
-# Career
-
-Career trajectory, positioning, and professional development notes."
+copy_with_timestamps "$REPO_DIR/src/templates/northstar/purpose.md"    "$VAULT_ROOT/Northstar/Purpose.md"    "$_now"
+copy_with_timestamps "$REPO_DIR/src/templates/northstar/vision.md"     "$VAULT_ROOT/Northstar/Vision.md"     "$_now"
+copy_with_timestamps "$REPO_DIR/src/templates/northstar/mission.md"    "$VAULT_ROOT/Northstar/Mission.md"    "$_now"
+copy_with_timestamps "$REPO_DIR/src/templates/northstar/principles.md" "$VAULT_ROOT/Northstar/Principles.md" "$_now"
+copy_with_timestamps "$REPO_DIR/src/templates/northstar/values.md"     "$VAULT_ROOT/Northstar/Values.md"     "$_now"
+copy_with_timestamps "$REPO_DIR/src/templates/northstar/goals.md"      "$VAULT_ROOT/Northstar/Goals.md"      "$_now"
+copy_with_timestamps "$REPO_DIR/src/templates/northstar/career.md"     "$VAULT_ROOT/Northstar/Career.md"     "$_now"
 
 echo ""
 
