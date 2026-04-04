@@ -1,0 +1,26 @@
+# Add the following directory creation block to new-company.sh
+# immediately after the existing Work/CurrentCompany subfolders
+# (Projects/ People/ Reference/ Incidents/ Vendors/ Goals/ Finances/ General/)
+#
+# Locate the block that creates those folders and append:
+
++  # Meetings layer
++  create_dir "$COMPANY_DIR/Meetings"
++  create_dir "$COMPANY_DIR/Meetings/1on1s"
++
++  _pass "Created Meetings/ and Meetings/1on1s/"
+
+# ── scaffold-vault.sh — same change, both profiles ───────────────────────────
+#
+# In the personal profile block and the work profile block, locate the
+# Work/CurrentCompany subfolder creation and append the same two lines:
+
++  create_dir "$WORK_DIR/Meetings"
++  create_dir "$WORK_DIR/Meetings/1on1s"
+
+# ── Shell Commands plugin — add palette entry ─────────────────────────────────
+#
+# Mirror the existing new-company / new-project entries.
+# Command name:    New Meeting Series
+# Shell command:   bash "{{vault_path}}/.scripts/new-meeting-series.sh" --vault "{{vault_path}}"
+# Working dir:     {{vault_path}}

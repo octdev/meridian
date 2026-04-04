@@ -19,7 +19,8 @@
 15. [[#Weekly Snapshots]]
 16. [[#Managing Companies]]
 17. [[#Managing Projects]]
-18. [[#Filing Heuristics]]
+18. [[#Managing Meetings]]
+19. [[#Filing Heuristics]]
 19. [[#Maintenance]]
 20. [[#Documentation]]
 
@@ -67,7 +68,20 @@ The `--profile work` flag creates only the folders appropriate for an employer-m
 
 Default path is `~/Documents/Meridian` if `--vault` is omitted (the script will prompt to confirm).
 
-The scaffold script automatically copies all three scripts (`weekly-snapshot.py`, `new-company.sh`, `new-project.sh`) into `.scripts/` and copies the full documentation suite into `Process/Meridian Documentation/`, including a PDF of the quick reference.
+The scaffold script automatically copies all scripts (`weekly-snapshot.py`, `new-company.sh`, `new-project.sh`, `new-meeting-series.sh`) into `.scripts/` and copies the full documentation suite into `Process/Meridian Documentation/`, including a PDF of the quick reference.
+
+### Upgrading an existing vault
+
+To add missing folders, templates, and scripts to an existing vault after a Meridian update:
+
+```bash
+./scaffold-vault.sh --vault /path/to/MyVault --upgrade
+```
+
+`--upgrade` is safe to run on a live vault:
+- Folders, templates, scripts, MOCs, and seed notes that already exist are skipped
+- Missing items are added
+- Documentation in `Process/Meridian Documentation/` is always overwritten with the latest version from the repo
 
 ### Step 2: Open the vault in Obsidian
 
@@ -296,6 +310,17 @@ Search "Shell commands" → Install → Enable
 
 If Python 3 is not in PATH, use the full path: `/usr/bin/python3`
 
+#### Command 2: New Meeting Series (palette)
+
+1. Click **New command**
+2. Enter: `bash "{{vault_path}}/.scripts/new-meeting-series.sh" --vault "{{vault_path}}"`
+3. Set **Working directory**: `{{vault_path}}`
+4. Click gear icon → **Events** tab: leave all disabled (palette-only, not automatic)
+5. **Output** tab → Output channel for stdout: **Show in notification** (or **Ask after execution**)
+6. Set alias: "New Meeting Series"
+
+After adding: open the command palette (`Cmd+P`) and confirm **New Meeting Series** appears. Run it once against your vault to verify the series and instance folders are created correctly before relying on it in a live meeting prep flow.
+
 ### 9. Scroller
 
 Search "Scroller" → Install → Enable
@@ -333,6 +358,25 @@ Assign the Templates hotkey to quickly insert the Reflection template at end of 
 ---
 
 ## Vault Updates
+
+### Upgrading an existing vault
+
+When a new version of Meridian adds folders, templates, or scripts, run the scaffold script with `--upgrade` to pull in the changes without touching your existing notes:
+
+```bash
+./scaffold-vault.sh --vault /path/to/MyVault --upgrade
+# or for a work vault:
+./scaffold-vault.sh --vault /path/to/WorkVault --profile work --upgrade
+```
+
+What `--upgrade` does:
+- Creates any missing folders
+- Copies any missing templates, scripts, MOCs, and seed notes
+- **Always overwrites** `Process/Meridian Documentation/` so your in-vault docs stay current
+
+What it does not do:
+- Overwrite existing notes, templates, or scripts you may have customized
+- Remove or rename anything
 
 ### Rename CurrentCompany
 
@@ -520,6 +564,8 @@ Work/[Company]/
   General/
   Goals/
   Incidents/
+  Meetings/
+    1on1s/
   People/
   Projects/
   Reference/
@@ -560,6 +606,26 @@ The script prompts for project name, vault root, and target Projects directory, 
 All files are seeded with frontmatter (`title`, `created`, `modified`) and starter structure. The MOC queries are scoped to the project folder using vault-relative paths — the same convention the Process MOCs use for `Process/Daily`.
 
 The script warns if the Projects directory you provide doesn't match the expected vault conventions (`Work/[Company]/Projects/` or `Life/Projects/`) and prompts for confirmation before proceeding.
+
+---
+
+## Managing Meetings
+
+Run `new-meeting-series.sh` when creating a new meeting instance (or a new recurring series for the first time). It handles both the series-level index and the per-date instance folder.
+
+Open a terminal in the vault directory and run:
+
+```bash
+bash .scripts/new-meeting-series.sh --vault .
+```
+
+Or invoke from the Obsidian command palette: **New Meeting Series**.
+
+The script prompts for series name and date, then creates or updates:
+- `Meetings/[Series]/[Series].md` — series index (first time only; prompts for purpose and cadence)
+- `Meetings/[Series]/YYYY-MM-DD/[Series] YYYY-MM-DD.md` — instance index
+
+If the instance folder already exists, the script aborts without modifying any files.
 
 ---
 

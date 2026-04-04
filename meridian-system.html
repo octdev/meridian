@@ -36,7 +36,7 @@
   .time-badge { display: inline-block; background: #5b6abf; color: #fff; padding: 1px 6px; border-radius: 8px; font-size: 9px; font-weight: 600; margin-left: 4px; }
   .code-block { font-family: 'SF Mono', 'Fira Code', monospace; white-space: pre; line-height: 1.5; background: #f8f8f8; padding: 6px 10px; margin: 3px 0; font-size: 10px; border-left: 2px solid #ddd; }
   .folder { font-size: 10.5px; font-family: 'SF Mono', 'Fira Code', monospace; line-height: 1.6; }
-  .folder .dir { color: #5b6abf; font-weight: 600; }
+  .folder .dir { color: #5b6abf; font-weight: 600; display: block; }
   .folder .file { color: #555; padding-left: 16px; display: block; }
   .folder .comment { color: #999; font-style: italic; }
 </style>
@@ -53,61 +53,23 @@
       <h2>Vault Layout</h2>
       <div class="folder">
         <span class="dir">Northstar/</span>
-        <span class="file"><span>Purpose · Vision · Mission · Principles · Values · Goals · Career</span></span>
+        <span class="file">Purpose Vision Mission Principles Values Goals Career</span>
         <span class="dir">Process/</span>
         <span class="file">Daily/ &nbsp;<span class="comment">← one file per day</span></span>
         <span class="file">Weekly/ &nbsp;<span class="comment">← auto-generated snapshots</span></span>
         <span class="file">Drafts/ &nbsp;<span class="comment">← new notes land here by default</span></span>
         <span class="file">Current Priorities</span>
-        <span class="file">MOCs: &nbsp;<span class="comment">Active Projects · Action Items · Open Loops · Review Queue · Weekly Outtake</span></span>
+        <span class="file">MOCs: &nbsp;<span class="comment">Active Projects Action Items Open Loops Review Queue Weekly Outtake</span></span>
         <span class="dir">Knowledge/</span>
-        <span class="file"><span>Technical/ · Leadership/ · Industry/ · General/</span></span>
+        <span class="file">Technical/ Leadership/ Industry/ General/</span>
         <span class="dir">Work/</span>
-        <span class="file">{{Current}}/</span>
-        <span class="file">{{Previous}}/</span>
+        <span class="file">{{Current}}/ Projects/ People/ Reference/ Incidents/ Vendors/ Finances/ Meetings/</span>
+        <span class="file">{{Previous}}/*</span>
         <span class="dir">Life/</span>
-        <span class="file"><span>Projects/  People/ · Health/ · Finances/ · Social/ · Development/ · Fun/ · General/</span></span>
-        <span class="dir">References/</span> &nbsp;<span class="comment">External artifacts, source material</span>
+        <span class="file">Projects/ People/ Health/ Finances/ Social/ Development/ Fun/</span>
+        <span class="dir">References/</span>
+        <span class="file">External artifacts, source material</span>
       </div>
-    </div>
-    <div>
-      <h2>Daily Note Template</h2>
-      <div class="code-block"># YYYY-MM-DD
-## Top 3 Goals
-1. 
-2. 
-3. 
-## Log
-  ### HH:MM — Meeting Title
-  - [ ] ! Action item [[source]]
-  - ? Decision made
-  - [[Person Name]] observation</div>
-      <h2>Task Lifecycle</h2>
-      <div class="code-block">Create:  - [ ] ! Task description
-Check:   Tasks auto-stamps ✅ YYYY-MM-DD
-View:    MOC "Recently Completed" for 2 days
-Age:     Drops from active MOC after 2 days
-Record:  Always in Weekly Outtake (7 days)
-Archive: Static snapshot in Process/Weekly/</div>
-    </div>
-  </div>
-
-  <h2>Markers</h2>
-  <table>
-    <tr><th>Marker</th><th>Meaning</th><th>Shows in MOC</th><th>Usage</th></tr>
-    <tr><td><code>!</code></td><td>Action item</td><td>Action Items (Standard)</td><td><code>- [ ] ! Schedule 1:1 with [[Jane Doe]]</code></td></tr>
-    <tr><td><code>!!</code></td><td>Urgent action</td><td>Action Items (Urgent)</td><td><code>- [ ] !! Fix prod alert {{2026-03-12}}</code></td></tr>
-    <tr><td><code>~</code></td><td>Waiting on someone</td><td>Open Loops</td><td><code>- [ ] ~ [[Bob Smith]] owes API spec</code></td></tr>
-    <tr><td><code>>></code></td><td>Process later</td><td>Review Queue</td><td><code>- [ ] >> interesting SRE article to read</code></td></tr>
-    <tr><td><code>?</code></td><td>Decision made</td><td>— (searchable)</td><td><code>- ? Chose Kafka over SQS for event bus</code></td></tr>
-    <tr><td><code>&</code></td><td>Insight / realization</td><td>— (searchable)</td><td><code>- & Team velocity drops when PRs > 3 days</code></td></tr>
-    <tr><td><code>^</code></td><td>Risk / concern</td><td>— (searchable)</td><td><code>- ^ Migration timeline assumes no Q2 freeze</code></td></tr>
-    <tr><td><code>*</code></td><td>Feedback given/received</td><td>— (searchable)</td><td><code>- * Told [[Jane Doe]] her RFC was strong</code></td></tr>
-  </table>
-  <div class="callout"><strong>Key rule:</strong> Markers go at the start of a bullet. Actionable items (<code>!</code> <code>!!</code> <code>~</code> <code>>></code>) use checkboxes.</div>
-
-  <div class="two-col">
-    <div>
       <h2>Links & Source Tags</h2>
       <table>
         <tr><th>Syntax</th><th>Use</th></tr>
@@ -126,6 +88,24 @@ Archive: Static snapshot in Process/Weekly/</div>
       </table>
     </div>
     <div>
+      <h2>Daily Note Template</h2>
+      <div class="code-block"># YYYY-MM-DD
+## Top 3 Goals
+1.
+2.
+3.
+## Log
+  ### HH:MM — Meeting Title
+  - [ ] ! Action item [[source]]
+  - ? Decision made
+  - [[Person Name]] observation</div>
+      <h2>Task Lifecycle</h2>
+      <div class="code-block">Create:  - [ ] ! Task description
+Check:   Tasks auto-stamps ✅ YYYY-MM-DD
+View:    MOC "Recently Completed" for 2 days
+Age:     Drops from active MOC after 2 days
+Record:  Always in Weekly Outtake (7 days)
+Archive: Static snapshot in Process/Weekly/</div>
       <h2>Due Dates</h2>
       <div class="callout">Only add when there's a <em>real</em> deadline.<br>Format: <code>{{YYYY-MM-DD}}</code><br>Example: <code>- [ ] !! Ship v2 API {{2026-03-15}}</code></div>
       <h2>Filing Heuristics</h2>
@@ -136,10 +116,26 @@ Archive: Static snapshot in Process/Weekly/</div>
         <tr class="filing-row"><td>Personal relationship?</td><td><code>Life/People/</code></td></tr>
         <tr class="filing-row"><td>Active scoped effort?</td><td><code>*/Projects/</code></td></tr>
         <tr class="filing-row"><td>Incident-related?</td><td><code>Work/Incidents/</code></td></tr>
+        <tr class="filing-row"><td>Recurring meeting?</td><td><code>Meetings/[*]/[*]</code></td></tr>
+        <tr class="filing-row"><td>1:1 with tracked person?</td><td><code>Meetings/1on1s/</code></td></tr>
         <tr class="filing-row"><td>Not sure?</td><td>Leave in Daily, mark <code>>></code></td></tr>
       </table>
     </div>
   </div>
+
+  <h2>Markers</h2>
+  <table>
+    <tr><th>Marker</th><th>Meaning</th><th>Shows in MOC</th><th>Usage</th></tr>
+    <tr><td><code>!</code></td><td>Action item</td><td>Action Items (Standard)</td><td><code>- [ ] ! Schedule 1:1 with [[Jane Doe]]</code></td></tr>
+    <tr><td><code>!!</code></td><td>Urgent action</td><td>Action Items (Urgent)</td><td><code>- [ ] !! Fix prod alert {{2026-03-12}}</code></td></tr>
+    <tr><td><code>~</code></td><td>Waiting on someone</td><td>Open Loops</td><td><code>- [ ] ~ [[Bob Smith]] owes API spec</code></td></tr>
+    <tr><td><code>>></code></td><td>Process later</td><td>Review Queue</td><td><code>- [ ] >> interesting SRE article to read</code></td></tr>
+    <tr><td><code>?</code></td><td>Decision made</td><td>— (searchable)</td><td><code>- ? Chose Kafka over SQS for event bus</code></td></tr>
+    <tr><td><code>&</code></td><td>Insight / realization</td><td>— (searchable)</td><td><code>- & Team velocity drops when PRs > 3 days</code></td></tr>
+    <tr><td><code>^</code></td><td>Risk / concern</td><td>— (searchable)</td><td><code>- ^ Migration timeline assumes no Q2 freeze</code></td></tr>
+    <tr><td><code>*</code></td><td>Feedback given/received</td><td>— (searchable)</td><td><code>- * Told [[Jane Doe]] her RFC was strong</code></td></tr>
+  </table>
+  <div class="callout"><strong>Key rule:</strong> Markers go at the start of a bullet. Actionable items (<code>!</code> <code>!!</code> <code>~</code> <code>>></code>) use checkboxes.</div>
 </div>
 
 <!-- PAGE 2: Daily & Weekly Workflow -->

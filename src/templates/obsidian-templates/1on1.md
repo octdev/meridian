@@ -1,0 +1,16 @@
+---
+title:
+created:
+modified:
+---
+
+# {{NAME}} 1:1s
+
+*People note:* [[{{NAME}}]]
+
+---
+
+## {{DATE}}
+**Agenda:**
+
+**Notes:**

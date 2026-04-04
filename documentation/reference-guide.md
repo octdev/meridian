@@ -20,10 +20,14 @@ Knowledge/       Technical/ · Leadership/ · Industry/ · General/
 Work/
   CurrentCompany/
     Projects/ · People/ · Reference/ · Incidents/ · Vendors/
+    Meetings/
+      1on1s/         [Name] 1on1s.md — rolling notes, one per person
+      [Series]/      [Series].md · YYYY-MM-DD/ → [Series] YYYY-MM-DD.md
 Life/            Projects/ · People/ · Health/ · Finances/ · Social/ · Development/ · Fun/
 References/      external artifacts, source material
 _templates/      Daily Note.md · Generic Note.md · Reflection.md
-.scripts/        weekly-snapshot.py · new-company.sh · new-project.sh
+                 Meeting Instance.md · Meeting Series.md · 1on1.md
+.scripts/        weekly-snapshot.py · new-company.sh · new-project.sh · new-meeting-series.sh
 ```
 
 **Work vault (`--profile work`) — Northstar, Life, References absent:**
@@ -38,9 +42,97 @@ Knowledge/       Technical/ · Leadership/ · Industry/ · General/
 Work/
   CurrentCompany/
     Projects/ · People/ · Reference/ · Incidents/ · Vendors/
+    Meetings/
+      1on1s/         [Name] 1on1s.md — rolling notes, one per person
+      [Series]/      [Series].md · YYYY-MM-DD/ → [Series] YYYY-MM-DD.md
 _templates/      Daily Note.md · Generic Note.md · Reflection.md
-.scripts/        weekly-snapshot.py · new-company.sh · new-project.sh
+                 Meeting Instance.md · Meeting Series.md · 1on1.md
+.scripts/        weekly-snapshot.py · new-company.sh · new-project.sh · new-meeting-series.sh
 ```
+
+---
+
+## Meeting Instance Note Structure
+
+```
+---
+title:
+created:
+modified:
+---
+
+# [Series] YYYY-MM-DD
+
+## Purpose
+
+## Attendees
+
+## Agenda
+
+## Key Points
+
+## Decisions
+- ?
+
+## Action Items
+- [ ] !
+
+## Next Meeting
+
+---
+*Series:* [[Series Name]]
+*Daily note:* [[YYYY-MM-DD]]
+```
+
+---
+
+## 1:1 Rolling Note Structure
+
+```
+---
+title:
+created:
+modified:
+---
+
+# [Name] 1:1s
+
+*People note:* [[Name]]
+
+---
+
+## YYYY-MM-DD
+**Agenda:**
+
+**Notes:**
+```
+
+Each meeting appends a new `## YYYY-MM-DD` section. Never split the file.
+
+---
+
+## Meeting Taxonomy — Decision Rules
+
+| Meeting type | Where output goes |
+|---|---|
+| Recurring series with artifacts | `Meetings/[Series]/[Date]/` |
+| Project-related meeting | `Projects/[Project]/` |
+| 1:1 with ongoing tracking | `Meetings/1on1s/[Name] 1on1s.md` |
+| Tasks + bullets only | Daily note only |
+| No notes needed | — |
+
+---
+
+## Linking Conventions — Meetings
+
+| From | Link | To |
+|---|---|---|
+| Daily note | `[[Series YYYY-MM-DD]]` | Instance index |
+| Instance index | `[[Series Name]]` | Series index |
+| Instance index | `[[YYYY-MM-DD]]` | Daily note |
+| Series index | `[[Series YYYY-MM-DD]]` | Each instance index |
+| 1:1 rolling note | `[[Name]]` | People note |
+| People note | `[[Name 1on1s]]` | 1:1 rolling note |
 
 ---
 
@@ -216,6 +308,9 @@ Archive: Static snapshot in Process/Weekly/
 | Active scoped effort? | `*/Projects/` |
 | Incident-related? | `Work/Incidents/` |
 | Vendor / contract? | `Work/Vendors/` |
+| Recurring meeting with artifacts? | `Meetings/[Series]/[Date]/` |
+| Meeting primarily about a project? | `Projects/[Project]/` |
+| 1:1 with a tracked person? | `Meetings/1on1s/[Name] 1on1s.md` |
 | Not sure? | Daily note, mark `>>` |
 
 ---
@@ -238,11 +333,19 @@ The scaffold script automatically copies all scripts into `.scripts/` and all do
 ## Vault Management Scripts
 
 ```bash
-bash .scripts/new-company.sh   # add a new employer/client under Work/
-bash .scripts/new-project.sh   # scaffold a new project under any Projects/ folder
+bash .scripts/new-company.sh          # add a new employer/client under Work/
+bash .scripts/new-project.sh          # scaffold a new project under any Projects/ folder
+bash .scripts/new-meeting-series.sh --vault <path>   # scaffold a meeting series instance
 ```
 
-Or invoke from the Obsidian command palette: **New Company**, **New Project**.
+Flags for `new-meeting-series.sh`:
+```bash
+--vault   path to vault (required, or prompted)
+--series  series name (optional, or prompted)
+--date    YYYY-MM-DD (optional, defaults to today)
+```
+
+Or invoke from the Obsidian command palette: **New Company**, **New Project**, **New Meeting Series**.
 
 ## Weekly Snapshot CLI
 
@@ -269,4 +372,4 @@ python3 .scripts/weekly-snapshot.py <vault> --force      # overwrite existing sn
 | 6 | Linter | Community | Frontmatter | Writes `title` from H1 on save |
 | 7 | Front Matter Timestamps | Community | Frontmatter | Auto-inserts `created` and `modified` |
 | 8 | Scroller | Community | UX | Cursor to bottom on open/rename |
-| 9 | Shell Commands | Community | Automation | Triggers weekly snapshot |
+| 9 | Shell Commands | Community | Automation | Triggers weekly snapshot; palette entries for new-company, new-project, new-meeting-series |
