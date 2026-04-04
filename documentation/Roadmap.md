@@ -14,7 +14,7 @@
 
 **Current:** Syncthing folder sync modes (Send Only, Receive Only, Send & Receive) are configured manually and verified by inspection.
 
-**Future:** A `verify-sync.sh` script queries the Syncthing REST API and confirms that each folder is configured with the correct mode per the sync matrix in [sync.md](sync.md). Outputs pass/fail per folder with remediation hints.
+**Future:** A `verify-sync.sh` script queries the Syncthing REST API and confirms that each folder is configured with the correct mode per the sync matrix in [Sync.md](Sync.md). Outputs pass/fail per folder with remediation hints.
 
 **Notes:** Syncthing exposes a REST API at http://127.0.0.1:8384/rest. Requires the Syncthing API key from the config file.
 

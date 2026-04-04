@@ -8,13 +8,13 @@ Meridian is a personal knowledge management system built on Obsidian. It consist
 
 | Task | Read first | Skip |
 |------|-----------|------|
-| Modify `scaffold-vault.sh` | `scaffold-vault.sh`, `architecture.md` (vault structure) | `sync.md`, `security.md`, `work-scaffold.md` |
-| Add or change a script in `scripts/` | The script itself, `user-setup.md` (Shell Commands section) | `sync.md`, `security.md` |
-| Update documentation | The specific doc file, `architecture.md` (repo structure) | `sync.md`, `security.md`, `STATUS.md` |
-| Add a vault MOC or seed file | `scaffold-vault.sh`, `architecture.md` (vault structure) | Everything else |
-| Understand the plugin stack or frontmatter chain | `architecture.md` | `sync.md`, `security.md` |
-| Understand sync or machine boundary | `sync.md`, `security.md` | Everything else |
-| Understand why something is designed a certain way | `design-decisions.md` | Everything else |
+| Modify `scaffold-vault.sh` | `scaffold-vault.sh`, `Architecture.md` (vault structure) | `Sync.md`, `Security.md`, `work-scaffold.md` |
+| Add or change a script in `scripts/` | The script itself, `User Setup.md` (Shell Commands section) | `Sync.md`, `Security.md` |
+| Update documentation | The specific doc file, `Architecture.md` (repo structure) | `Sync.md`, `Security.md`, `STATUS.md` |
+| Add a vault MOC or seed file | `scaffold-vault.sh`, `Architecture.md` (vault structure) | Everything else |
+| Understand the plugin stack or frontmatter chain | `Architecture.md` | `Sync.md`, `Security.md` |
+| Understand sync or machine boundary | `Sync.md`, `Security.md` | Everything else |
+| Understand why something is designed a certain way | `Design Decision.md` | Everything else |
 
 `work-scaffold.md` and `STATUS.md` are internal project working notes. They are almost never needed for code changes.
 
@@ -73,6 +73,6 @@ Meridian is a personal knowledge management system built on Obsidian. It consist
 - Numbered DD-01, DD-02... sequentially; never renumber
 - If a decision changes, add a new entry that supersedes — do not edit the old one
 
-**Vault structure is the source of truth in `architecture.md`:**
+**Vault structure is the source of truth in `Architecture.md`:**
 - Both the project repo layout and the generated vault layout are documented there
 - Keep both diagrams current when adding files or folders

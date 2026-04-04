@@ -1,6 +1,6 @@
 # Reference Guide
 
-See [user-setup.md](user-setup.md) for installation and configuration details. See [user-handbook.md](user-handbook.md) for concepts and daily workflow.
+See [User Setup.md](User%20Setup.md) for installation and configuration details. See [User Handbook.md](User%20Handbook.md) for concepts and daily workflow.
 
 ---
 
@@ -14,8 +14,8 @@ Process/
   Weekly/        auto-generated snapshots
   Active Projects · Action Items · Open Loops · Review Queue
   Weekly Outtake · Current Priorities
-  Meridian Documentation/   user-guide · reference-guide · architecture
-                            design-decisions · security · sync · roadmap · PDF
+  Meridian Documentation/   User Setup · User Handbook · Reference Guide
+                            Architecture · Design Decision · Security · Sync · Roadmap · PDF
 Knowledge/       Technical/ · Leadership/ · Industry/ · General/
 Work/
   CurrentCompany/

@@ -1,4 +1,4 @@
-# Sync Architecture
+# Sync
 
 ## Overview
 
@@ -45,7 +45,7 @@ The work laptop vault must be scaffolded with `--profile work` before configurin
 ./scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
 ```
 
-This ensures `Northstar/`, `Life/`, and `References/` do not exist on the work machine before Syncthing is configured. See [user-setup.md](user-setup.md#work-machine-setup) for the full work machine setup sequence.
+This ensures `Northstar/`, `Life/`, and `References/` do not exist on the work machine before Syncthing is configured. See [User Setup.md](User%20Setup.md#work-machine-setup) for the full work machine setup sequence.
 
 ### Install
 
@@ -86,10 +86,10 @@ Syncthing appends `.sync-conflict-YYYYMMDD-HHMMSS-DEVICEID` to conflicting files
 
 ## V2 Architecture (NAS, deferred)
 
-See [roadmap.md](roadmap.md) for the NAS migration plan using TrueNAS + Syncthing container + Nextcloud.
+See [Roadmap.md](Roadmap.md) for the NAS migration plan using TrueNAS + Syncthing container + Nextcloud.
 
 ---
 
 ## Security Boundary
 
-The sync configuration enforces the personal/work boundary. See [security.md](security.md) for the threat model.
+The sync configuration enforces the personal/work boundary. See [Security.md](Security.md) for the threat model.

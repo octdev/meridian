@@ -1,4 +1,4 @@
-# User Guide
+# User Setup
 
 ## Table of Contents
 
@@ -130,7 +130,7 @@ Then follow the standard setup from [Step 1: Run the scaffold script](#initial-s
 | `Northstar/` | Not configured |
 | `References/` | Not configured |
 
-`Knowledge/` is Send Only from the work machine so work-originated knowledge flows to all devices, but personal knowledge notes never reach the work machine. See [sync.md](sync.md) for the full Syncthing setup.
+`Knowledge/` is Send Only from the work machine so work-originated knowledge flows to all devices, but personal knowledge notes never reach the work machine. See [Sync.md](Sync.md) for the full Syncthing setup.
 
 ---
 
@@ -669,14 +669,14 @@ The full documentation suite is copied into `Process/Meridian Documentation/` in
 
 | File | Purpose |
 |------|---------|
-| `user-setup.md` | This file — installation, plugin configuration, and operational reference |
-| `user-handbook.md` | Concepts, mindset, and how to use the system day-to-day |
-| `reference-guide.md` | Quick command and convention lookup |
-| `architecture.md` | System structure, data flows, and plugin stack |
-| `design-decisions.md` | Design decision log with rationale |
-| `security.md` | Threat model and work/personal boundary |
-| `sync.md` | Syncthing setup and folder sync matrix |
-| `roadmap.md` | Deferred features |
+| `User Setup.md` | This file — installation, plugin configuration, and operational reference |
+| `User Handbook.md` | Concepts, mindset, and how to use the system day-to-day |
+| `Reference Guide.md` | Quick command and convention lookup |
+| `Architecture.md` | System structure, data flows, and plugin stack |
+| `Design Decision.md` | Design decision log with rationale |
+| `Security.md` | Threat model and work/personal boundary |
+| `Sync.md` | Syncthing setup and folder sync matrix |
+| `Roadmap.md` | Deferred features |
 | `Meridian System.pdf` | Printable quick reference |
 
 ### Quick Reference PDF

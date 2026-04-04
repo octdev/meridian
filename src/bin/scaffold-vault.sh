@@ -178,6 +178,62 @@ copy_with_timestamps() {
 }
 
 
+# --- vault registry ---
+
+register_vault() {
+  local vault_path="$1"
+  local vaults_file="$REPO_DIR/config/vaults.txt"
+  local lines=()
+
+  if [[ -f "$vaults_file" ]]; then
+    while IFS= read -r line; do
+      [[ -n "$line" && "$line" != "$vault_path" ]] && lines+=("$line")
+    done < "$vaults_file"
+  fi
+
+  mkdir -p "$(dirname "$vaults_file")"
+  {
+    echo "$vault_path"
+    if [[ ${#lines[@]} -gt 0 ]]; then
+      printf '%s\n' "${lines[@]}"
+    fi
+  } > "$vaults_file"
+}
+
+load_known_vaults() {
+  KNOWN_VAULTS=()
+  local vaults_file="$REPO_DIR/config/vaults.txt"
+  if [[ ! -f "$vaults_file" ]]; then
+    return 0
+  fi
+
+  local valid=() stale=()
+  while IFS= read -r line; do
+    [[ -z "$line" ]] && continue
+    if [[ -d "$line" ]]; then
+      valid+=("$line")
+    else
+      stale+=("$line")
+    fi
+  done < "$vaults_file"
+
+  if [[ ${#stale[@]} -gt 0 ]]; then
+    if [[ ${#valid[@]} -gt 0 ]]; then
+      printf '%s\n' "${valid[@]}" > "$vaults_file"
+    else
+      > "$vaults_file"
+    fi
+    local _n=${#stale[@]}
+    _warn "Removed $_n stale vault $([ "$_n" -eq 1 ] && echo entry || echo entries) ($([ "$_n" -eq 1 ] && echo directory || echo directories) no longer exist)."
+    echo ""
+  fi
+
+  if [[ ${#valid[@]} -gt 0 ]]; then
+    KNOWN_VAULTS=("${valid[@]}")
+  fi
+  return 0
+}
+
 # --- main ---
 
 echo ""
@@ -189,11 +245,38 @@ fi
 echo ""
 
 if [[ "$VAULT_ROOT_SET" == false ]]; then
-  read -rp "  Vault path [~/Documents/Meridian]: " _vault_input
-  if [[ -n "$_vault_input" ]]; then
-    VAULT_ROOT="${_vault_input/#\~/$HOME}"
+  if [[ "$UPGRADE" == true ]]; then
+    load_known_vaults
+    if [[ ${#KNOWN_VAULTS[@]} -gt 0 ]]; then
+      echo "  Known vaults:"
+      for _i in "${!KNOWN_VAULTS[@]}"; do
+        if [[ $_i -eq 0 ]]; then
+          _hint "    $((_i+1)). ${KNOWN_VAULTS[$_i]}  (default)"
+        else
+          _hint "    $((_i+1)). ${KNOWN_VAULTS[$_i]}"
+        fi
+      done
+      echo ""
+      read -rp "  Select vault [1] or enter path: " _vault_input
+      echo ""
+      if [[ -z "$_vault_input" || "$_vault_input" == "1" ]]; then
+        VAULT_ROOT="${KNOWN_VAULTS[0]}"
+      elif [[ "$_vault_input" =~ ^[0-9]+$ ]] && \
+           [[ "$_vault_input" -ge 1 && "$_vault_input" -le ${#KNOWN_VAULTS[@]} ]]; then
+        VAULT_ROOT="${KNOWN_VAULTS[$((_vault_input-1))]}"
+      else
+        VAULT_ROOT="${_vault_input/#\~/$HOME}"
+      fi
+    else
+      read -rp "  Vault path: " _vault_input
+      echo ""
+      [[ -n "$_vault_input" ]] && VAULT_ROOT="${_vault_input/#\~/$HOME}"
+    fi
+  else
+    read -rp "  Vault path [~/Documents/Meridian]: " _vault_input
+    echo ""
+    [[ -n "$_vault_input" ]] && VAULT_ROOT="${_vault_input/#\~/$HOME}"
   fi
-  echo ""
 fi
 
 if [[ "$UPGRADE" == true ]]; then
@@ -441,24 +524,30 @@ DOCS_DEST="$VAULT_ROOT/Process/Meridian Documentation"
 
 if [[ "$UPGRADE" == true ]]; then
   # Upgrade: always overwrite documentation so vault copies stay current.
-  write_doc_with_frontmatter "$DOCS_SRC/user-setup.md"      "$DOCS_DEST/user-setup.md"      "User Setup"         "$_now"
-  write_doc_with_frontmatter "$DOCS_SRC/user-handbook.md"   "$DOCS_DEST/user-handbook.md"   "User Handbook"      "$_now"
-  write_doc_with_frontmatter "$DOCS_SRC/reference-guide.md"  "$DOCS_DEST/reference-guide.md"  "Reference Guide"  "$_now"
-  write_doc_with_frontmatter "$DOCS_SRC/architecture.md"     "$DOCS_DEST/architecture.md"     "Architecture"     "$_now"
-  write_doc_with_frontmatter "$DOCS_SRC/design-decisions.md" "$DOCS_DEST/design-decisions.md" "Design Decisions" "$_now"
-  write_doc_with_frontmatter "$DOCS_SRC/security.md"         "$DOCS_DEST/security.md"         "Security"         "$_now"
-  write_doc_with_frontmatter "$DOCS_SRC/sync.md"             "$DOCS_DEST/sync.md"             "Sync Architecture" "$_now"
-  write_doc_with_frontmatter "$DOCS_SRC/roadmap.md"          "$DOCS_DEST/roadmap.md"          "Roadmap"          "$_now"
+  write_doc_with_frontmatter "$DOCS_SRC/User Setup.md"      "$DOCS_DEST/User Setup.md"      "User Setup"        "$_now"
+  write_doc_with_frontmatter "$DOCS_SRC/User Handbook.md"   "$DOCS_DEST/User Handbook.md"   "User Handbook"     "$_now"
+  write_doc_with_frontmatter "$DOCS_SRC/Reference Guide.md" "$DOCS_DEST/Reference Guide.md" "Reference Guide"   "$_now"
+  write_doc_with_frontmatter "$DOCS_SRC/Architecture.md"    "$DOCS_DEST/Architecture.md"    "Architecture"      "$_now"
+  write_doc_with_frontmatter "$DOCS_SRC/Design Decision.md" "$DOCS_DEST/Design Decision.md" "Design Decision"   "$_now"
+  write_doc_with_frontmatter "$DOCS_SRC/Security.md"        "$DOCS_DEST/Security.md"        "Security"          "$_now"
+  write_doc_with_frontmatter "$DOCS_SRC/Sync.md"            "$DOCS_DEST/Sync.md"            "Sync"              "$_now"
+  write_doc_with_frontmatter "$DOCS_SRC/Roadmap.md"         "$DOCS_DEST/Roadmap.md"         "Roadmap"           "$_now"
+  if [[ -f "$REPO_DIR/Meridian System.pdf" ]]; then
+    cp "$REPO_DIR/Meridian System.pdf" "$DOCS_DEST/Meridian System.pdf"
+    _pass "Updated: Meridian System.pdf"
+  else
+    _warn "Source not found, skipping: Meridian System.pdf"
+  fi
 else
   # Fresh scaffold: skip-if-exists.
-  copy_doc_with_frontmatter "$DOCS_SRC/user-setup.md"      "$DOCS_DEST/user-setup.md"      "User Setup"         "$_now"
-  copy_doc_with_frontmatter "$DOCS_SRC/user-handbook.md"   "$DOCS_DEST/user-handbook.md"   "User Handbook"      "$_now"
-  copy_doc_with_frontmatter "$DOCS_SRC/reference-guide.md"  "$DOCS_DEST/reference-guide.md"  "Reference Guide"  "$_now"
-  copy_doc_with_frontmatter "$DOCS_SRC/architecture.md"     "$DOCS_DEST/architecture.md"     "Architecture"     "$_now"
-  copy_doc_with_frontmatter "$DOCS_SRC/design-decisions.md" "$DOCS_DEST/design-decisions.md" "Design Decisions" "$_now"
-  copy_doc_with_frontmatter "$DOCS_SRC/security.md"         "$DOCS_DEST/security.md"         "Security"         "$_now"
-  copy_doc_with_frontmatter "$DOCS_SRC/sync.md"             "$DOCS_DEST/sync.md"             "Sync Architecture" "$_now"
-  copy_doc_with_frontmatter "$DOCS_SRC/roadmap.md"          "$DOCS_DEST/roadmap.md"          "Roadmap"          "$_now"
+  copy_doc_with_frontmatter "$DOCS_SRC/User Setup.md"      "$DOCS_DEST/User Setup.md"      "User Setup"        "$_now"
+  copy_doc_with_frontmatter "$DOCS_SRC/User Handbook.md"   "$DOCS_DEST/User Handbook.md"   "User Handbook"     "$_now"
+  copy_doc_with_frontmatter "$DOCS_SRC/Reference Guide.md" "$DOCS_DEST/Reference Guide.md" "Reference Guide"   "$_now"
+  copy_doc_with_frontmatter "$DOCS_SRC/Architecture.md"    "$DOCS_DEST/Architecture.md"    "Architecture"      "$_now"
+  copy_doc_with_frontmatter "$DOCS_SRC/Design Decision.md" "$DOCS_DEST/Design Decision.md" "Design Decision"   "$_now"
+  copy_doc_with_frontmatter "$DOCS_SRC/Security.md"        "$DOCS_DEST/Security.md"        "Security"          "$_now"
+  copy_doc_with_frontmatter "$DOCS_SRC/Sync.md"            "$DOCS_DEST/Sync.md"            "Sync"              "$_now"
+  copy_doc_with_frontmatter "$DOCS_SRC/Roadmap.md"         "$DOCS_DEST/Roadmap.md"         "Roadmap"           "$_now"
   copy_if_new "$REPO_DIR/Meridian System.pdf" "$DOCS_DEST/Meridian System.pdf"
 fi
 
@@ -487,8 +576,10 @@ else
   fi
   echo "Next steps:"
   _hint "1. Open Obsidian → Open folder as vault → $VAULT_ROOT"
-  _hint "2. Follow Process/Meridian Documentation/user-setup.md from Step 3 (Rename CurrentCompany)"
+  _hint "2. Follow Process/Meridian Documentation/User Setup.md from Step 3 (Rename CurrentCompany)"
   echo ""
   _warn "Rename Work/CurrentCompany/ to your actual company name after opening the vault."
   echo ""
 fi
+
+register_vault "$VAULT_ROOT"

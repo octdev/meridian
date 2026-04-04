@@ -1,6 +1,6 @@
 # User Handbook
 
-This document explains how to think about and use Meridian day-to-day. For installation and plugin configuration, see [user-setup.md](user-setup.md).
+This document explains how to think about and use Meridian day-to-day. For installation and plugin configuration, see [User Setup.md](User%20Setup.md).
 
 ## Table of Contents
 
@@ -123,11 +123,14 @@ Not every meeting needs a note outside the daily note. The decision:
 
 **Project folder** — the meeting was primarily about a project. Notes go in `Work/CurrentCompany/Projects/[Project]/`. You would look for this note when thinking about the project, not when thinking about the meeting series. Filing it under Meetings would orphan it from its context.
 
-**Meetings folder** — the meeting is a recurring operational cadence (all-hands, staff meeting, council, board review) that generates artifacts, decisions, and action items that need to be found *as a series* over time. This is what the Meetings layer is for.
+**Meetings folder** — any planned meeting that needs its own record: recurring operational cadences (all-hands, staff meeting, council, board review), but also one-off meetings that warrant more than a daily note entry. Two forms:
+
+- **Single file** — a note at `Meetings/YYYY-MM-DD-meeting-name.md`. Use this when the meeting needs its own record but won't generate separate artifacts.
+- **Folder** — a directory at `Meetings/YYYY-MM-DD-meeting-name/` containing the note and whatever artifacts belong to it. Use this when prep materials, slides, references, or other files need to be co-located with the meeting record. There is no required artifact list — put whatever belongs there.
 
 **1:1 rolling note** — one-on-ones with direct reports or tracked peers where you maintain an ongoing record of the working relationship. Not a per-meeting file — a single rolling document per person, appended over time.
 
-If you're unsure: does the output need to be found independently of a specific date, and does it belong to a recurring series rather than a project? If yes, use Meetings.
+If you're unsure: does this meeting need a record you'd look for outside the daily note, and is it not primarily about a project? If yes, use Meetings.
 
 ### Series index and instance index
 

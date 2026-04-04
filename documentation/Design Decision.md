@@ -1,4 +1,4 @@
-# Design Decisions
+# Design Decision
 
 ## DD-01: Markers over tags and folders
 

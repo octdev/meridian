@@ -57,8 +57,13 @@ meridian/
         weekly-outtake.md
         current-priorities.md
       northstar/
-        purpose.md  vision.md  mission.md
-        principles.md  values.md  goals.md  career.md
+        purpose.md
+        vision.md
+        mission.md
+        principles.md
+        values.md
+        goals.md
+        career.md
   scripts/
     ci/
       release.sh                  version tagging and README update script
@@ -67,14 +72,14 @@ meridian/
     base/
       version.json                semver source of truth
   documentation/
-    user-setup.md
-    user-handbook.md
-    reference-guide.md
-    architecture.md               this file
-    design-decisions.md
-    security.md
-    sync.md
-    roadmap.md
+    User Setup.md
+    User Handbook.md
+    Reference Guide.md
+    Architecture.md               this file
+    Design Decision.md
+    Security.md
+    Sync.md
+    Roadmap.md
 ```
 
 `src/bin/` contains all product scripts. `scaffold-vault.sh` copies them — and the `src/lib/` shared libraries — into the vault's `.scripts/` directory at setup time. `src/templates/` holds vault seed files; filenames are kebab-case in the repo and retain their display-case names when written into the vault. The `documentation/` directory contains all user-facing docs — these are copied into the vault at `Process/Meridian Documentation/` with frontmatter injected. The vault itself is not committed to this repo.
@@ -131,8 +136,13 @@ vault/
     Meeting Series.md
     1on1.md
   Northstar/
-    Purpose.md  Vision.md  Mission.md
-    Principles.md  Values.md  Goals.md  Career.md
+    Purpose.md
+    Vision.md
+    Mission.md
+    Principles.md
+    Values.md
+    Goals.md
+    Career.md
   Process/
     Daily/                        YYYY-MM-DD.md files
     Weekly/                       YYYY-MM-DD–DD Weekly Outtake.md files
@@ -146,22 +156,30 @@ vault/
     email.md                      source tag note
     teams.md                      source tag note
     Meridian Documentation/
-      user-setup.md
-      user-handbook.md
-      reference-guide.md
-      cheat-sheet.md
-      architecture.md
-      design-decisions.md
-      security.md
-      sync.md
-      roadmap.md
+      User Setup.md
+      User Handbook.md
+      Reference Guide.md
+      Architecture.md
+      Design Decision.md
+      Security.md
+      Sync.md
+      Roadmap.md
       Meridian System.pdf
   Knowledge/
-    Technical/  Leadership/  Industry/  General/
+    Technical/
+    Leadership/
+    Industry/
+    General/
   Work/
     CurrentCompany/
-      Projects/  People/  Reference/  Incidents/  Vendors/
-      Goals/  Finances/  General/
+      Projects/
+      People/
+      Reference/
+      Incidents/
+      Vendors/
+      Goals/
+      Finances/
+      General/
       Meetings/
         1on1s/                    rolling 1:1 notes, one file per direct report or tracked peer
         [Series Name]/            one folder per recurring series (created by new-meeting-series.sh)
@@ -169,8 +187,14 @@ vault/
           YYYY-MM-DD/             one folder per instance (created by new-meeting-series.sh)
             [Series] YYYY-MM-DD.md
   Life/
-    Projects/  People/  Health/  Finances/
-    Social/  Development/  Fun/  General/
+    Projects/
+    People/
+    Health/
+    Finances/
+    Social/
+    Development/
+    Fun/
+    General/
   References/
 ```
 
@@ -211,11 +235,20 @@ vault/
     teams.md                      source tag note
     Meridian Documentation/       (same docs as personal vault)
   Knowledge/
-    Technical/  Leadership/  Industry/  General/
+    Technical/
+    Leadership/
+    Industry/
+    General/
   Work/
     CurrentCompany/
-      Projects/  People/  Reference/  Incidents/  Vendors/
-      Goals/  Finances/  General/
+      Projects/
+      People/
+      Reference/
+      Incidents/
+      Vendors/
+      Goals/
+      Finances/
+      General/
       Meetings/
         1on1s/                    rolling 1:1 notes, one file per direct report or tracked peer
         [Series Name]/            one folder per recurring series (created by new-meeting-series.sh)
@@ -302,7 +335,7 @@ Work laptop ──Syncthing──► Personal machine ──iCloud──► Phon
   (Life/, Northstar/, References/ not configured on work laptop)
 ```
 
-See [sync.md](sync.md) for full configuration.
+See [Sync.md](Sync.md) for full configuration.
 
 ---
 

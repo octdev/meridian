@@ -38,7 +38,7 @@ The sync configuration ensures `Life/`, `Northstar/`, and `References/` are neve
 
 `Process/` and `Work/` sync bidirectionally — these are expected to be accessible on the work machine.
 
-See [sync.md](sync.md) for the full folder sync matrix.
+See [Sync.md](Sync.md) for the full folder sync matrix.
 
 ### Layer 3: iCloud for personal-to-phone sync
 
@@ -55,7 +55,7 @@ The vault is never stored in employer-managed cloud storage (OneDrive, SharePoin
 | Risk | Mitigation | Residual risk | Future path |
 |------|------------|---------------|-------------|
 | Work machine is employer-controlled — anything on it is potentially visible | Keep personal folders off the work machine via `--profile work` scaffold + Syncthing config | Work content (Process/, Work/, Knowledge/) is on an employer machine | Accept — this is the expected state |
-| Syncthing misconfiguration could expose personal folders | `--profile work` means folders don't exist to misconfigure; document the matrix explicitly | Human error creating personal folders manually on work machine | Automated config verification script (see roadmap.md) |
+| Syncthing misconfiguration could expose personal folders | `--profile work` means folders don't exist to misconfigure; document the matrix explicitly | Human error creating personal folders manually on work machine | Automated config verification script (see Roadmap.md) |
 | Vault is not encrypted at rest | Physical machine security | Low for typical threat model | Full-disk encryption on both machines mitigates this outside Obsidian |
 
 ---

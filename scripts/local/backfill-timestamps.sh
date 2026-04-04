@@ -138,14 +138,14 @@ echo "[meridian] Meridian Documentation..."
 
 DOCS_DEST="$VAULT_ROOT/Process/Meridian Documentation"
 
-update_timestamps "$DOCS_DEST/user-setup.md"
-update_timestamps "$DOCS_DEST/user-handbook.md"
-update_timestamps "$DOCS_DEST/reference-guide.md"
-update_timestamps "$DOCS_DEST/architecture.md"
-update_timestamps "$DOCS_DEST/design-decisions.md"
-update_timestamps "$DOCS_DEST/security.md"
-update_timestamps "$DOCS_DEST/sync.md"
-update_timestamps "$DOCS_DEST/roadmap.md"
+update_timestamps "$DOCS_DEST/User Setup.md"
+update_timestamps "$DOCS_DEST/User Handbook.md"
+update_timestamps "$DOCS_DEST/Reference Guide.md"
+update_timestamps "$DOCS_DEST/Architecture.md"
+update_timestamps "$DOCS_DEST/Design Decision.md"
+update_timestamps "$DOCS_DEST/Security.md"
+update_timestamps "$DOCS_DEST/Sync.md"
+update_timestamps "$DOCS_DEST/Roadmap.md"
 
 echo ""
 

@@ -204,19 +204,19 @@ assert_exists "  script: .scripts/new-company.sh" "$PERSONAL_VAULT/.scripts/new-
 assert_exists "  script: .scripts/new-project.sh" "$PERSONAL_VAULT/.scripts/new-project.sh"
 
 # Documentation
-for f in "user-setup.md" "user-handbook.md" "reference-guide.md" "architecture.md" \
-          "design-decisions.md" "security.md" "sync.md" "roadmap.md" "Meridian System.pdf"; do
+for f in "User Setup.md" "User Handbook.md" "Reference Guide.md" "Architecture.md" \
+          "Design Decision.md" "Security.md" "Sync.md" "Roadmap.md" "Meridian System.pdf"; do
   assert_exists "  doc: Process/Meridian Documentation/$f" "$PERSONAL_VAULT/Process/Meridian Documentation/$f"
 done
 
 # ============================================================
 section "scaffold-vault.sh — personal profile frontmatter injection"
 
-UG="$PERSONAL_VAULT/Process/Meridian Documentation/user-setup.md"
-assert_file_contains "  user-setup.md has title frontmatter" "$UG" "title: User Setup"
-assert_file_contains "  user-setup.md has created frontmatter" "$UG" "created:"
-assert_file_contains "  user-setup.md has modified frontmatter" "$UG" "modified:"
-assert_file_contains "  user-setup.md has --- delimiter" "$UG" "---"
+UG="$PERSONAL_VAULT/Process/Meridian Documentation/User Setup.md"
+assert_file_contains "  User Setup.md has title frontmatter" "$UG" "title: User Setup"
+assert_file_contains "  User Setup.md has created frontmatter" "$UG" "created:"
+assert_file_contains "  User Setup.md has modified frontmatter" "$UG" "modified:"
+assert_file_contains "  User Setup.md has --- delimiter" "$UG" "---"
 
 # ============================================================
 section "scaffold-vault.sh — personal profile obsidian config content"
@@ -247,7 +247,7 @@ assert_absent "  Northstar notes absent" "$WORK_VAULT/Northstar"
 
 # Scripts and docs still present
 assert_exists "  scripts deployed on work profile" "$WORK_VAULT/.scripts/new-company.sh"
-assert_exists "  docs deployed on work profile" "$WORK_VAULT/Process/Meridian Documentation/user-setup.md"
+assert_exists "  docs deployed on work profile" "$WORK_VAULT/Process/Meridian Documentation/User Setup.md"
 
 # ============================================================
 section "scaffold-vault.sh — idempotency (re-run skips existing files)"
@@ -447,24 +447,24 @@ section "documentation — no references to nonexistent cheat-sheet.md"
 
 assert_file_not_contains "  README.md does not reference cheat-sheet.md" \
   "$REPO_DIR/README.md" "cheat-sheet.md"
-assert_file_not_contains "  user-setup.md does not reference cheat-sheet.md" \
-  "$REPO_DIR/documentation/user-setup.md" "cheat-sheet.md"
+assert_file_not_contains "  User Setup.md does not reference cheat-sheet.md" \
+  "$REPO_DIR/documentation/User Setup.md" "cheat-sheet.md"
 
 # ============================================================
 section "documentation — default vault path is correct"
 
-assert_file_not_contains "  user-setup.md does not say default is ./vault" \
-  "$REPO_DIR/documentation/user-setup.md" "Default path is \`./vault\`"
-assert_file_contains "  user-setup.md states ~/Documents/Meridian as default" \
-  "$REPO_DIR/documentation/user-setup.md" "~/Documents/Meridian"
+assert_file_not_contains "  User Setup.md does not say default is ./vault" \
+  "$REPO_DIR/documentation/User Setup.md" "Default path is \`./vault\`"
+assert_file_contains "  User Setup.md states ~/Documents/Meridian as default" \
+  "$REPO_DIR/documentation/User Setup.md" "~/Documents/Meridian"
 
 # ============================================================
 section "documentation — scaffold copies match what docs claim"
 
 # Docs say these are copied to vault — verify scaffold-vault.sh actually copies them
-for doc in "user-setup.md" "user-handbook.md" "reference-guide.md" "architecture.md" \
-            "design-decisions.md" "security.md" "sync.md" "roadmap.md"; do
-  if grep -q "$doc" "$REPO_DIR/scaffold-vault.sh"; then
+for doc in "User Setup.md" "User Handbook.md" "Reference Guide.md" "Architecture.md" \
+            "Design Decision.md" "Security.md" "Sync.md" "Roadmap.md"; do
+  if grep -q "$doc" "$REPO_DIR/src/bin/scaffold-vault.sh"; then
     pass "  scaffold copies $doc (referenced in script)"
   else
     fail "  scaffold copies $doc (not found in scaffold-vault.sh)"
@@ -472,8 +472,8 @@ for doc in "user-setup.md" "user-handbook.md" "reference-guide.md" "architecture
 done
 
 # Verify docs source files actually exist
-for doc in "user-setup.md" "user-handbook.md" "reference-guide.md" "architecture.md" \
-            "design-decisions.md" "security.md" "sync.md" "roadmap.md"; do
+for doc in "User Setup.md" "User Handbook.md" "Reference Guide.md" "Architecture.md" \
+            "Design Decision.md" "Security.md" "Sync.md" "Roadmap.md"; do
   assert_exists "  documentation/$doc exists" "$REPO_DIR/documentation/$doc"
 done
 
