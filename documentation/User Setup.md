@@ -72,16 +72,13 @@ The scaffold script automatically copies all scripts (`weekly-snapshot.py`, `new
 
 ### Upgrading an existing vault
 
-To add missing folders, templates, and scripts to an existing vault after a Meridian update:
+To upgrade an existing vault to the latest Meridian version:
 
 ```bash
-./scaffold-vault.sh --vault /path/to/MyVault --upgrade
+./src/bin/scaffold-vault.sh --upgrade
 ```
 
-`--upgrade` is safe to run on a live vault:
-- Folders, templates, scripts, MOCs, and seed notes that already exist are skipped
-- Missing items are added
-- Documentation in `Process/Meridian Documentation/` is always overwritten with the latest version from the repo
+The script will prompt you to select a vault and which company folders to upgrade. See [[Upgrades]] for the full upgrade guide.
 
 ### Step 2: Open the vault in Obsidian
 
@@ -361,22 +358,15 @@ Assign the Templates hotkey to quickly insert the Reflection template at end of 
 
 ### Upgrading an existing vault
 
-When a new version of Meridian adds folders, templates, or scripts, run the scaffold script with `--upgrade` to pull in the changes without touching your existing notes:
+To upgrade an existing vault to the latest Meridian version:
 
 ```bash
-./scaffold-vault.sh --vault /path/to/MyVault --upgrade
-# or for a work vault:
-./scaffold-vault.sh --vault /path/to/WorkVault --profile work --upgrade
+./src/bin/scaffold-vault.sh --upgrade
 ```
 
-What `--upgrade` does:
-- Creates any missing folders
-- Copies any missing templates, scripts, MOCs, and seed notes
-- **Always overwrites** `Process/Meridian Documentation/` so your in-vault docs stay current
+The script will prompt you to select a vault and which company folders to upgrade. It runs all applicable migration scripts in order, then overwrites `Process/Meridian Documentation/` with the latest docs.
 
-What it does not do:
-- Overwrite existing notes, templates, or scripts you may have customized
-- Remove or rename anything
+See [[Upgrades]] for the full upgrade guide, including what happens when upgrading across multiple versions and how per-company version tracking works.
 
 ### Rename CurrentCompany
 

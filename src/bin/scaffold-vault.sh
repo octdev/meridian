@@ -4,6 +4,7 @@
 #
 # Usage:
 #   scaffold-vault.sh [--vault <path>] [--profile personal|work] [--upgrade]
+#   scaffold-vault.sh --version
 #   scaffold-vault.sh -h | --help
 #
 # Options:
@@ -13,6 +14,9 @@
 #                            templates, scripts, and MOCs (skips existing files).
 #                            Always overwrites documentation in
 #                            Process/Meridian Documentation/.
+#   --version                Print the Meridian project version and the installed
+#                            vault version, then exit. Uses --vault <path> if
+#                            supplied, otherwise the first registered vault.
 #
 # Profiles:
 #   personal  Full vault: Process, Work, Knowledge, Northstar, Life, References
@@ -34,10 +38,12 @@ REPO_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$REPO_DIR/src/lib/colors.sh"
 source "$REPO_DIR/src/lib/logging.sh"
 source "$REPO_DIR/src/lib/errors.sh"
+source "$REPO_DIR/src/lib/vault-select.sh"
 
 usage() {
   cat <<EOF
 Usage: scaffold-vault.sh [--vault <path>] [--profile personal|work] [--upgrade]
+       scaffold-vault.sh --version
        scaffold-vault.sh -h | --help
 
 Creates the Meridian vault folder structure and seed files.
@@ -46,6 +52,9 @@ Options:
   --vault <path>           Path to vault root directory. Default: ~/Documents/Meridian
   --profile personal|work  Scaffold profile. Default: personal
   --upgrade                Upgrade an existing vault instead of creating a new one.
+  --version                Print the Meridian project version and the installed
+                           vault version, then exit. Accepts --vault <path>;
+                           defaults to the first registered vault.
 
 Profiles:
   personal  Full vault including Northstar, Life, and References.
@@ -65,12 +74,25 @@ Examples:
 EOF
 }
 
+# --- version helper ---
+
+# Reads X.Y.Z from the known Meridian version.json format.
+semver_from_version_json() {
+  local json_file="$1"
+  local major minor patch
+  major="$(grep '"major"' "$json_file" | grep -o '[0-9]*')"
+  minor="$(grep '"minor"' "$json_file" | grep -o '[0-9]*')"
+  patch="$(grep '"patch"' "$json_file" | grep -o '[0-9]*')"
+  echo "${major}.${minor}.${patch}"
+}
+
 # --- argument parsing ---
 
 VAULT_ROOT="${HOME}/Documents/Meridian"
 VAULT_ROOT_SET=false
 PROFILE="personal"
 UPGRADE=false
+SHOW_VERSION=false
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -85,12 +107,64 @@ while [[ $# -gt 0 ]]; do
       esac ;;
     --upgrade)
       UPGRADE=true; shift ;;
+    --version)
+      SHOW_VERSION=true; shift ;;
     -h|--help)
       usage; exit 0 ;;
     *)
       echo "[meridian] Error: unknown argument: $1" >&2; usage >&2; exit 1 ;;
   esac
 done
+
+# --- version display ---
+
+if [[ "$SHOW_VERSION" == true ]]; then
+  _meridian_version="$(semver_from_version_json "$REPO_DIR/config/base/version.json")"
+
+  if [[ "$VAULT_ROOT_SET" == false ]]; then
+    select_vault
+    VAULT_ROOT_SET=true
+  fi
+
+  _vault_ver_file="$VAULT_ROOT/.scripts/.vault-version"
+  if [[ -f "$_vault_ver_file" ]]; then
+    # Read vault= key (new format); fall back to full file content (old plain format).
+    # || true prevents grep's non-zero exit from triggering set -e when key is absent.
+    _vault_version="$(grep "^vault=" "$_vault_ver_file" 2>/dev/null | cut -d= -f2)" || true
+    [[ -n "$_vault_version" ]] || _vault_version="$(cat "$_vault_ver_file")"
+  else
+    _vault_version="unknown (pre-dates version tracking)"
+  fi
+
+  echo "Meridian: $_meridian_version"
+  echo "Vault:    $_vault_version  ($VAULT_ROOT)"
+
+  # Show per-company versions from new key=value format (*-vault= entries).
+  if [[ -f "$_vault_ver_file" ]]; then
+    while IFS= read -r _line; do
+      _company="${_line%-vault=*}"
+      _cver="${_line#*-vault=}"
+      printf "  %-20s %s\n" "${_company}:" "$_cver"
+    done < <(grep "\-vault=" "$_vault_ver_file" 2>/dev/null || true)
+  fi
+
+  echo ""
+  exit 0
+fi
+
+# --- upgrade delegation ---
+
+if [[ "$UPGRADE" == true ]]; then
+  if [[ "$VAULT_ROOT_SET" == false ]]; then
+    select_vault
+  fi
+  _target="$(semver_from_version_json "$REPO_DIR/config/base/version.json")"
+  _upgrade_script="$REPO_DIR/scripts/upgrade/upgrade-to-${_target}.sh"
+  if [[ ! -f "$_upgrade_script" ]]; then
+    die "scaffold" "No upgrade script found for version ${_target}. Is the repo up to date?"
+  fi
+  exec bash "$_upgrade_script" --vault "$VAULT_ROOT"
+fi
 
 # --- write helper ---
 
@@ -140,23 +214,6 @@ copy_doc_with_frontmatter() {
   fi
 }
 
-write_doc_with_frontmatter() {
-  # Like copy_doc_with_frontmatter but always overwrites — used by --upgrade for docs.
-  local src="$1"
-  local dest="$2"
-  local title="$3"
-  local ts="$4"
-  if [[ ! -f "$src" ]]; then
-    _warn "Source not found, skipping: $(basename "$src")"
-    return
-  fi
-  {
-    printf -- '---\ntitle: %s\ncreated: %s\nmodified: %s\n---\n\n' "$title" "$ts" "$ts"
-    cat "$src"
-  } > "$dest" || die "write-doc" "Could not write: $dest"
-  _pass "Updated: ${dest#$VAULT_ROOT/}"
-}
-
 copy_with_timestamps() {
   local src="$1"
   local dest="$2"
@@ -178,167 +235,31 @@ copy_with_timestamps() {
 }
 
 
-# --- vault registry ---
-
-register_vault() {
-  local vault_path="$1"
-  local vaults_file="$REPO_DIR/config/vaults.txt"
-  local lines=()
-
-  if [[ -f "$vaults_file" ]]; then
-    while IFS= read -r line; do
-      [[ -n "$line" && "$line" != "$vault_path" ]] && lines+=("$line")
-    done < "$vaults_file"
-  fi
-
-  mkdir -p "$(dirname "$vaults_file")"
-  {
-    echo "$vault_path"
-    if [[ ${#lines[@]} -gt 0 ]]; then
-      printf '%s\n' "${lines[@]}"
-    fi
-  } > "$vaults_file"
-}
-
-load_known_vaults() {
-  KNOWN_VAULTS=()
-  local vaults_file="$REPO_DIR/config/vaults.txt"
-  if [[ ! -f "$vaults_file" ]]; then
-    return 0
-  fi
-
-  local valid=() stale=()
-  while IFS= read -r line; do
-    [[ -z "$line" ]] && continue
-    if [[ -d "$line" ]]; then
-      valid+=("$line")
-    else
-      stale+=("$line")
-    fi
-  done < "$vaults_file"
-
-  if [[ ${#stale[@]} -gt 0 ]]; then
-    if [[ ${#valid[@]} -gt 0 ]]; then
-      printf '%s\n' "${valid[@]}" > "$vaults_file"
-    else
-      > "$vaults_file"
-    fi
-    local _n=${#stale[@]}
-    _warn "Removed $_n stale vault $([ "$_n" -eq 1 ] && echo entry || echo entries) ($([ "$_n" -eq 1 ] && echo directory || echo directories) no longer exist)."
-    echo ""
-  fi
-
-  if [[ ${#valid[@]} -gt 0 ]]; then
-    KNOWN_VAULTS=("${valid[@]}")
-  fi
-  return 0
-}
-
 # --- main ---
 
 echo ""
-if [[ "$UPGRADE" == true ]]; then
-  echo "[meridian] Upgrade Vault"
-else
-  echo "[meridian] New Vault"
-fi
+echo "[meridian] New Vault"
 echo ""
 
 if [[ "$VAULT_ROOT_SET" == false ]]; then
-  if [[ "$UPGRADE" == true ]]; then
-    load_known_vaults
-    if [[ ${#KNOWN_VAULTS[@]} -gt 0 ]]; then
-      echo "  Known vaults:"
-      for _i in "${!KNOWN_VAULTS[@]}"; do
-        if [[ $_i -eq 0 ]]; then
-          _hint "    $((_i+1)). ${KNOWN_VAULTS[$_i]}  (default)"
-        else
-          _hint "    $((_i+1)). ${KNOWN_VAULTS[$_i]}"
-        fi
-      done
-      echo ""
-      read -rp "  Select vault [1] or enter path: " _vault_input
-      echo ""
-      if [[ -z "$_vault_input" || "$_vault_input" == "1" ]]; then
-        VAULT_ROOT="${KNOWN_VAULTS[0]}"
-      elif [[ "$_vault_input" =~ ^[0-9]+$ ]] && \
-           [[ "$_vault_input" -ge 1 && "$_vault_input" -le ${#KNOWN_VAULTS[@]} ]]; then
-        VAULT_ROOT="${KNOWN_VAULTS[$((_vault_input-1))]}"
-      else
-        VAULT_ROOT="${_vault_input/#\~/$HOME}"
-      fi
-    else
-      read -rp "  Vault path: " _vault_input
-      echo ""
-      [[ -n "$_vault_input" ]] && VAULT_ROOT="${_vault_input/#\~/$HOME}"
-    fi
-  else
-    read -rp "  Vault path [~/Documents/Meridian]: " _vault_input
-    echo ""
-    [[ -n "$_vault_input" ]] && VAULT_ROOT="${_vault_input/#\~/$HOME}"
-  fi
+  read -rp "  Vault path [~/Documents/Meridian]: " _vault_input
+  echo ""
+  [[ -n "$_vault_input" ]] && VAULT_ROOT="${_vault_input/#\~/$HOME}"
 fi
 
-if [[ "$UPGRADE" == true ]]; then
-  echo "[meridian] Upgrading vault at: $VAULT_ROOT (profile: $PROFILE)"
-  echo ""
-  if [[ ! -d "$VAULT_ROOT" ]]; then
-    printf "${_C_RED}[meridian] ✗ Vault not found: %s${_C_RESET}\n" "$VAULT_ROOT" >&2
-    echo "" >&2
-    echo "  --upgrade requires an existing vault. Run without --upgrade to create a new one." >&2
-    echo "" >&2
-    exit 1
-  fi
-else
-  echo "[meridian] Scaffolding vault at: $VAULT_ROOT (profile: $PROFILE)"
-  echo ""
-  if [[ -d "$VAULT_ROOT" ]]; then
-    printf "${_C_RED}[meridian] ✗ Target directory already exists: %s${_C_RESET}\n" "$VAULT_ROOT" >&2
-    echo "" >&2
-    echo "  To upgrade an existing vault, re-run with --upgrade." >&2
-    echo "" >&2
-    exit 1
-  fi
+echo "[meridian] Scaffolding vault at: $VAULT_ROOT (profile: $PROFILE)"
+echo ""
+
+if [[ -d "$VAULT_ROOT" ]]; then
+  printf "${_C_RED}[meridian] ✗ Target directory already exists: %s${_C_RESET}\n" "$VAULT_ROOT" >&2
+  echo "" >&2
+  echo "  To upgrade an existing vault, re-run with --upgrade." >&2
+  echo "" >&2
+  exit 1
 fi
 
-# --- company name ---
-# Upgrade mode: detect from Work/ and confirm with user.
-# Fresh scaffold: use the placeholder; user renames after opening in Obsidian.
-
-if [[ "$UPGRADE" == true ]]; then
-  _companies=()
-  if [[ -d "$VAULT_ROOT/Work" ]]; then
-    for _d in "$VAULT_ROOT/Work"/*/; do
-      [[ -d "$_d" ]] && _companies+=("$(basename "$_d")")
-    done
-  fi
-
-  if [[ ${#_companies[@]} -eq 1 ]]; then
-    _detected="${_companies[0]}"
-    echo ""
-    read -rp "$(printf "${_C_CYAN}Company name [${_detected}]:${_C_RESET} ")" COMPANY
-    COMPANY="${COMPANY:-$_detected}"
-  elif [[ ${#_companies[@]} -gt 1 ]]; then
-    echo ""
-    _detail "Multiple companies found under Work/:"
-    for _c in "${_companies[@]}"; do _detail "  $_c"; done
-    echo ""
-    read -rp "$(printf "${_C_CYAN}Company name to upgrade:${_C_RESET} ")" COMPANY
-  else
-    echo ""
-    read -rp "$(printf "${_C_CYAN}Company name:${_C_RESET} ")" COMPANY
-  fi
-
-  [[ -n "$COMPANY" ]] || die "Company name cannot be empty." ""
-  [[ -d "$VAULT_ROOT/Work/$COMPANY" ]] || \
-    die "Company directory not found: Work/$COMPANY" "Check the name and try again."
-
-  echo ""
-  _detail "Company: $COMPANY"
-  echo ""
-else
-  COMPANY="CurrentCompany"
-fi
+# Fresh scaffold always uses CurrentCompany; user renames after opening in Obsidian.
+COMPANY="CurrentCompany"
 
 # --- folders ---
 
@@ -515,6 +436,20 @@ chmod +x "$VAULT_ROOT/.scripts/new-meeting-series.sh" 2>/dev/null || true
 
 echo ""
 
+# --- vault version ---
+
+_vault_version="$(semver_from_version_json "$REPO_DIR/config/base/version.json")"
+if [[ ! -f "$VAULT_ROOT/.scripts/.vault-version" ]]; then
+  {
+    echo "vault=${_vault_version}"
+    echo "${COMPANY}-vault=${_vault_version}"
+  } > "$VAULT_ROOT/.scripts/.vault-version"
+  _pass "Created: .scripts/.vault-version"
+else
+  echo "  — Skipped (exists): .scripts/.vault-version"
+fi
+echo ""
+
 # --- documentation ---
 
 echo "[meridian] Copying documentation..."
@@ -522,64 +457,33 @@ echo "[meridian] Copying documentation..."
 DOCS_SRC="$REPO_DIR/documentation"
 DOCS_DEST="$VAULT_ROOT/Process/Meridian Documentation"
 
-if [[ "$UPGRADE" == true ]]; then
-  # Upgrade: always overwrite documentation so vault copies stay current.
-  write_doc_with_frontmatter "$DOCS_SRC/User Setup.md"      "$DOCS_DEST/User Setup.md"      "User Setup"        "$_now"
-  write_doc_with_frontmatter "$DOCS_SRC/User Handbook.md"   "$DOCS_DEST/User Handbook.md"   "User Handbook"     "$_now"
-  write_doc_with_frontmatter "$DOCS_SRC/Reference Guide.md" "$DOCS_DEST/Reference Guide.md" "Reference Guide"   "$_now"
-  write_doc_with_frontmatter "$DOCS_SRC/Architecture.md"    "$DOCS_DEST/Architecture.md"    "Architecture"      "$_now"
-  write_doc_with_frontmatter "$DOCS_SRC/Design Decision.md" "$DOCS_DEST/Design Decision.md" "Design Decision"   "$_now"
-  write_doc_with_frontmatter "$DOCS_SRC/Security.md"        "$DOCS_DEST/Security.md"        "Security"          "$_now"
-  write_doc_with_frontmatter "$DOCS_SRC/Sync.md"            "$DOCS_DEST/Sync.md"            "Sync"              "$_now"
-  write_doc_with_frontmatter "$DOCS_SRC/Roadmap.md"         "$DOCS_DEST/Roadmap.md"         "Roadmap"           "$_now"
-  if [[ -f "$REPO_DIR/Meridian System.pdf" ]]; then
-    cp "$REPO_DIR/Meridian System.pdf" "$DOCS_DEST/Meridian System.pdf"
-    _pass "Updated: Meridian System.pdf"
-  else
-    _warn "Source not found, skipping: Meridian System.pdf"
-  fi
-else
-  # Fresh scaffold: skip-if-exists.
-  copy_doc_with_frontmatter "$DOCS_SRC/User Setup.md"      "$DOCS_DEST/User Setup.md"      "User Setup"        "$_now"
-  copy_doc_with_frontmatter "$DOCS_SRC/User Handbook.md"   "$DOCS_DEST/User Handbook.md"   "User Handbook"     "$_now"
-  copy_doc_with_frontmatter "$DOCS_SRC/Reference Guide.md" "$DOCS_DEST/Reference Guide.md" "Reference Guide"   "$_now"
-  copy_doc_with_frontmatter "$DOCS_SRC/Architecture.md"    "$DOCS_DEST/Architecture.md"    "Architecture"      "$_now"
-  copy_doc_with_frontmatter "$DOCS_SRC/Design Decision.md" "$DOCS_DEST/Design Decision.md" "Design Decision"   "$_now"
-  copy_doc_with_frontmatter "$DOCS_SRC/Security.md"        "$DOCS_DEST/Security.md"        "Security"          "$_now"
-  copy_doc_with_frontmatter "$DOCS_SRC/Sync.md"            "$DOCS_DEST/Sync.md"            "Sync"              "$_now"
-  copy_doc_with_frontmatter "$DOCS_SRC/Roadmap.md"         "$DOCS_DEST/Roadmap.md"         "Roadmap"           "$_now"
-  copy_if_new "$REPO_DIR/Meridian System.pdf" "$DOCS_DEST/Meridian System.pdf"
-fi
+copy_doc_with_frontmatter "$DOCS_SRC/User Setup.md"      "$DOCS_DEST/User Setup.md"      "User Setup"        "$_now"
+copy_doc_with_frontmatter "$DOCS_SRC/User Handbook.md"   "$DOCS_DEST/User Handbook.md"   "User Handbook"     "$_now"
+copy_doc_with_frontmatter "$DOCS_SRC/Reference Guide.md" "$DOCS_DEST/Reference Guide.md" "Reference Guide"   "$_now"
+copy_doc_with_frontmatter "$DOCS_SRC/Architecture.md"    "$DOCS_DEST/Architecture.md"    "Architecture"      "$_now"
+copy_doc_with_frontmatter "$DOCS_SRC/Design Decision.md" "$DOCS_DEST/Design Decision.md" "Design Decision"   "$_now"
+copy_doc_with_frontmatter "$DOCS_SRC/Security.md"        "$DOCS_DEST/Security.md"        "Security"          "$_now"
+copy_doc_with_frontmatter "$DOCS_SRC/Sync.md"            "$DOCS_DEST/Sync.md"            "Sync"              "$_now"
+copy_doc_with_frontmatter "$DOCS_SRC/Roadmap.md"         "$DOCS_DEST/Roadmap.md"         "Roadmap"           "$_now"
+copy_doc_with_frontmatter "$DOCS_SRC/Upgrades.md"        "$DOCS_DEST/Upgrades.md"        "Upgrades"          "$_now"
+copy_if_new "$REPO_DIR/Meridian System.pdf" "$DOCS_DEST/Meridian System.pdf"
 
 echo ""
 
 # --- summary ---
 
-if [[ "$UPGRADE" == true ]]; then
-  printf "${_C_GREEN}[meridian] Vault upgraded successfully.${_C_RESET}\n"
-  echo ""
-  if [[ "$PROFILE" == "work" ]]; then
-    _warn "Work profile: Northstar/, Life/, and References/ were not created."
-    _hint "These folders are intentionally absent — never add them to Syncthing on this machine."
-    echo ""
-  fi
-  _hint "Documentation in Process/Meridian Documentation/ has been refreshed."
-  _hint "Any missing folders, templates, and scripts have been added."
-  echo ""
-else
-  printf "${_C_GREEN}[meridian] Vault scaffolded successfully.${_C_RESET}\n"
-  echo ""
-  if [[ "$PROFILE" == "work" ]]; then
-    _warn "Work profile: Northstar/, Life/, and References/ were not created."
-    _hint "These folders are intentionally absent — never add them to Syncthing on this machine."
-    echo ""
-  fi
-  echo "Next steps:"
-  _hint "1. Open Obsidian → Open folder as vault → $VAULT_ROOT"
-  _hint "2. Follow Process/Meridian Documentation/User Setup.md from Step 3 (Rename CurrentCompany)"
-  echo ""
-  _warn "Rename Work/CurrentCompany/ to your actual company name after opening the vault."
+printf "${_C_GREEN}[meridian] Vault scaffolded successfully.${_C_RESET}\n"
+echo ""
+if [[ "$PROFILE" == "work" ]]; then
+  _warn "Work profile: Northstar/, Life/, and References/ were not created."
+  _hint "These folders are intentionally absent — never add them to Syncthing on this machine."
   echo ""
 fi
+echo "Next steps:"
+_hint "1. Open Obsidian → Open folder as vault → $VAULT_ROOT"
+_hint "2. Follow Process/Meridian Documentation/User Setup.md from Step 3 (Rename CurrentCompany)"
+echo ""
+_warn "Rename Work/CurrentCompany/ to your actual company name after opening the vault."
+echo ""
 
 register_vault "$VAULT_ROOT"

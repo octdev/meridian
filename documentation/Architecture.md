@@ -41,6 +41,7 @@ meridian/
       colors.sh                   TTY-aware color variable definitions
       logging.sh                  output helpers: _pass, _fail, _warn, _hint, _detail, _cmd
       errors.sh                   die function and shared error handling
+      vault-select.sh             vault registry, interactive vault selection, company detection
     templates/
       obsidian-templates/
         daily-note.md
@@ -69,6 +70,11 @@ meridian/
       release.sh                  version tagging and README update script
     local/
       backfill-timestamps.sh      populates empty created:/modified: fields in existing vault files
+    upgrade/
+      upgrade-runner.sh           sourced library: orchestrates vault upgrade chain
+      upgrade-to-X.Y.Z.sh         entry point per release (one file per version)
+      migrations/
+        vX.Y.Z.sh                 migration script per release (one file per version)
   config/
     base/
       version.json                semver source of truth
@@ -81,11 +87,14 @@ meridian/
     Security.md
     Sync.md
     Roadmap.md
+    Upgrades.md                   upgrade system: user guide and developer reference
 ```
 
 `src/bin/` contains all product scripts. `scaffold-vault.sh` copies them — and the `src/lib/` shared libraries — into the vault's `.scripts/` directory at setup time. `src/templates/` holds vault seed files; filenames are kebab-case in the repo and retain their display-case names when written into the vault. The `documentation/` directory contains all user-facing docs — these are copied into the vault at `Process/Meridian Documentation/` with frontmatter injected. The vault itself is not committed to this repo.
 
 `scripts/local/` holds one-off utilities run directly from the repo, not copied to the vault. `backfill-timestamps.sh` is used when migrating an existing vault: it walks all Markdown files and populates any empty `created:` or `modified:` frontmatter fields, leaving existing timestamps untouched.
+
+`scripts/upgrade/` contains the versioned upgrade system. `upgrade-runner.sh` is a sourced library that orchestrates discovery, ordering, and execution of migration scripts. Each release gets one entry point (`upgrade-to-X.Y.Z.sh`) and one migration script (`migrations/vX.Y.Z.sh`). Users run upgrades via `scaffold-vault.sh --upgrade`, which delegates to the appropriate entry point. See `documentation/Upgrades.md` for full details.
 
 ---
 
@@ -123,6 +132,7 @@ vault/
     daily-notes.json
     templates.json
   .scripts/
+    .vault-version                key=value version file (vault= and Company-vault= entries)
     weekly-snapshot.py
     new-company.sh
     new-project.sh
@@ -167,6 +177,7 @@ vault/
       Security.md
       Sync.md
       Roadmap.md
+      Upgrades.md
       Meridian System.pdf
   Knowledge/
     Technical/
@@ -209,6 +220,7 @@ vault/
     daily-notes.json
     templates.json
   .scripts/
+    .vault-version                key=value version file (vault= and Company-vault= entries)
     weekly-snapshot.py
     new-company.sh
     new-project.sh
@@ -236,7 +248,7 @@ vault/
     Current Priorities.md         Manual MOC
     email.md                      source tag note
     teams.md                      source tag note
-    Meridian Documentation/       (same docs as personal vault)
+    Meridian Documentation/       (same docs as personal vault, including Upgrades.md)
   Knowledge/
     Technical/
     Leadership/

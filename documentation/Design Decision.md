@@ -160,6 +160,36 @@
 
 ---
 
+## DD-18: Serial versioned upgrade chain over a single cumulative script
+
+**Decision:** Each Meridian release that changes vault content gets its own pair of files: a thin entry point (`upgrade-to-X.Y.Z.sh`) and a migration script (`migrations/vX.Y.Z.sh`). When upgrading across multiple versions, the runner discovers and executes all applicable migration scripts in semver order.
+
+**Rationale:** A single cumulative upgrade script must account for every possible starting state a user's vault might be in. As versions accumulate, this becomes increasingly complex to write and impossible to test completely. Individual migration scripts each assume exactly one starting state — the version immediately before them — which is always known and testable. Multi-version upgrades are automatically correct: they are just sequential single-version upgrades. No integration testing across version combinations is needed.
+
+**Tradeoff:** Each release requires creating a new file pair, and a migration chain may contain no-op stubs for releases with no vault-visible changes. This overhead is low and keeps the version history explicit.
+
+---
+
+## DD-19: Per-company version tracking in .vault-version
+
+**Decision:** The vault's `.scripts/.vault-version` file tracks versions per company folder (`AcmeCorp-vault=1.2.0`) in addition to the main vault version (`vault=1.2.0`), rather than using a single vault-wide version for everything.
+
+**Rationale:** Work contexts have different lifecycles. A user may have multiple company folders — an active employer and one or more previous ones. Migrations that add new subfolders or seed files under `Work/[Company]/` should apply only to companies the user is actively maintaining. A previous employer's folder is a complete historical record; applying forward migrations to it serves no purpose and risks altering a closed context. Independent tracking makes eligibility explicit and gives the user a meaningful choice at upgrade time.
+
+**Tradeoff:** Version tracking is more complex and more things can fall out of sync. Mitigated by the upgrade prompt showing eligible vs. ineligible companies clearly, and by the strong guidance to always upgrade active employer vaults.
+
+---
+
+## DD-20: Documentation always overwritten on upgrade (supersedes DD-10 in part)
+
+**Decision:** Every upgrade run unconditionally overwrites all files in `Process/Meridian Documentation/` with the latest versions from the repo. This replaces the prior behavior (DD-10) where vault documentation was a scaffold-time snapshot that never auto-updated.
+
+**Rationale:** Documentation is repo-owned content — users do not customise it. Leaving it as a static snapshot means users on old vault installations read outdated guidance, which is worse than the cost of overwriting. The upgrade system provides the natural delivery vehicle that was absent when DD-10 was written.
+
+**Tradeoff:** Any notes a user has added to files inside `Process/Meridian Documentation/` would be lost on upgrade. The folder is documented as Meridian-owned and not a place for personal notes.
+
+---
+
 ## DD-07: Syncthing for work/personal boundary enforcement
 
 **Decision:** Syncthing with folder-level Send Only / Receive Only modes enforces the personal/work content boundary between machines.

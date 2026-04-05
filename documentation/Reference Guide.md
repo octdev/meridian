@@ -15,7 +15,7 @@ Process/
   Active Projects · Action Items · Open Loops · Review Queue
   Weekly Outtake · Current Priorities
   Meridian Documentation/   User Setup · User Handbook · Reference Guide
-                            Architecture · Design Decision · Security · Sync · Roadmap · PDF
+                            Architecture · Design Decision · Security · Sync · Roadmap · Upgrades · PDF
 Knowledge/       Technical/ · Leadership/ · Industry/ · General/
 Work/
   CurrentCompany/
@@ -28,6 +28,7 @@ References/      external artifacts, source material
 _templates/      Daily Note.md · Generic Note.md · Reflection.md
                  Meeting Instance.md · Meeting Series.md · 1on1.md
 .scripts/        weekly-snapshot.py · new-company.sh · new-project.sh · new-meeting-series.sh
+                 .vault-version
 ```
 
 **Work vault (`--profile work`) — Northstar, Life, References absent:**
@@ -37,7 +38,7 @@ Process/
   Weekly/        auto-generated snapshots
   Active Projects · Action Items · Open Loops · Review Queue
   Weekly Outtake · Current Priorities
-  Meridian Documentation/   (same as personal vault)
+  Meridian Documentation/   (same as personal vault, including Upgrades)
 Knowledge/       Technical/ · Leadership/ · Industry/ · General/
 Work/
   CurrentCompany/
@@ -48,6 +49,7 @@ Work/
 _templates/      Daily Note.md · Generic Note.md · Reflection.md
                  Meeting Instance.md · Meeting Series.md · 1on1.md
 .scripts/        weekly-snapshot.py · new-company.sh · new-project.sh · new-meeting-series.sh
+                 .vault-version
 ```
 
 ---
@@ -329,6 +331,16 @@ chmod +x scaffold-vault.sh
 ```
 
 The scaffold script automatically copies all scripts into `.scripts/` and all documentation into `Process/Meridian Documentation/`.
+
+**Upgrade an existing vault:**
+```bash
+./src/bin/scaffold-vault.sh --upgrade
+```
+
+**Check vault and Meridian versions:**
+```bash
+./src/bin/scaffold-vault.sh --version
+```
 
 ## Vault Management Scripts
 

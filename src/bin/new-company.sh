@@ -116,3 +116,14 @@ echo ""
 _detail "Location: ${company_dir}"
 _detail "Run new-project.sh to add a project under ${company_dir}/Projects/"
 echo ""
+
+# Register the new company in .vault-version at the current vault version.
+_vault_version_file="${vault_root}/.scripts/.vault-version"
+if [[ -f "$_vault_version_file" ]]; then
+  _vault_ver="$(grep "^vault=" "$_vault_version_file" 2>/dev/null | cut -d= -f2)"
+  if [[ -n "$_vault_ver" ]]; then
+    echo "${company_name}-vault=${_vault_ver}" >> "$_vault_version_file"
+    _pass ".vault-version updated: ${company_name} registered at ${_vault_ver}"
+    echo ""
+  fi
+fi
