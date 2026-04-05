@@ -347,6 +347,16 @@ Flags for `new-meeting-series.sh`:
 
 Or invoke from the Obsidian command palette: **New Company**, **New Project**, **New Meeting Series**.
 
+## Repo Utilities (not copied to vault)
+
+```bash
+bash scripts/local/backfill-timestamps.sh --vault <path>
+```
+
+Populates empty `created:` and `modified:` frontmatter fields in all Markdown files in the vault. Only touches fields that are completely empty — existing timestamps are left unchanged. Run once when migrating an existing vault to Meridian or after a bulk import.
+
+---
+
 ## Weekly Snapshot CLI
 
 The weekly snapshot runs automatically every Monday via the Shell Commands plugin. These flags are available if you need to trigger or inspect it manually:

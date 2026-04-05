@@ -67,7 +67,8 @@ meridian/
   scripts/
     ci/
       release.sh                  version tagging and README update script
-    local/                        (empty — reserved for local dev scripts)
+    local/
+      backfill-timestamps.sh      populates empty created:/modified: fields in existing vault files
   config/
     base/
       version.json                semver source of truth
@@ -83,6 +84,8 @@ meridian/
 ```
 
 `src/bin/` contains all product scripts. `scaffold-vault.sh` copies them — and the `src/lib/` shared libraries — into the vault's `.scripts/` directory at setup time. `src/templates/` holds vault seed files; filenames are kebab-case in the repo and retain their display-case names when written into the vault. The `documentation/` directory contains all user-facing docs — these are copied into the vault at `Process/Meridian Documentation/` with frontmatter injected. The vault itself is not committed to this repo.
+
+`scripts/local/` holds one-off utilities run directly from the repo, not copied to the vault. `backfill-timestamps.sh` is used when migrating an existing vault: it walks all Markdown files and populates any empty `created:` or `modified:` frontmatter fields, leaving existing timestamps untouched.
 
 ---
 
