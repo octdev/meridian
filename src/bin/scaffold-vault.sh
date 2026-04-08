@@ -20,7 +20,8 @@
 #
 # Profiles:
 #   personal  Full vault: Process, Work, Knowledge, Northstar, Life, References
-#   work      Work vault: Process, Work, Knowledge only.
+#   work      Work vault: Process and Work/ only. Knowledge lives at
+#             Work/<Company>/Knowledge/ — no top-level Knowledge/ folder.
 #             Northstar, Life, and References are intentionally omitted so
 #             personal content never exists on a work machine.
 #
@@ -60,7 +61,8 @@ Profiles:
   personal  Full vault including Northstar, Life, and References.
             Use for your personal machine.
 
-  work      Work-only vault: Process, Work, and Knowledge only.
+  work      Work-only vault: Process and Work/ only. Knowledge lives at
+            Work/<Company>/Knowledge/ — no top-level Knowledge/ folder.
             Northstar, Life, and References are intentionally omitted.
             Use for employer-managed or work machines. Personal content
             is never created and therefore cannot be accidentally synced.
@@ -259,7 +261,6 @@ echo "[meridian] Creating folders..."
 
 dirs=(
   "Process/Weekly"
-  "Process/Drafts"
   "Process/Meridian Documentation"
   "Work/$COMPANY/Projects"
   "Work/$COMPANY/People"
@@ -272,6 +273,7 @@ dirs=(
   "Work/$COMPANY/Meetings"
   "Work/$COMPANY/Meetings/1on1s"
   "Work/$COMPANY/Daily"
+  "Work/$COMPANY/Drafts"
   "Work/$COMPANY/Knowledge/Technical"
   "Work/$COMPANY/Knowledge/Leadership"
   "Work/$COMPANY/Knowledge/Industry"
@@ -283,6 +285,7 @@ dirs=(
 if [[ "$PROFILE" == "personal" ]]; then
   dirs+=(
     "Northstar"
+    "Life/Drafts"
     "Life/Projects"
     "Life/People"
     "Life/Health"
@@ -400,8 +403,12 @@ mkdir -p "$VAULT_ROOT/.obsidian"
 
 if [[ "$PROFILE" == "personal" ]]; then
   DAILY_FOLDER="Life/Daily"
+  DRAFTS_FOLDER="Life/Drafts"
+  ATTACHMENTS_FOLDER="References"
 else
   DAILY_FOLDER="Work/$COMPANY/Daily"
+  DRAFTS_FOLDER="Work/$COMPANY/Drafts"
+  ATTACHMENTS_FOLDER="Work/$COMPANY/Reference"
 fi
 
 write_if_new "$VAULT_ROOT/.obsidian/daily-notes.json" "{
@@ -409,6 +416,12 @@ write_if_new "$VAULT_ROOT/.obsidian/daily-notes.json" "{
   \"template\": \"_templates/Daily Note\",
   \"format\": \"YYYY-MM-DD\",
   \"autorun\": false
+}"
+
+write_if_new "$VAULT_ROOT/.obsidian/app.json" "{
+  \"newFileLocation\": \"folder\",
+  \"newFileFolderPath\": \"$DRAFTS_FOLDER\",
+  \"attachmentFolderPath\": \"$ATTACHMENTS_FOLDER\"
 }"
 
 write_if_new "$VAULT_ROOT/.obsidian/templates.json" '{

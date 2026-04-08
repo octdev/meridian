@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# migrations/v0.10.0.sh — vault changes for Meridian 0.10.0
+# migrations/v0.10.1.sh — vault changes for Meridian 0.10.1
 #
 # Called by upgrade-runner.sh. Do not run directly.
 #
@@ -9,24 +9,26 @@
 #   $3  COMPANY    — (optional) company name under Work/; if set, apply
 #                    per-company changes only; if absent, apply global changes only
 #
-# What this migration does:
-#   Global (personal vault):
-#     - Creates Life/Daily/
-#     - Moves Process/Daily/*.md → Life/Daily/ (conflict detection)
-#     - Removes Process/Daily/ if empty
-#     - Overwrites .obsidian/daily-notes.json → "folder": "Life/Daily"
-#     - Replaces `path includes Process/Daily` → `path includes /Daily/`
-#       in all 4 Process MOC files
-#   Global (work vault — no Life/ folder):
-#     - Updates MOC query paths only; daily notes handled per-company
-#   Per-company:
-#     - Creates Work/$COMPANY/Daily/
-#     - Creates Work/$COMPANY/Knowledge/{Technical,Leadership,Industry}/
-#     - Moves Knowledge/{Technical,Leadership,Industry}/* to Work/$COMPANY/Knowledge/
-#       (conflict detection; Knowledge/General/ warned if non-empty)
-#     - Removes top-level Knowledge/ if empty
-#     - Moves Process/Daily/*.md → Work/$COMPANY/Daily/ (work vault only)
-#     - Overwrites .obsidian/daily-notes.json → "folder": "Work/$COMPANY/Daily"
+# This script supersedes v0.10.0.sh entirely. It handles two cases:
+#
+#   1. Vault already at 0.10.0 (ran the broken migration):
+#      The per-company section of v0.10.0 incorrectly moved top-level
+#      Knowledge/ content on personal vaults and deleted the folder.
+#      This script restores Knowledge/{Technical,Leadership,Industry,General}/
+#      on personal vaults if missing.
+#
+#   2. Vault at any version before 0.10.0:
+#      Applies all 0.10.0 changes with the correct Knowledge/ handling:
+#      - Daily notes moved to domain folders (Life/Daily/ or Work/$COMPANY/Daily/)
+#      - MOC queries updated to discover /Daily/ in any domain folder
+#      - Work/$COMPANY/Knowledge/ created
+#      - Top-level Knowledge/ moved to Work/$COMPANY/Knowledge/ on work vaults ONLY
+#
+# Detection is filesystem-based, not version-based (idempotent):
+#   Personal vault:          Life/ directory exists
+#   Work vault:              Life/ directory does not exist
+#   Knowledge needs restore: personal vault + Knowledge/ missing
+#   Daily notes migrated:    Life/Daily/ exists and Process/Daily/ is empty/absent
 #
 # Exit codes:
 #   0 — success
@@ -178,7 +180,7 @@ _update_moc_query() {
 # ============================================================
 
 if [[ -z "$COMPANY" ]]; then
-  echo "[meridian] v0.10.0 global migrations..."
+  echo "[meridian] v0.10.1 global migrations..."
   echo ""
 
   # --- MOC query path updates (both personal and work vaults) ---
@@ -189,10 +191,7 @@ if [[ -z "$COMPANY" ]]; then
   _update_moc_query "${VAULT_ROOT}/Process/Weekly Outtake.md"
   echo ""
 
-  # --- Personal vault: migrate Process/Daily/ → Life/Daily/ ---
-  # Work vaults (no Life/ folder) skip this block; daily notes
-  # are handled in the per-company section instead.
-
+  # --- Personal vault migrations ---
   if [[ -d "${VAULT_ROOT}/Life" ]]; then
     echo "  Personal vault detected — migrating daily notes..."
 
@@ -217,8 +216,33 @@ if [[ -z "$COMPANY" ]]; then
     _remove_if_empty "${VAULT_ROOT}/Process/Daily"
     echo ""
 
+    # --- Restore (or create) top-level Knowledge/ on personal vault ---
+    # This is the fix for vaults broken by v0.10.0's incorrect per-company
+    # migration, which moved Knowledge/ content into Work/<Company>/Knowledge/.
+    # mkdir -p is idempotent: safe to run on vaults that already have Knowledge/.
+    echo "  Ensuring Knowledge/ folder structure..."
+    _knowledge_was_missing=false
+    if [[ ! -d "${VAULT_ROOT}/Knowledge" ]]; then
+      _knowledge_was_missing=true
+    fi
+
+    mkdir -p "${VAULT_ROOT}/Knowledge/Technical"
+    mkdir -p "${VAULT_ROOT}/Knowledge/Leadership"
+    mkdir -p "${VAULT_ROOT}/Knowledge/Industry"
+    mkdir -p "${VAULT_ROOT}/Knowledge/General"
+    _pass "Ensured: Knowledge/{Technical,Leadership,Industry,General}/"
+
+    if [[ "$_knowledge_was_missing" == true ]]; then
+      echo ""
+      _warn "Knowledge/ was missing on this personal vault."
+      _hint "  This was likely caused by the v0.10.0 migration, which incorrectly"
+      _hint "  moved personal Knowledge/ content into Work/<Company>/Knowledge/."
+      _hint "  Your files are not lost — check each Work/<Company>/Knowledge/ folder"
+      _hint "  and manually move transferable notes back to Knowledge/ as needed."
+    fi
+    echo ""
+
     # Update daily-notes.json → Life/Daily
-    # (will be overwritten by per-company section if this vault also has companies)
     cat > "${VAULT_ROOT}/.obsidian/daily-notes.json" <<DAILY
 {
   "folder": "Life/Daily",
@@ -236,14 +260,14 @@ DAILY
     echo ""
   fi
 
-  _pass "v0.10.0 global migrations complete."
+  _pass "v0.10.1 global migrations complete."
 
 # ============================================================
 # Per-company changes ($COMPANY is set)
 # ============================================================
 
 else
-  echo "[meridian] v0.10.0 company migrations: $COMPANY..."
+  echo "[meridian] v0.10.1 company migrations: $COMPANY..."
   echo ""
 
   COMPANY_DIR="${VAULT_ROOT}/Work/${COMPANY}"
@@ -253,7 +277,7 @@ else
     exit 0
   fi
 
-  # --- Create new directories ---
+  # --- Create new directories (idempotent) ---
   mkdir -p "${COMPANY_DIR}/Daily"
   _pass "Ensured: Work/${COMPANY}/Daily/"
   mkdir -p "${COMPANY_DIR}/Knowledge/Technical"
@@ -262,9 +286,12 @@ else
   _pass "Ensured: Work/${COMPANY}/Knowledge/{Technical,Leadership,Industry}/"
   echo ""
 
-  # --- Move daily notes (work vaults only: Process/Daily → Work/$COMPANY/Daily) ---
-  # Personal vaults already moved their daily notes in the global section.
+  # --- Work vault only: move daily notes and Knowledge content ---
+  # Personal vaults (detected by presence of Life/) keep their top-level
+  # Knowledge/ at the vault root. Only work vaults migrate Knowledge/ here.
   if [[ ! -d "${VAULT_ROOT}/Life" ]]; then
+
+    # Move daily notes: Process/Daily → Work/$COMPANY/Daily
     echo "  Moving daily notes..."
     _MOVED_COUNT=0
     _CONFLICT_COUNT=0
@@ -283,36 +310,35 @@ else
 
     _remove_if_empty "${VAULT_ROOT}/Process/Daily"
     echo ""
-  fi
 
-  # --- Move top-level Knowledge → Work/$COMPANY/Knowledge/ ---
-  KNOWLEDGE_DIR="${VAULT_ROOT}/Knowledge"
-  if [[ -d "$KNOWLEDGE_DIR" ]]; then
-    echo "  Moving work knowledge..."
-    _KNOWLEDGE_MOVED=0
-    _KNOWLEDGE_CONFLICTS=0
-    _move_knowledge_subdir "$KNOWLEDGE_DIR" "${COMPANY_DIR}/Knowledge" "Technical"
-    _move_knowledge_subdir "$KNOWLEDGE_DIR" "${COMPANY_DIR}/Knowledge" "Leadership"
-    _move_knowledge_subdir "$KNOWLEDGE_DIR" "${COMPANY_DIR}/Knowledge" "Industry"
-    echo ""
+    # Move top-level Knowledge → Work/$COMPANY/Knowledge/
+    KNOWLEDGE_DIR="${VAULT_ROOT}/Knowledge"
+    if [[ -d "$KNOWLEDGE_DIR" ]]; then
+      echo "  Moving work knowledge..."
+      _KNOWLEDGE_MOVED=0
+      _KNOWLEDGE_CONFLICTS=0
+      _move_knowledge_subdir "$KNOWLEDGE_DIR" "${COMPANY_DIR}/Knowledge" "Technical"
+      _move_knowledge_subdir "$KNOWLEDGE_DIR" "${COMPANY_DIR}/Knowledge" "Leadership"
+      _move_knowledge_subdir "$KNOWLEDGE_DIR" "${COMPANY_DIR}/Knowledge" "Industry"
+      echo ""
 
-    # Knowledge/General/ — warn if non-empty, never delete
-    if [[ -d "${KNOWLEDGE_DIR}/General" ]]; then
-      local_files="$(find "${KNOWLEDGE_DIR}/General" -type f 2>/dev/null | wc -l | tr -d ' ')"
-      if [[ "$local_files" -gt 0 ]]; then
-        _warn "Knowledge/General/ contains ${local_files} file(s) — not moved."
-        _hint "  Review these files manually: promote to personal Knowledge/ or discard."
-        _hint "  Knowledge/General/ is not created in work vaults under v0.10.0."
-        echo ""
+      # Knowledge/General/ — warn if non-empty, never delete
+      if [[ -d "${KNOWLEDGE_DIR}/General" ]]; then
+        local_files="$(find "${KNOWLEDGE_DIR}/General" -type f 2>/dev/null | wc -l | tr -d ' ')"
+        if [[ "$local_files" -gt 0 ]]; then
+          _warn "Knowledge/General/ contains ${local_files} file(s) — not moved."
+          _hint "  Review these files manually: promote to personal Knowledge/ or discard."
+          _hint "  Knowledge/General/ is not created in work vaults under v0.10.1."
+          echo ""
+        fi
       fi
+
+      _remove_if_empty "$KNOWLEDGE_DIR"
+      echo ""
     fi
 
-    _remove_if_empty "$KNOWLEDGE_DIR"
-    echo ""
-  fi
-
-  # --- Update daily-notes.json → Work/$COMPANY/Daily ---
-  cat > "${VAULT_ROOT}/.obsidian/daily-notes.json" <<DAILY
+    # Update daily-notes.json → Work/$COMPANY/Daily
+    cat > "${VAULT_ROOT}/.obsidian/daily-notes.json" <<DAILY
 {
   "folder": "Work/${COMPANY}/Daily",
   "template": "_templates/Daily Note",
@@ -320,8 +346,15 @@ else
   "autorun": false
 }
 DAILY
-  _pass "Updated: .obsidian/daily-notes.json → Work/${COMPANY}/Daily"
-  echo ""
+    _pass "Updated: .obsidian/daily-notes.json → Work/${COMPANY}/Daily"
+    echo ""
 
-  _pass "v0.10.0 company migrations complete: $COMPANY"
+  else
+    # Personal vault — Knowledge/ was handled in global section.
+    # Work/<Company>/Knowledge/ directories were already created above.
+    _detail "Personal vault — Knowledge/ managed at vault root; no content migration needed."
+    echo ""
+  fi
+
+  _pass "v0.10.1 company migrations complete: $COMPANY"
 fi

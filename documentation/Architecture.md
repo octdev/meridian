@@ -158,7 +158,6 @@ vault/
     Career.md
   Process/
     Weekly/                       YYYY-MM-DD–DD Weekly Outtake.md files
-    Drafts/                       default location for new notes
     Active Projects.md            Dataview MOC
     Action Items.md               Tasks MOC
     Open Loops.md                 Tasks MOC
@@ -194,6 +193,7 @@ vault/
       Finances/
       General/
       Daily/                      YYYY-MM-DD.md files
+      Drafts/                     default location for new notes (work vault)
       Knowledge/
         Technical/
         Leadership/
@@ -206,6 +206,7 @@ vault/
             [Series] YYYY-MM-DD.md
   Life/
     Daily/                        YYYY-MM-DD.md files
+    Drafts/                       default location for new notes (personal vault)
     Projects/
     People/
     Health/
@@ -243,7 +244,6 @@ vault/
     1on1.md
   Process/
     Weekly/                       YYYY-MM-DD–DD Weekly Outtake.md files
-    Drafts/                       default location for new notes
     Active Projects.md            Dataview MOC
     Action Items.md               Tasks MOC
     Open Loops.md                 Tasks MOC
@@ -264,6 +264,7 @@ vault/
       Finances/
       General/
       Daily/                      YYYY-MM-DD.md files
+      Drafts/                     default location for new notes
       Knowledge/
         Technical/
         Leadership/

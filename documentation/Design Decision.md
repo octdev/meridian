@@ -212,11 +212,23 @@
 
 ## DD-23: Process/ as pure aggregation layer
 
-**Decision:** `Process/` contains only retrieval surfaces: MOCs, Weekly snapshots, Drafts, and Documentation. No content originates in `Process/`. Daily notes moved to domain folders (DD-21).
+**Decision:** `Process/` contains only retrieval surfaces: MOCs, Weekly snapshots, and Documentation. No content originates in `Process/`. Daily notes moved to domain folders (DD-21); Drafts moved to domain folders (DD-24).
 
 **Rationale:** Mixing capture (daily notes) with aggregation (MOCs) in `Process/` created a conceptual blur. MOCs query content; they are not content. `Process/` is now exclusively the layer where content is retrieved and reviewed, not where it lands. This makes the architectural model explicit: capture happens in domain folders, aggregation happens in Process.
 
-**Tradeoff:** The familiar `Process/Daily/` path is gone. Users who have the path memorized must update their mental model. The upgrade script and updated documentation address this.
+**Tradeoff:** The familiar `Process/Daily/` and `Process/Drafts/` paths are gone. Users who have the paths memorized must update their mental model. Upgrade scripts and updated documentation address this.
+
+---
+
+## DD-24: Domain-scoped Drafts (supersedes DD-11)
+
+**Decision:** Drafts is scoped to the domain that matches the vault profile:
+- Personal vault: `Life/Drafts/` — set as Obsidian's default new note location
+- Work vault: `Work/<Company>/Drafts/` — set as Obsidian's default new note location
+
+**Rationale:** DD-21 moved daily notes to domain folders; DD-23 established `Process/` as a pure aggregation layer. `Process/Drafts/` was the last remaining capture surface in `Process/`, creating an inconsistency. Scoping Drafts to its domain (`Life/` or `Work/<Company>/`) completes the model. The same `Life/` presence detection already used for daily notes and `daily-notes.json` drives the selection. On a personal machine, the vast majority of ad-hoc notes are personal in intent; on a work machine, everything is work-scoped. The frictionless single-default is preserved: Obsidian's "Default location for new notes" is written automatically by the scaffold to the correct folder per profile via `.obsidian/app.json`.
+
+**Tradeoff:** A note created on a personal machine that turns out to be work-related lands in `Life/Drafts/` and must be manually relocated during weekly filing. This is acceptable — Drafts is processed during weekly review regardless, so the extra move is already part of the existing workflow.
 
 ---
 

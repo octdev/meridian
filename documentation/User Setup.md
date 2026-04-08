@@ -72,6 +72,8 @@ The scaffold script automatically copies all scripts (`weekly-snapshot.py`, `new
 
 ### Upgrading an existing vault
 
+**Close Obsidian before running an upgrade.** Some migrations update `.obsidian/app.json`. If Obsidian is open, it will overwrite that file with its cached settings when it closes, discarding the migration changes.
+
 To upgrade an existing vault to the latest Meridian version:
 
 ```bash
@@ -157,11 +159,13 @@ Configure these before enabling plugins. Order matters.
 
 Settings → Files and Links
 
+The scaffold sets **Default location for new notes** and **Default location for new attachments** automatically in `.obsidian/app.json`. If you ran the scaffold, these are already correct — verify but do not override. If you are setting up manually, use the values below.
+
 | Setting | Value |
 |---------|-------|
 | Default file to open | Daily note |
-| Default location for new notes | `Process/Drafts` |
-| Default location for new attachments | `References` |
+| Default location for new notes | `Life/Drafts` (personal) or `Work/<Company>/Drafts` (work) — **In the folder specified below** |
+| Default location for new attachments | `References` (personal) or `Work/<Company>/Reference` (work) — **In the folder specified below** |
 | Confirm file deletion | OFF |
 
 ---
@@ -428,7 +432,7 @@ The core rule: things that *happen to you* go in the daily note. Things you *int
 4. **Review Queue MOC** — process `>>` items: promote to Knowledge/Work/Life or check off.
 5. **Current Priorities** — update if anything shifted.
 6. Scan the week's daily notes for `&` insights worth promoting to Knowledge.
-7. **Drafts** — file or delete any notes left in `Process/Drafts/`.
+7. **Drafts** — file or delete any notes left in `Life/Drafts/` (personal) or `Work/<Company>/Drafts/` (work).
 
 ---
 
