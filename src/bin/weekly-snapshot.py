@@ -162,6 +162,22 @@ def generate_markdown(by_day, mon, sun, title):
     return "\n".join(lines) + "\n"
 
 
+def find_daily_dirs(vault: Path) -> list:
+    """Discover all Daily/ directories across domain folders."""
+    candidates = [
+        vault / "Life" / "Daily",
+        vault / "Process" / "Daily",        # legacy support
+    ]
+    work_dir = vault / "Work"
+    if work_dir.exists():
+        for child in sorted(work_dir.iterdir()):
+            if child.is_dir():
+                d = child / "Daily"
+                if d.exists():
+                    candidates.append(d)
+    return [d for d in candidates if d.exists()]
+
+
 def main():
     p = argparse.ArgumentParser(description="Generate a static weekly completed-task snapshot.")
     p.add_argument("vault", type=Path)
@@ -171,10 +187,10 @@ def main():
     args = p.parse_args()
 
     vault      = args.vault.expanduser().resolve()
-    daily_dir  = vault / "Process" / "Daily"
     weekly_dir = vault / "Process" / "Weekly"
 
-    if not daily_dir.exists():
+    daily_dirs = find_daily_dirs(vault)
+    if not daily_dirs:
         sys.exit(0)
 
     if args.date:
@@ -187,7 +203,11 @@ def main():
     if out.exists() and not args.force:
         sys.exit(0)
 
-    by_day = extract_tasks(daily_dir, mon, sun)
+    by_day: dict = {}
+    for dd in daily_dirs:
+        partial = extract_tasks(dd, mon, sun)
+        for day, tasks in partial.items():
+            by_day.setdefault(day, []).extend(tasks)
     content = generate_markdown(by_day, mon, sun, title)
 
     if args.dry_run:

@@ -10,7 +10,7 @@ modified:
 ```tasks
 not done
 description includes ~
-path includes Process/Daily
+path includes /Daily/
 sort by filename reverse
 ```
 
@@ -19,6 +19,6 @@ sort by filename reverse
 done
 done after 2 days ago
 description includes ~
-path includes Process/Daily
+path includes /Daily/
 sort by done reverse
 ```

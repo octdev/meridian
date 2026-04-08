@@ -103,6 +103,8 @@ Vendors/      Contracts, renewals, contacts, relationship notes
 Goals/        Your goals at this company — performance review material
 Finances/     Compensation, equity, benefits, offers
 General/      Anything that doesn't fit the above
+Daily/        Your daily notes at this company (YYYY-MM-DD.md)
+Knowledge/    Work-scoped knowledge: Technical/, Leadership/, Industry/
 ```
 
 A note belongs in Work if it is specific to your current employer. If you leave this company, does the note still matter? If no, it belongs in Work. If yes, it belongs in Knowledge.
@@ -215,7 +217,7 @@ Knowledge is the most important folder in the vault, and the most commonly under
 
 Knowledge is not where you dump reference material. It is where you put things you've actually learned — insights, mental models, technical understanding, leadership observations — that you want to carry with you across jobs, across roles, across years.
 
-The four subfolders are:
+**Personal vault:** top-level `Knowledge/` with four subfolders:
 
 ```
 Technical/    Engineering, architecture, tooling, systems design
@@ -224,18 +226,24 @@ Industry/     Market knowledge, domain expertise, trends
 General/      Everything else worth knowing
 ```
 
+**Work vault:** knowledge starts at `Work/<Company>/Knowledge/` (Technical, Leadership, Industry) and is promoted to personal `Knowledge/` by deliberate choice. This scoping is intentional — work-generated knowledge is context-specific until you decide it is transferable.
+
 ### The Test
 
 Before filing a note, ask: *would I want this if I started at a new company tomorrow?*
 
 - Notes about your current company's architecture → `Work/Reference/`
-- Notes about architectural patterns you've developed opinions on → `Knowledge/Technical/`
+- Notes about architectural patterns you've developed opinions on → `Work/<Company>/Knowledge/Technical/` (then promote to personal `Knowledge/` if truly transferable)
 - Notes about how your current manager gives feedback → `Work/People/`
-- Notes about what you've learned about giving good feedback → `Knowledge/Leadership/`
+- Notes about what you've learned about giving good feedback → `Work/<Company>/Knowledge/Leadership/`
 - Notes about your current product's market position → `Work/Reference/`
-- Notes about how to think about market positioning → `Knowledge/Industry/`
+- Notes about how to think about market positioning → `Work/<Company>/Knowledge/Industry/`
 
 The distinction is *specific context* (Work) versus *transferable understanding* (Knowledge). When in doubt, leave the note in the daily note with a `>>` marker and decide at weekly review.
+
+### Promoting Work Knowledge
+
+Knowledge that started as work-scoped can graduate to your personal `Knowledge/` folder when you are confident it is transferable — patterns you'd apply at a future employer, mental models that outlast any single job. This is a manual move: copy or rename the file from `Work/<Company>/Knowledge/` to `Knowledge/`. Obsidian updates backlinks automatically.
 
 ### Promoting Insights
 
@@ -292,7 +300,7 @@ The core rule from the reference guide applies here:
 
 > Things that *happen to you* go in the daily note. Things you *intentionally create* go directly where they belong.
 
-If you're sitting down to write a project design document, don't start in the daily note — start directly in `Work/[Company]/Projects/[Project]/`. If a conversation triggers an important technical insight you want to capture as a standing note, write it directly in `Knowledge/Technical/`. The daily note is for reactive capture; intentional creation goes to its destination immediately.
+If you're sitting down to write a project design document, don't start in the daily note — start directly in `Work/[Company]/Projects/[Project]/`. If a conversation triggers an important technical insight you want to capture as a standing note, write it directly in `Work/[Company]/Knowledge/Technical/` (or `Knowledge/Technical/` on a personal vault). The daily note is for reactive capture; intentional creation goes to its destination immediately.
 
 ---
 

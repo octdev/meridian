@@ -98,6 +98,10 @@ mkdir -p "${company_dir}/Reference"
 mkdir -p "${company_dir}/Vendors"
 mkdir -p "${company_dir}/Meetings"
 mkdir -p "${company_dir}/Meetings/1on1s"
+mkdir -p "${company_dir}/Daily"
+mkdir -p "${company_dir}/Knowledge/Technical"
+mkdir -p "${company_dir}/Knowledge/Leadership"
+mkdir -p "${company_dir}/Knowledge/Industry"
 
 _pass "Finances/ created."
 _pass "General/ created."
@@ -109,6 +113,22 @@ _pass "Reference/ created."
 _pass "Vendors/ created."
 _pass "Meetings/ created."
 _pass "Meetings/1on1s/ created."
+_pass "Daily/ created."
+_pass "Knowledge/Technical/ created."
+_pass "Knowledge/Leadership/ created."
+_pass "Knowledge/Industry/ created."
+
+# --- update daily-notes.json ---
+daily_config="${vault_root}/.obsidian/daily-notes.json"
+cat > "$daily_config" <<DAILY
+{
+  "folder": "Work/${company_name}/Daily",
+  "template": "_templates/Daily Note",
+  "format": "YYYY-MM-DD",
+  "autorun": false
+}
+DAILY
+_pass "Daily notes config updated to Work/${company_name}/Daily"
 
 echo ""
 printf "${_C_GREEN}[Meridian] Company scaffolded.${_C_RESET} ${company_name} is ready.\n"

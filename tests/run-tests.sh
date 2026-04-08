@@ -159,19 +159,24 @@ PERSONAL_VAULT="$(new_vault)"
 
 # Shared folders
 for d in \
-  "Process/Daily" "Process/Weekly" "Process/Drafts" "Process/Meridian Documentation" \
-  "Knowledge/Technical" "Knowledge/Leadership" "Knowledge/Industry" "Knowledge/General" \
+  "Process/Weekly" "Process/Drafts" "Process/Meridian Documentation" \
   "Work/CurrentCompany/Projects" "Work/CurrentCompany/People" "Work/CurrentCompany/Reference" \
   "Work/CurrentCompany/Incidents" "Work/CurrentCompany/Vendors" \
+  "Work/CurrentCompany/Daily" "Work/CurrentCompany/Knowledge/Technical" \
   "_templates" ".scripts"; do
   assert_exists "  folder: $d" "$PERSONAL_VAULT/$d"
 done
 
 # Personal-only folders
 for d in "Northstar" "Life/Projects" "Life/People" "Life/Health" \
-          "Life/Finances" "Life/Social" "Life/Development" "Life/Fun" "References"; do
+          "Life/Finances" "Life/Social" "Life/Development" "Life/Fun" "References" \
+          "Life/Daily" \
+          "Knowledge/Technical" "Knowledge/Leadership" "Knowledge/Industry" "Knowledge/General"; do
   assert_exists "  personal folder: $d" "$PERSONAL_VAULT/$d"
 done
+
+# Process/Daily absent in personal vault
+assert_absent "  Process/Daily absent in personal vault" "$PERSONAL_VAULT/Process/Daily"
 
 # Templates
 for f in "_templates/Daily Note.md" "_templates/Generic Note.md" "_templates/Reflection.md"; do
@@ -221,7 +226,7 @@ assert_file_contains "  User Setup.md has --- delimiter" "$UG" "---"
 # ============================================================
 section "scaffold-vault.sh — personal profile obsidian config content"
 
-assert_file_contains "  daily-notes.json: folder" "$PERSONAL_VAULT/.obsidian/daily-notes.json" '"folder": "Process/Daily"'
+assert_file_contains "  daily-notes.json: folder" "$PERSONAL_VAULT/.obsidian/daily-notes.json" '"folder": "Life/Daily"'
 assert_file_contains "  daily-notes.json: template" "$PERSONAL_VAULT/.obsidian/daily-notes.json" '"template": "_templates/Daily Note"'
 assert_file_contains "  daily-notes.json: format" "$PERSONAL_VAULT/.obsidian/daily-notes.json" '"format": "YYYY-MM-DD"'
 assert_file_contains "  templates.json: folder" "$PERSONAL_VAULT/.obsidian/templates.json" '"folder": "_templates"'
@@ -233,7 +238,8 @@ WORK_VAULT="$(new_vault)"
 "$SCAFFOLD" --vault "$WORK_VAULT" --profile work > /dev/null 2>&1
 
 # Shared folders present
-for d in "Process/Daily" "Work/CurrentCompany/Projects" "Knowledge/Technical" "_templates" ".scripts"; do
+for d in "Work/CurrentCompany/Projects" "Work/CurrentCompany/Daily" \
+          "Work/CurrentCompany/Knowledge/Technical" "_templates" ".scripts"; do
   assert_exists "  work folder present: $d" "$WORK_VAULT/$d"
 done
 
@@ -244,6 +250,13 @@ done
 
 # Northstar notes absent
 assert_absent "  Northstar notes absent" "$WORK_VAULT/Northstar"
+
+# Process/Daily and top-level Knowledge absent in work vault
+assert_absent "  Process/Daily absent in work vault" "$WORK_VAULT/Process/Daily"
+assert_absent "  top-level Knowledge absent in work vault" "$WORK_VAULT/Knowledge"
+
+# Work vault daily-notes.json points to Work/CurrentCompany/Daily
+assert_file_contains "  work daily-notes.json: folder" "$WORK_VAULT/.obsidian/daily-notes.json" '"folder": "Work/CurrentCompany/Daily"'
 
 # Scripts and docs still present
 assert_exists "  scripts deployed on work profile" "$WORK_VAULT/.scripts/new-company.sh"
@@ -280,9 +293,13 @@ COMPANY_SCRIPT="$COMPANY_VAULT/.scripts/new-company.sh"
 
 printf "%s\n%s\n" "$COMPANY_VAULT" "Acme Corp" | bash "$COMPANY_SCRIPT" > /dev/null 2>&1
 
-for d in "Incidents" "People" "Projects" "Reference" "Vendors"; do
+for d in "Incidents" "People" "Projects" "Reference" "Vendors" \
+          "Daily" "Knowledge/Technical" "Knowledge/Leadership" "Knowledge/Industry"; do
   assert_exists "  Work/Acme Corp/$d created" "$COMPANY_VAULT/Work/Acme Corp/$d"
 done
+
+assert_file_contains "  daily-notes.json updated to new company" \
+  "$COMPANY_VAULT/.obsidian/daily-notes.json" '"folder": "Work/Acme Corp/Daily"'
 
 # ============================================================
 section "new-company.sh — error cases"

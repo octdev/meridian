@@ -1,11 +1,11 @@
 {
   "semver": {
     "major": 0,
-    "minor": 9,
-    "patch": 2
+    "minor": 10,
+    "patch": 0
   },
   "metadata": {
-    "releaseDate": "2026-04-05",
-    "gitCommit": "d6672a0"
+    "releaseDate": "2026-04-07",
+    "gitCommit": "pending"
   }
 }

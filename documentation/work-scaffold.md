@@ -6,9 +6,9 @@
 |--------|----------|----------------|
 | `Process/` | Yes | Send & Receive |
 | `Work/CurrentCompany/` | Yes | Send & Receive |
-| `Knowledge/` | Yes | Send Only |
 | `_templates/` | Yes | Send & Receive |
 | `.scripts/` | Yes | Send & Receive |
+| `Knowledge/` | No | Not configured |
 | `Northstar/` | No | Not configured |
 | `Life/` | No | Not configured |
 | `References/` | No | Not configured |
@@ -20,6 +20,10 @@
 - `Reference/`
 - `Incidents/`
 - `Vendors/`
+- `Daily/`
+- `Knowledge/Technical/`
+- `Knowledge/Leadership/`
+- `Knowledge/Industry/`
 
 ## Scaffold behavior
 
@@ -31,12 +35,11 @@ The work scaffold is identical to the personal scaffold except it skips:
 
 Everything else is created identically:
 
-- `Process/Daily/`, `Process/Weekly/`, all 6 MOCs, source tag notes
-- `Work/CurrentCompany/` with all 5 subfolders
-- `Knowledge/Technical/`, `Leadership/`, `Industry/`, `General/`
+- `Process/Weekly/`, all 6 MOCs, source tag notes (no `Process/Daily/`)
+- `Work/CurrentCompany/` with all standard subfolders, plus `Daily/` and `Knowledge/Technical/`, `Leadership/`, `Industry/`
 - `_templates/Daily Note.md`, `Generic Note.md`, `Reflection.md`
 - `.scripts/` (for weekly-snapshot.py)
-- `.obsidian/daily-notes.json` and `templates.json`
+- `.obsidian/daily-notes.json` (points to `Work/CurrentCompany/Daily`) and `templates.json`
 
 ## Implementation plan
 
@@ -63,9 +66,8 @@ The daily note and all MOC queries are identical between work and personal vault
 
 | Folder | Mode | Notes |
 |--------|------|-------|
-| `Process/` | Send & Receive | Daily notes, MOCs, weekly snapshots |
-| `Work/` | Send & Receive | All company subfolders |
-| `Knowledge/` | Send Only | Work knowledge flows out; personal knowledge never comes in |
+| `Process/` | Send & Receive | MOCs, weekly snapshots |
+| `Work/` | Send & Receive | All company subfolders including Daily/ and Knowledge/ |
 | `Life/` | Not configured | Never present on work machine |
 | `Northstar/` | Not configured | Never present on work machine |
 | `References/` | Not configured | Never present on work machine |

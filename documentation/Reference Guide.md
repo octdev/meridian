@@ -10,7 +10,6 @@ See [User Setup.md](User%20Setup.md) for installation and configuration details.
 ```
 Northstar/       Purpose · Vision · Mission · Principles · Values · Goals · Career
 Process/
-  Daily/         one file per day
   Weekly/        auto-generated snapshots
   Active Projects · Action Items · Open Loops · Review Queue
   Weekly Outtake · Current Priorities
@@ -20,10 +19,14 @@ Knowledge/       Technical/ · Leadership/ · Industry/ · General/
 Work/
   CurrentCompany/
     Projects/ · People/ · Reference/ · Incidents/ · Vendors/
+    Daily/         one file per day
+    Knowledge/     Technical/ · Leadership/ · Industry/
     Meetings/
       1on1s/         [Name] 1on1s.md — rolling notes, one per person
       [Series]/      [Series].md · YYYY-MM-DD/ → [Series] YYYY-MM-DD.md
-Life/            Projects/ · People/ · Health/ · Finances/ · Social/ · Development/ · Fun/
+Life/
+  Daily/         one file per day
+  Projects/ · People/ · Health/ · Finances/ · Social/ · Development/ · Fun/
 References/      external artifacts, source material
 _templates/      Daily Note.md · Generic Note.md · Reflection.md
                  Meeting Instance.md · Meeting Series.md · 1on1.md
@@ -31,18 +34,18 @@ _templates/      Daily Note.md · Generic Note.md · Reflection.md
                  .vault-version
 ```
 
-**Work vault (`--profile work`) — Northstar, Life, References absent:**
+**Work vault (`--profile work`) — Northstar, Life, References, top-level Knowledge absent:**
 ```
 Process/
-  Daily/         one file per day
   Weekly/        auto-generated snapshots
   Active Projects · Action Items · Open Loops · Review Queue
   Weekly Outtake · Current Priorities
   Meridian Documentation/   (same as personal vault, including Upgrades)
-Knowledge/       Technical/ · Leadership/ · Industry/ · General/
 Work/
   CurrentCompany/
     Projects/ · People/ · Reference/ · Incidents/ · Vendors/
+    Daily/         one file per day
+    Knowledge/     Technical/ · Leadership/ · Industry/
     Meetings/
       1on1s/         [Name] 1on1s.md — rolling notes, one per person
       [Series]/      [Series].md · YYYY-MM-DD/ → [Series] YYYY-MM-DD.md
@@ -260,7 +263,7 @@ Archive: Static snapshot in Process/Weekly/
 
 ## Morning Triage (~2 min)
 
-1. Open today's daily note via `Cmd+D` — located at `Process/Daily/YYYY-MM-DD.md`
+1. Open today's daily note via `Cmd+D` — located at `Life/Daily/YYYY-MM-DD.md` (personal) or `Work/<Company>/Daily/YYYY-MM-DD.md` (work)
 2. Glance at calendar → drop meeting headings into Log section
 3. Fill in **Top 3 Goals**
 4. First comms sweep — scan email + Teams, capture actionable items with markers

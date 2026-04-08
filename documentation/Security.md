@@ -34,7 +34,7 @@ The `--profile work` flag ensures personal folders are never created on the work
 
 The sync configuration ensures `Life/`, `Northstar/`, and `References/` are never configured as sync targets on the work machine. Because these folders do not exist on the work machine (Layer 1), they cannot appear in its Syncthing folder list.
 
-`Knowledge/` is configured Send Only from the work laptop. Work-originated knowledge flows to personal machines. Personal knowledge notes never reach the work laptop.
+Work-originated knowledge lives at `Work/<Company>/Knowledge/` and syncs bidirectionally as part of the `Work/` folder. The top-level `Knowledge/` folder is personal-only and is not configured on the work machine.
 
 `Process/` and `Work/` sync bidirectionally — these are expected to be accessible on the work machine.
 
@@ -54,7 +54,7 @@ The vault is never stored in employer-managed cloud storage (OneDrive, SharePoin
 
 | Risk | Mitigation | Residual risk | Future path |
 |------|------------|---------------|-------------|
-| Work machine is employer-controlled — anything on it is potentially visible | Keep personal folders off the work machine via `--profile work` scaffold + Syncthing config | Work content (Process/, Work/, Knowledge/) is on an employer machine | Accept — this is the expected state |
+| Work machine is employer-controlled — anything on it is potentially visible | Keep personal folders off the work machine via `--profile work` scaffold + Syncthing config | Work content (Process/, Work/) is on an employer machine | Accept — this is the expected state |
 | Syncthing misconfiguration could expose personal folders | `--profile work` means folders don't exist to misconfigure; document the matrix explicitly | Human error creating personal folders manually on work machine | Automated config verification script (see Roadmap.md) |
 | Vault is not encrypted at rest | Physical machine security | Low for typical threat model | Full-disk encryption on both machines mitigates this outside Obsidian |
 
@@ -65,7 +65,6 @@ The vault is never stored in employer-managed cloud storage (OneDrive, SharePoin
 Before using on a new work machine, verify:
 
 - [ ] Vault was scaffolded with `--profile work` — confirm `Northstar/`, `Life/`, `References/` are absent
-- [ ] `Life/`, `Northstar/`, `References/` are not present in Syncthing folder list on work laptop
-- [ ] `Knowledge/` is set to Send Only on work laptop
+- [ ] `Life/`, `Northstar/`, `References/`, and top-level `Knowledge/` are not present in Syncthing folder list on work laptop
 - [ ] Vault is stored in a personally-owned storage location, not employer cloud storage
 - [ ] Full-disk encryption is enabled on both machines (FileVault on macOS)

@@ -112,7 +112,7 @@ src/bin/scaffold-vault.sh --vault ~/Documents/MyVault
 
 ### Work profile
 
-Work-only vault. Creates `Process/`, `Work/`, `Knowledge/`, `_templates/`, and `.scripts/`. Omits `Northstar/`, `Life/`, and `References/` entirely — they are never written to disk and cannot be accidentally synced to an employer machine.
+Work-only vault. Creates `Process/`, `Work/`, `_templates/`, and `.scripts/`. Omits `Northstar/`, `Life/`, `References/`, and the top-level `Knowledge/` entirely — they are never written to disk and cannot be accidentally synced to an employer machine. Knowledge generated at work lives at `Work/<Company>/Knowledge/`.
 
 ```bash
 src/bin/scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
@@ -157,7 +157,6 @@ vault/
     Goals.md
     Career.md
   Process/
-    Daily/                        YYYY-MM-DD.md files
     Weekly/                       YYYY-MM-DD–DD Weekly Outtake.md files
     Drafts/                       default location for new notes
     Active Projects.md            Dataview MOC
@@ -194,6 +193,11 @@ vault/
       Goals/
       Finances/
       General/
+      Daily/                      YYYY-MM-DD.md files
+      Knowledge/
+        Technical/
+        Leadership/
+        Industry/
       Meetings/
         1on1s/                    rolling 1:1 notes, one file per direct report or tracked peer
         [Series Name]/            one folder per recurring series (created by new-meeting-series.sh)
@@ -201,6 +205,7 @@ vault/
           YYYY-MM-DD/             one folder per instance (created by new-meeting-series.sh)
             [Series] YYYY-MM-DD.md
   Life/
+    Daily/                        YYYY-MM-DD.md files
     Projects/
     People/
     Health/
@@ -237,7 +242,6 @@ vault/
     Meeting Series.md
     1on1.md
   Process/
-    Daily/                        YYYY-MM-DD.md files
     Weekly/                       YYYY-MM-DD–DD Weekly Outtake.md files
     Drafts/                       default location for new notes
     Active Projects.md            Dataview MOC
@@ -249,11 +253,6 @@ vault/
     email.md                      source tag note
     teams.md                      source tag note
     Meridian Documentation/       (same docs as personal vault, including Upgrades.md)
-  Knowledge/
-    Technical/
-    Leadership/
-    Industry/
-    General/
   Work/
     CurrentCompany/
       Projects/
@@ -264,6 +263,11 @@ vault/
       Goals/
       Finances/
       General/
+      Daily/                      YYYY-MM-DD.md files
+      Knowledge/
+        Technical/
+        Leadership/
+        Industry/
       Meetings/
         1on1s/                    rolling 1:1 notes, one file per direct report or tracked peer
         [Series Name]/            one folder per recurring series (created by new-meeting-series.sh)
@@ -272,7 +276,7 @@ vault/
             [Series] YYYY-MM-DD.md
 ```
 
-`Northstar/`, `Life/`, and `References/` are absent — not excluded, not hidden. They do not exist. `Process/Meridian Documentation/` is present in both profiles.
+`Northstar/`, `Life/`, `References/`, and the top-level `Knowledge/` are absent — not excluded, not hidden. They do not exist. `Process/Meridian Documentation/` is present in both profiles.
 
 ---
 
@@ -338,15 +342,14 @@ Daily note → Tasks query (MOC) → completion stamp → Recently Completed vie
 
 ### Weekly snapshot script
 
-The script runs on vault open and every 4 hours via Shell Commands. It scans `Process/Daily/` for the previous Monday–Sunday, extracts completed tasks by marker category, and writes a static Markdown report. It is idempotent — it exits immediately if the output file already exists. Use `--force` to regenerate.
+The script runs on vault open and every 4 hours via Shell Commands. It discovers all `Daily/` directories across domain folders (`Life/Daily/`, `Work/*/Daily/`, and legacy `Process/Daily/`), extracts completed tasks by marker category for the previous Monday–Sunday, and writes a static Markdown report. It is idempotent — it exits immediately if the output file already exists. Use `--force` to regenerate.
 
 ### Sync data flow (v1)
 
 ```
 Work laptop ──Syncthing──► Personal machine ──iCloud──► Phone
   Process/: Send & Receive   Send & Receive              full vault
-  Work/:    Send & Receive
-  Knowledge/: Send Only
+  Work/:    Send & Receive   (includes Work/*/Daily/ and Work/*/Knowledge/)
   (Life/, Northstar/, References/ not configured on work laptop)
 ```
 

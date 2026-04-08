@@ -94,7 +94,7 @@
 
 **Decision:** Obsidian's "Default location for new notes" is set to `In the folder specified below` with the path `Process/Drafts/`, rather than "Same folder as current file."
 
-**Rationale:** "Same folder as current file" places new notes wherever Obsidian's focus happens to be — almost always `Process/Daily/` during normal use, since that is where the primary capture surface lives. This contaminates the Daily folder with standalone notes and requires immediate manual relocation. `Process/Drafts/` is a neutral creation point: notes land there predictably regardless of context, and are filed to their intended destination immediately after creation. The folder is not an inbox for uncertain items — it is a workaround for Obsidian's default behavior.
+**Rationale:** "Same folder as current file" places new notes wherever Obsidian's focus happens to be — almost always a daily note folder during normal use, since that is where the primary capture surface lives. This contaminates the Daily folder with standalone notes and requires immediate manual relocation. `Process/Drafts/` is a neutral creation point: notes land there predictably regardless of context, and are filed to their intended destination immediately after creation. The folder is not an inbox for uncertain items — it is a workaround for Obsidian's default behavior.
 
 **Tradeoff:** New notes require one extra filing step even when the destination is already known. The cost is low: the draft state is seconds long in normal use, and the alternative (notes scattered across wrong folders) is worse.
 
@@ -190,10 +190,40 @@
 
 ---
 
+## DD-21: Daily notes scoped to domain folders (supersedes implicit Process/Daily assumption)
+
+**Decision:** Daily notes live in the domain that generated them: `Life/Daily/` for personal vaults, `Work/<Company>/Daily/` for work vaults. `Process/` no longer contains a `Daily/` folder.
+
+**Rationale:** Daily capture belongs to the context that generated it. A personal daily note in `Life/Daily/` is coherent with the rest of the Life domain. A work daily note in `Work/<Company>/Daily/` is co-located with the company's other operational records. The prior placement in `Process/Daily/` conflated the capture layer with the aggregation layer — `Process/` is now a pure retrieval surface (MOCs, Weekly snapshots, Drafts, Documentation). MOC queries use `path includes /Daily/` to match all domain Daily folders without needing to enumerate them.
+
+**Tradeoff:** Users with existing vaults must migrate `Process/Daily/` files to the new location. The upgrade script (v0.10.0) handles this automatically.
+
+---
+
+## DD-22: Work-scoped knowledge under company folder
+
+**Decision:** Work vaults do not get a top-level `Knowledge/` folder. Work-generated knowledge lives at `Work/<Company>/Knowledge/{Technical,Leadership,Industry}/`. Promotion to personal `Knowledge/` is a manual, intentional act.
+
+**Rationale:** Knowledge generated at work is initially work-scoped. Automatically placing it in a shared top-level `Knowledge/` folder implies it is already transferable and personal — a judgment that hasn't been made yet. By scoping it under the company folder first, the user makes an explicit decision to promote knowledge that is genuinely transferable. This also eliminates the awkward `Knowledge/: Send Only` Syncthing rule: work knowledge syncs bidirectionally as part of `Work/`, and personal knowledge never reaches the work machine because `Life/` and top-level `Knowledge/` are not configured there.
+
+**Tradeoff:** Users who want to promote work knowledge to personal must copy or move files. This friction is intentional — it is the point where a deliberate decision is made about what is context-specific versus genuinely transferable.
+
+---
+
+## DD-23: Process/ as pure aggregation layer
+
+**Decision:** `Process/` contains only retrieval surfaces: MOCs, Weekly snapshots, Drafts, and Documentation. No content originates in `Process/`. Daily notes moved to domain folders (DD-21).
+
+**Rationale:** Mixing capture (daily notes) with aggregation (MOCs) in `Process/` created a conceptual blur. MOCs query content; they are not content. `Process/` is now exclusively the layer where content is retrieved and reviewed, not where it lands. This makes the architectural model explicit: capture happens in domain folders, aggregation happens in Process.
+
+**Tradeoff:** The familiar `Process/Daily/` path is gone. Users who have the path memorized must update their mental model. The upgrade script and updated documentation address this.
+
+---
+
 ## DD-07: Syncthing for work/personal boundary enforcement
 
 **Decision:** Syncthing with folder-level Send Only / Receive Only modes enforces the personal/work content boundary between machines.
 
-**Rationale:** Personal content (Life/, Northstar/, References/) must never appear on an employer-managed work machine. Syncthing's per-folder sync modes enforce this at the filesystem level without relying on manual discipline. Knowledge/ is Send Only from the work laptop so personal knowledge notes stay off the work machine.
+**Rationale:** Personal content (Life/, Northstar/, References/, top-level Knowledge/) must never appear on an employer-managed work machine. Syncthing's per-folder sync modes enforce this at the filesystem level without relying on manual discipline. Work-generated knowledge lives under `Work/<Company>/Knowledge/` and syncs bidirectionally as part of `Work/` — no separate Send Only rule needed.
 
 **Tradeoff:** Syncthing must be installed on the work laptop. If the work machine is MDM-locked against software installation, this approach is not available.

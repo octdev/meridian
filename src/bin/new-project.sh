@@ -144,7 +144,7 @@ _pass "Directories created."
 
 # --- project index (MOC) ---
 write_file "${project_dir}/${project_name}.md" "---
-title: \"${project_name}\"
+title: ${project_name}
 created: ${today}
 modified: ${today}
 ---

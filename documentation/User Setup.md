@@ -122,12 +122,11 @@ Then follow the standard setup from [Step 1: Run the scaffold script](#initial-s
 |--------|------|
 | `Process/` | Send & Receive |
 | `Work/` | Send & Receive |
-| `Knowledge/` | Send Only |
 | `Life/` | Not configured |
 | `Northstar/` | Not configured |
 | `References/` | Not configured |
 
-`Knowledge/` is Send Only from the work machine so work-originated knowledge flows to all devices, but personal knowledge notes never reach the work machine. See [Sync.md](Sync.md) for the full Syncthing setup.
+`Work/` is Send & Receive and includes `Work/<Company>/Daily/` and `Work/<Company>/Knowledge/`. Work knowledge syncs bidirectionally as part of the `Work/` folder — there is no separate `Knowledge/` Syncthing entry on the work machine. See [Sync.md](Sync.md) for the full Syncthing setup.
 
 ---
 
@@ -176,7 +175,7 @@ Settings → Core Plugins → Daily Notes → ON
 | Setting | Value |
 |---------|-------|
 | Date format | `YYYY-MM-DD` |
-| New file location | `Process/Daily` |
+| New file location | `Life/Daily` (personal) or `Work/<Company>/Daily` (work) |
 | Template file location | `_templates/Daily Note` |
 
 ### Templates
@@ -387,7 +386,7 @@ mv Work/CurrentCompany "Work/Your Company Name"
 
 Work through these checks after setup.
 
-1. Press `Cmd+D` — a note should appear in `Process/Daily/YYYY-MM-DD.md` (today's date) with the template populated and `created`/`modified` timestamps filled in.
+1. Press `Cmd+D` — a note should appear in `Life/Daily/YYYY-MM-DD.md` (personal vault) or `Work/<Company>/Daily/YYYY-MM-DD.md` (work vault), with the template populated and `created`/`modified` timestamps filled in.
 2. Add a test task: `- [ ] !! Test urgent action item`
 3. Open `Process/Action Items.md` — the task should appear under Urgent.
 4. Check the task — it should show `✅ YYYY-MM-DD` and move to Recently Completed — Urgent.
@@ -522,7 +521,7 @@ Archive:  Static snapshot in Process/Weekly/ (auto-generated)
 
 ## Weekly Snapshots
 
-The weekly snapshot script runs automatically on vault open and every 4 hours via Shell Commands. It scans `Process/Daily/` for the previous Monday–Sunday and writes a static report to `Process/Weekly/`.
+The weekly snapshot script runs automatically on vault open and every 4 hours via Shell Commands. It discovers all `Daily/` directories across domain folders (`Life/Daily/`, `Work/*/Daily/`, and legacy `Process/Daily/`) and writes a static report to `Process/Weekly/` for the previous Monday–Sunday.
 
 Output filename format: `YYYY-MM-DD–DD Weekly Outtake.md`
 
@@ -593,7 +592,7 @@ The script prompts for project name, vault root, and target Projects directory, 
     scratch.md
 ```
 
-All files are seeded with frontmatter (`title`, `created`, `modified`) and starter structure. The MOC queries are scoped to the project folder using vault-relative paths — the same convention the Process MOCs use for `Process/Daily`.
+All files are seeded with frontmatter (`title`, `created`, `modified`) and starter structure. The MOC queries are scoped to the project folder using vault-relative paths — the same convention the Process MOCs use for `/Daily/`.
 
 The script warns if the Projects directory you provide doesn't match the expected vault conventions (`Work/[Company]/Projects/` or `Life/Projects/`) and prompts for confirmation before proceeding.
 

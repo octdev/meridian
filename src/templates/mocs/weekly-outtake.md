@@ -13,7 +13,7 @@ Rolling 7-day view of completed tasks. For permanent weekly records, see `Proces
 done
 done after 7 days ago
 description includes !!
-path includes Process/Daily
+path includes /Daily/
 group by done
 sort by done
 ```
@@ -24,7 +24,7 @@ done
 done after 7 days ago
 description includes !
 description does not include !!
-path includes Process/Daily
+path includes /Daily/
 group by done
 sort by done
 ```
@@ -34,7 +34,7 @@ sort by done
 done
 done after 7 days ago
 description includes ~
-path includes Process/Daily
+path includes /Daily/
 group by done
 sort by done
 ```
@@ -44,7 +44,7 @@ sort by done
 done
 done after 7 days ago
 description includes >>
-path includes Process/Daily
+path includes /Daily/
 group by done
 sort by done
 ```

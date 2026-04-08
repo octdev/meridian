@@ -250,14 +250,6 @@ fi
 echo "[meridian] Scaffolding vault at: $VAULT_ROOT (profile: $PROFILE)"
 echo ""
 
-if [[ -d "$VAULT_ROOT" ]]; then
-  printf "${_C_RED}[meridian] ✗ Target directory already exists: %s${_C_RESET}\n" "$VAULT_ROOT" >&2
-  echo "" >&2
-  echo "  To upgrade an existing vault, re-run with --upgrade." >&2
-  echo "" >&2
-  exit 1
-fi
-
 # Fresh scaffold always uses CurrentCompany; user renames after opening in Obsidian.
 COMPANY="CurrentCompany"
 
@@ -266,14 +258,9 @@ COMPANY="CurrentCompany"
 echo "[meridian] Creating folders..."
 
 dirs=(
-  "Process/Daily"
   "Process/Weekly"
   "Process/Drafts"
   "Process/Meridian Documentation"
-  "Knowledge/Technical"
-  "Knowledge/Leadership"
-  "Knowledge/Industry"
-  "Knowledge/General"
   "Work/$COMPANY/Projects"
   "Work/$COMPANY/People"
   "Work/$COMPANY/Reference"
@@ -284,6 +271,10 @@ dirs=(
   "Work/$COMPANY/General"
   "Work/$COMPANY/Meetings"
   "Work/$COMPANY/Meetings/1on1s"
+  "Work/$COMPANY/Daily"
+  "Work/$COMPANY/Knowledge/Technical"
+  "Work/$COMPANY/Knowledge/Leadership"
+  "Work/$COMPANY/Knowledge/Industry"
   "_templates"
   ".scripts"
   ".scripts/lib"
@@ -300,6 +291,11 @@ if [[ "$PROFILE" == "personal" ]]; then
     "Life/Development"
     "Life/Fun"
     "Life/General"
+    "Life/Daily"
+    "Knowledge/Technical"
+    "Knowledge/Leadership"
+    "Knowledge/Industry"
+    "Knowledge/General"
     "References"
   )
 fi
@@ -402,12 +398,18 @@ echo "[meridian] Writing Obsidian config..."
 
 mkdir -p "$VAULT_ROOT/.obsidian"
 
-write_if_new "$VAULT_ROOT/.obsidian/daily-notes.json" '{
-  "folder": "Process/Daily",
-  "template": "_templates/Daily Note",
-  "format": "YYYY-MM-DD",
-  "autorun": false
-}'
+if [[ "$PROFILE" == "personal" ]]; then
+  DAILY_FOLDER="Life/Daily"
+else
+  DAILY_FOLDER="Work/$COMPANY/Daily"
+fi
+
+write_if_new "$VAULT_ROOT/.obsidian/daily-notes.json" "{
+  \"folder\": \"$DAILY_FOLDER\",
+  \"template\": \"_templates/Daily Note\",
+  \"format\": \"YYYY-MM-DD\",
+  \"autorun\": false
+}"
 
 write_if_new "$VAULT_ROOT/.obsidian/templates.json" '{
   "folder": "_templates",

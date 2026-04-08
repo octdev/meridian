@@ -26,12 +26,12 @@ The work laptop is scaffolded with `--profile work`, which means `Northstar/`, `
 |--------|-------------|------------------|-------|
 | `Process/` | Send & Receive | Send & Receive | Send & Receive (iCloud) |
 | `Work/` | Send & Receive | Send & Receive | Send & Receive (iCloud) |
-| `Knowledge/` | Send Only | Send & Receive | Send & Receive (iCloud) |
+| `Knowledge/` | Not synced | Send & Receive | Send & Receive (iCloud) |
 | `Life/` | Not synced | Send & Receive | Send & Receive (iCloud) |
 | `Northstar/` | Not synced | Send & Receive | Send & Receive (iCloud) |
 | `References/` | Not synced | Send & Receive | Send & Receive (iCloud) |
 
-Knowledge/ is Send Only from the work laptop. Work-originated knowledge flows to all devices. Personal/phone-originated knowledge stays between personal machine and phone. The enforcement is at the sync layer — no discipline required.
+`Work/` is Send & Receive and includes `Work/<Company>/Daily/` and `Work/<Company>/Knowledge/`. Work-originated knowledge syncs bidirectionally as part of `Work/` — there is no separate Syncthing entry for it. The top-level `Knowledge/` folder is personal-only and not present on the work machine.
 
 ---
 
@@ -78,9 +78,8 @@ Folder type settings in Syncthing:
 ### Conflict handling
 
 Syncthing appends `.sync-conflict-YYYYMMDD-HHMMSS-DEVICEID` to conflicting files. Obsidian surfaces these as separate notes. Resolution rule:
-- `Process/Daily/` — keep most recent version
-- `Work/` — work laptop wins
-- `Knowledge/` — personal machine wins (work laptop is Send Only, so conflicts should not occur)
+- `Work/<Company>/Daily/` — keep most recent version
+- `Work/` (other folders) — work laptop wins
 
 ---
 
