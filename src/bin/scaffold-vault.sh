@@ -162,10 +162,14 @@ if [[ "$UPGRADE" == true ]]; then
   fi
   _target="$(semver_from_version_json "$REPO_DIR/config/base/version.json")"
   _upgrade_script="$REPO_DIR/scripts/upgrade/upgrade-to-${_target}.sh"
-  if [[ ! -f "$_upgrade_script" ]]; then
-    die "scaffold" "No upgrade script found for version ${_target}. Is the repo up to date?"
+  if [[ -f "$_upgrade_script" ]]; then
+    exec bash "$_upgrade_script" --vault "$VAULT_ROOT"
+  else
+    # No version-specific entry point — invoke the runner directly.
+    # This is normal for releases with no structural vault changes (docs-only, etc.).
+    source "$REPO_DIR/scripts/upgrade/upgrade-runner.sh"
+    run_upgrade_to "$_target" "$REPO_DIR/scripts/upgrade/migrations" --vault "$VAULT_ROOT"
   fi
-  exec bash "$_upgrade_script" --vault "$VAULT_ROOT"
 fi
 
 # --- write helper ---

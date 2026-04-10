@@ -35,7 +35,7 @@ After the script finishes, `vX.Y.Z` and `latest` both point to the release commi
 
 ## Upgrade Scripts
 
-Every release needs two files under `scripts/upgrade/`:
+Releases with structural vault changes (new files, folders, templates, or config) need two files under `scripts/upgrade/`. Releases with no vault changes (docs-only, repo reorganization) can skip this section entirely — the runner handles them automatically.
 
 ### 1. Entry point — `upgrade-to-X.Y.Z.sh`
 

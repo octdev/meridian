@@ -86,7 +86,7 @@ The Meridian repo tracks its current version in `config/base/version.json`. The 
 
 ### The Migration Chain
 
-Upgrade scripts live in `scripts/upgrade/`. When `scaffold-vault.sh --upgrade` is run, it determines the current Meridian version and delegates to the matching entry point script:
+Upgrade scripts live in `scripts/upgrade/`. When `scaffold-vault.sh --upgrade` is run, it determines the current Meridian version and delegates to the matching entry point script if one exists, or invokes the runner directly for releases with no structural vault changes:
 
 ```
 scripts/upgrade/
@@ -125,18 +125,18 @@ As the final step, the runner updates `config/base/version.json` in the repo to 
 
 ### When to Create an Upgrade Script
 
-Every release that changes anything inside a vault — new files, new folders, new templates, changed configuration — requires an upgrade script. Even releases with no vault-visible changes should have a migration script (it can be a no-op stub) so the version chain stays complete.
+Every release that changes anything inside a vault — new files, new folders, new templates, changed configuration — requires an upgrade script. Releases with no structural vault changes (docs-only, repo reorganization) do not need an entry point or migration script; the runner handles them automatically.
 
-Create an upgrade script as part of the same commit that bumps `config/base/version.json`.
+Create upgrade scripts as part of the same commit that bumps `config/base/version.json`.
 
 ### File Naming and Location
 
 ```
-scripts/upgrade/upgrade-to-X.Y.Z.sh     # entry point
-scripts/upgrade/migrations/vX.Y.Z.sh    # migration logic
+scripts/upgrade/upgrade-to-X.Y.Z.sh     # entry point (structural releases only)
+scripts/upgrade/migrations/vX.Y.Z.sh    # migration logic (structural releases only)
 ```
 
-Replace `X.Y.Z` with the new semantic version. Both files are required for every release.
+Replace `X.Y.Z` with the new semantic version.
 
 ### The Entry Point
 
