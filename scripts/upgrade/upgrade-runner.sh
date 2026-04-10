@@ -430,6 +430,12 @@ run_upgrade_to() {
     done
   fi
 
+  # --- bump vault version to target (always, even if no migrations ran) ---
+  _write_version_key "$version_file" "vault" "$target_version"
+  for company in "${_SELECTED_COMPANIES[@]:-}"; do
+    [[ -n "$company" ]] && _write_version_key "$version_file" "${company}-vault" "$target_version"
+  done
+
   # --- refresh docs (always, after all migrations) ---
   _refresh_vault_docs "$vault_root" "$_repo_dir"
 

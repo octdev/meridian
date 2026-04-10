@@ -169,6 +169,7 @@ if [[ "$UPGRADE" == true ]]; then
     # This is normal for releases with no structural vault changes (docs-only, etc.).
     source "$REPO_DIR/scripts/upgrade/upgrade-runner.sh"
     run_upgrade_to "$_target" "$REPO_DIR/scripts/upgrade/migrations" --vault "$VAULT_ROOT"
+    exit 0
   fi
 fi
 
