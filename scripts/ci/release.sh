@@ -131,5 +131,19 @@ git tag -a "$NEW_TAG" -m "Release $NEW_TAG"
 echo ""
 echo "Tagged $NEW_TAG on commit $(git rev-parse --short HEAD)."
 echo ""
-echo "To push:"
-echo "  git push && git push origin $NEW_TAG"
+
+printf "Pushing commit...     "
+git push origin HEAD
+echo "done."
+
+printf "Pushing $NEW_TAG...   "
+git push origin "$NEW_TAG"
+echo "done."
+
+printf "Moving latest tag...  "
+git tag -f latest
+git push origin latest --force
+echo "done."
+
+echo ""
+echo "Released $NEW_TAG — users cloning --branch latest will get this version."

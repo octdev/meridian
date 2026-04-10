@@ -124,7 +124,7 @@ _migrate_version_file() {
 # Always overwrites vault documentation with the latest from the repo.
 _refresh_vault_docs() {
   local vault_root="$1" repo_dir="$2"
-  local docs_src="${repo_dir}/documentation"
+  local docs_src="${repo_dir}/src/documentation"
   local docs_dest="${vault_root}/Process/Meridian Documentation"
   local ts
   ts="$(date '+%Y-%m-%d %H:%M:%S')"

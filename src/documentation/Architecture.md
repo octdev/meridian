@@ -65,6 +65,16 @@ meridian/
         values.md
         goals.md
         career.md
+    documentation/
+      User Setup.md
+      User Handbook.md
+      Reference Guide.md
+      Architecture.md               this file
+      Design Decision.md
+      Security.md
+      Sync.md
+      Roadmap.md
+      Upgrades.md                   upgrade system: user guide and developer reference
   scripts/
     ci/
       release.sh                  version tagging and README update script
@@ -78,23 +88,15 @@ meridian/
   config/
     base/
       version.json                semver source of truth
-  documentation/
-    User Setup.md
-    User Handbook.md
-    Reference Guide.md
-    Architecture.md               this file
-    Design Decision.md
-    Security.md
-    Sync.md
-    Roadmap.md
-    Upgrades.md                   upgrade system: user guide and developer reference
+  docs/
+    work-scaffold.md              dev/planning notes for --profile work feature
 ```
 
-`src/bin/` contains all product scripts. `scaffold-vault.sh` copies them — and the `src/lib/` shared libraries — into the vault's `.scripts/` directory at setup time. `src/templates/` holds vault seed files; filenames are kebab-case in the repo and retain their display-case names when written into the vault. The `documentation/` directory contains all user-facing docs — these are copied into the vault at `Process/Meridian Documentation/` with frontmatter injected. The vault itself is not committed to this repo.
+`src/bin/` contains all product scripts. `scaffold-vault.sh` copies them — and the `src/lib/` shared libraries — into the vault's `.scripts/` directory at setup time. `src/templates/` holds vault seed files; filenames are kebab-case in the repo and retain their display-case names when written into the vault. `src/documentation/` contains all user-facing docs — these are copied into the vault at `Process/Meridian Documentation/` with frontmatter injected. `docs/` contains developer and project planning notes that are never distributed to users. The vault itself is not committed to this repo.
 
 `scripts/local/` holds one-off utilities run directly from the repo, not copied to the vault. `backfill-timestamps.sh` is used when migrating an existing vault: it walks all Markdown files and populates any empty `created:` or `modified:` frontmatter fields, leaving existing timestamps untouched.
 
-`scripts/upgrade/` contains the versioned upgrade system. `upgrade-runner.sh` is a sourced library that orchestrates discovery, ordering, and execution of migration scripts. Each release gets one entry point (`upgrade-to-X.Y.Z.sh`) and one migration script (`migrations/vX.Y.Z.sh`). Users run upgrades via `scaffold-vault.sh --upgrade`, which delegates to the appropriate entry point. See `documentation/Upgrades.md` for full details.
+`scripts/upgrade/` contains the versioned upgrade system. `upgrade-runner.sh` is a sourced library that orchestrates discovery, ordering, and execution of migration scripts. Each release gets one entry point (`upgrade-to-X.Y.Z.sh`) and one migration script (`migrations/vX.Y.Z.sh`). Users run upgrades via `scaffold-vault.sh --upgrade`, which delegates to the appropriate entry point. See `src/documentation/Upgrades.md` for full details.
 
 ---
 

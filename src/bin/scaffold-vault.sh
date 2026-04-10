@@ -469,7 +469,7 @@ echo ""
 
 echo "[meridian] Copying documentation..."
 
-DOCS_SRC="$REPO_DIR/documentation"
+DOCS_SRC="$REPO_DIR/src/documentation"
 DOCS_DEST="$VAULT_ROOT/Process/Meridian Documentation"
 
 copy_doc_with_frontmatter "$DOCS_SRC/User Setup.md"      "$DOCS_DEST/User Setup.md"      "User Setup"        "$_now"

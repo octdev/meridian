@@ -74,6 +74,6 @@ The daily note and all MOC queries are identical between work and personal vault
 
 ## Current status
 
-- `--profile work` is documented in `documentation/roadmap.md` as a deferred feature
+- `--profile work` is documented in `src/documentation/Roadmap.md` as a deferred feature
 - Current workaround: run full scaffold, manually delete personal folders, configure Syncthing to exclude them
 - Building `--profile work` into `scaffold-vault.sh` is the next development task

@@ -222,5 +222,5 @@ fi
 - [ ] Create `scripts/upgrade/upgrade-to-X.Y.Z.sh` entry point
 - [ ] Update `config/base/version.json` to `X.Y.Z`
 - [ ] Add `Upgrades.md` copy call to `scaffold-vault.sh` and `_refresh_vault_docs` in `upgrade-runner.sh` if new doc files were added
-- [ ] Update `documentation/Architecture.md` repo and vault structure diagrams if files or folders changed
+- [ ] Update `src/documentation/Architecture.md` repo and vault structure diagrams if files or folders changed
 - [ ] Commit all four changes together

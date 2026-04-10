@@ -465,15 +465,15 @@ section "documentation — no references to nonexistent cheat-sheet.md"
 assert_file_not_contains "  README.md does not reference cheat-sheet.md" \
   "$REPO_DIR/README.md" "cheat-sheet.md"
 assert_file_not_contains "  User Setup.md does not reference cheat-sheet.md" \
-  "$REPO_DIR/documentation/User Setup.md" "cheat-sheet.md"
+  "$REPO_DIR/src/documentation/User Setup.md" "cheat-sheet.md"
 
 # ============================================================
 section "documentation — default vault path is correct"
 
 assert_file_not_contains "  User Setup.md does not say default is ./vault" \
-  "$REPO_DIR/documentation/User Setup.md" "Default path is \`./vault\`"
+  "$REPO_DIR/src/documentation/User Setup.md" "Default path is \`./vault\`"
 assert_file_contains "  User Setup.md states ~/Documents/Meridian as default" \
-  "$REPO_DIR/documentation/User Setup.md" "~/Documents/Meridian"
+  "$REPO_DIR/src/documentation/User Setup.md" "~/Documents/Meridian"
 
 # ============================================================
 section "documentation — scaffold copies match what docs claim"
@@ -491,7 +491,7 @@ done
 # Verify docs source files actually exist
 for doc in "User Setup.md" "User Handbook.md" "Reference Guide.md" "Architecture.md" \
             "Design Decision.md" "Security.md" "Sync.md" "Roadmap.md"; do
-  assert_exists "  documentation/$doc exists" "$REPO_DIR/documentation/$doc"
+  assert_exists "  src/documentation/$doc exists" "$REPO_DIR/src/documentation/$doc"
 done
 
 # Verify PDF exists

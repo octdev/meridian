@@ -53,15 +53,20 @@ python3 --version
 
 ### Step 1: Run the scaffold script
 
+**Clone the repo:**
+```bash
+git clone --branch latest --depth 1 https://github.com/your-username/meridian.git
+cd meridian
+```
+
 **Personal machine:**
 ```bash
-chmod +x scaffold-vault.sh
-./scaffold-vault.sh --vault /path/to/MyVault
+./src/bin/scaffold-vault.sh --vault /path/to/MyVault
 ```
 
 **Work machine:**
 ```bash
-./scaffold-vault.sh --vault /path/to/WorkVault --profile work
+./src/bin/scaffold-vault.sh --vault /path/to/WorkVault --profile work
 ```
 
 The `--profile work` flag creates only the folders appropriate for an employer-managed machine — `Process/`, `Work/`, and `Knowledge/`. `Northstar/`, `Life/`, and `References/` are never created. See [Work Machine Setup](#work-machine-setup) for the full workflow.

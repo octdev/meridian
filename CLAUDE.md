@@ -8,15 +8,15 @@ Meridian is a personal knowledge management system built on Obsidian. It consist
 
 | Task | Read first | Skip |
 |------|-----------|------|
-| Modify `scaffold-vault.sh` | `scaffold-vault.sh`, `Architecture.md` (vault structure) | `Sync.md`, `Security.md`, `work-scaffold.md` |
+| Modify `scaffold-vault.sh` | `scaffold-vault.sh`, `Architecture.md` (vault structure) | `Sync.md`, `Security.md` |
 | Add or change a script in `scripts/` | The script itself, `User Setup.md` (Shell Commands section) | `Sync.md`, `Security.md` |
-| Update documentation | The specific doc file, `Architecture.md` (repo structure) | `Sync.md`, `Security.md`, `STATUS.md` |
+| Update documentation | The specific doc file, `Architecture.md` (repo structure) | `Sync.md`, `Security.md` |
 | Add a vault MOC or seed file | `scaffold-vault.sh`, `Architecture.md` (vault structure) | Everything else |
 | Understand the plugin stack or frontmatter chain | `Architecture.md` | `Sync.md`, `Security.md` |
 | Understand sync or machine boundary | `Sync.md`, `Security.md` | Everything else |
 | Understand why something is designed a certain way | `Design Decision.md` | Everything else |
 
-`work-scaffold.md` and `STATUS.md` are internal project working notes. They are almost never needed for code changes.
+`docs/work-scaffold.md` is a project planning note. It is almost never needed for code changes.
 
 ---
 
@@ -27,10 +27,11 @@ Meridian is a personal knowledge management system built on Obsidian. It consist
 - `.scripts/` — scripts as deployed inside the vault
 - `scaffold-vault.sh` copies from `scripts/` → `.scripts/` at setup time using `copy_if_new`
 
-**Vault documentation is a scaffold-time snapshot:**
-- `documentation/` in the project is the source of truth
-- `Process/Meridian Documentation/` in the vault is a copy, injected with frontmatter at scaffold time via `copy_doc_with_frontmatter`
-- Re-running scaffold skips existing files — vault docs do not auto-update
+**Vault documentation:**
+- `src/documentation/` in the project is the source of truth
+- `Process/Meridian Documentation/` in the vault is a copy, injected with frontmatter via `copy_doc_with_frontmatter`
+- Fresh scaffold skips existing doc files (`copy_if_new` semantics)
+- Upgrade runs always overwrite vault docs with the latest from the repo (`_refresh_vault_docs` in `upgrade-runner.sh`)
 
 **`_templates/` must be excluded in Linter and Filename Heading Sync:**
 - Without this exclusion, both plugins corrupt template files on save
@@ -67,7 +68,7 @@ Meridian is a personal knowledge management system built on Obsidian. It consist
 
 **Documentation files have no frontmatter in the project:**
 - Frontmatter is injected only when copying to the vault
-- Do not add frontmatter to files in `documentation/` — it would be doubled on copy
+- Do not add frontmatter to files in `src/documentation/` — it would be doubled on copy
 
 **Design decisions:**
 - Numbered DD-01, DD-02... sequentially; never renumber
