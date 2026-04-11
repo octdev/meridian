@@ -24,7 +24,8 @@ scripts/ci/version.sh
 #    scripts/upgrade/upgrade-to-X.Y.Z.sh
 
 # 3. Validate
-scripts/ci/test-vault.sh   # or manually: scaffold-vault.sh --upgrade against a test vault
+tests/run-tests.sh
+src/bin/scaffold-vault.sh --upgrade --vault ~/Documents/TestVault
 
 # 4. Stage everything
 git add config/base/version.json README.md scripts/upgrade/...  src/documentation/...
