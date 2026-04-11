@@ -20,7 +20,7 @@ Prompts for a vault path (default: `~/Documents/Meridian`). Creates the full vau
 ```bash
 src/bin/scaffold-vault.sh --profile work
 ```
-Creates only `Process/`, `Work/`, and `Knowledge/`. Personal folders are never created, so personal content cannot exist on the work machine.
+Creates only `Process/` and `Work/`. Personal folders are never created, so personal content cannot exist on the work machine.
 
 ---
 
@@ -61,7 +61,7 @@ Then follow `Process/Meridian Documentation/User Setup.md` in the vault from Ste
 
 Meridian is designed to keep personal knowledge off employer-managed machines. The `--profile work` flag ensures personal folders are never created on the work machine. The Syncthing sync architecture then enforces the same boundary at the network level. See [src/documentation/Security.md](src/documentation/Security.md).
 
-## Documentation
+## User Documentation
 
 | File | Purpose |
 |------|---------|
@@ -75,3 +75,12 @@ Meridian is designed to keep personal knowledge off employer-managed machines. T
 | [src/documentation/Roadmap.md](src/documentation/Roadmap.md) | Deferred features |
 
 All documentation is also available inside the vault at `Process/Meridian Documentation/` after running `scaffold-vault.sh`.
+
+## Project Documentation
+
+| File | Purpose |
+|------|---------|
+| [RELEASING.md](RELEASING.md) | Release process: version bumping, migration scripts, validation, and tagging |
+| [CLAUDE.md](CLAUDE.md) | Agent working guide: constraints, conventions, and task-specific read lists |
+| [docs/next-release.md](docs/next-release.md) | Accumulated migration notes for the next release |
+| [docs/work-scaffold.md](docs/work-scaffold.md) | Planning notes for the work profile feature |
