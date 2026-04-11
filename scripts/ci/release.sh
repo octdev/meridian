@@ -9,20 +9,8 @@ VERSION_FILE="$REPO_DIR/config/base/version.json"
 
 cd "$REPO_DIR"
 
-STAGED="$(git diff --cached --name-only)"
-
-if [[ -z "$STAGED" ]]; then
-  echo "Error: no staged changes. Stage your changes with git add before releasing."
-  exit 1
-fi
-
-if ! echo "$STAGED" | grep -q "^config/base/version.json$"; then
-  echo "Error: config/base/version.json is not staged. Run scripts/ci/version.sh first."
-  exit 1
-fi
-
-if ! echo "$STAGED" | grep -q "^README.md$"; then
-  echo "Error: README.md is not staged. Run scripts/ci/version.sh first."
+if [[ ! -f "$VERSION_FILE" ]]; then
+  echo "Error: $VERSION_FILE not found."
   exit 1
 fi
 
@@ -40,11 +28,23 @@ else
   NEW_TAG="v$NEW_VERSION"
 fi
 
+# Guard against re-releasing an already-tagged version.
+if git tag --list | grep -q "^${NEW_TAG}$"; then
+  echo "Error: tag $NEW_TAG already exists. Run scripts/ci/version.sh to bump the version."
+  exit 1
+fi
+
 # ── Confirm ───────────────────────────────────────────────────────────────────
 
+STAGED="$(git diff --cached --name-only)"
+
 echo ""
-echo "Staged files:"
-echo "$STAGED" | sed 's/^/  /'
+if [[ -n "$STAGED" ]]; then
+  echo "Staged files (will be included in release commit):"
+  echo "$STAGED" | sed 's/^/  /'
+else
+  echo "No staged changes — tagging HEAD."
+fi
 echo ""
 echo "Release: $NEW_TAG"
 read -rp "Proceed? [y/N] " CONFIRM
@@ -53,9 +53,11 @@ if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
   exit 0
 fi
 
-# ── Commit and tag ────────────────────────────────────────────────────────────
+# ── Commit (if staged changes exist) and tag ─────────────────────────────────
 
-git commit -m "Release $NEW_TAG"
+if [[ -n "$STAGED" ]]; then
+  git commit -m "Release $NEW_TAG"
+fi
 
 git tag -a "$NEW_TAG" -m "Release $NEW_TAG"
 

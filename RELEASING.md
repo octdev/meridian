@@ -28,9 +28,9 @@ tests/run-tests.sh
 src/bin/scaffold-vault.sh --upgrade --vault ~/Documents/TestVault
 
 # 4. Stage everything
-git add config/base/version.json README.md scripts/upgrade/...  src/documentation/...
+git add .
 
-# 5. Release
+# 5. Release (commits staged changes, creates tag, pushes)
 scripts/ci/release.sh
 ```
 
@@ -233,18 +233,7 @@ Fix any issues in the migration scripts and re-run until clean. Since the versio
 
 ## Phase 2: Commit and Tag
 
-Once validation passes, stage everything that belongs in the release commit:
-
-```bash
-git add config/base/version.json
-git add README.md
-git add scripts/upgrade/migrations/vX.Y.Z.sh
-git add scripts/upgrade/upgrade-to-X.Y.Z.sh
-git add src/documentation/...    # any updated docs
-# etc.
-```
-
-Then release:
+Once validation passes, stage everything and release:
 
 ```bash
 scripts/ci/release.sh
@@ -290,6 +279,6 @@ Clear `docs/next-release.md` after the release scripts are written and validated
 - [ ] Update `src/documentation/` for any user-visible changes
 - [ ] Update `src/documentation/Architecture.md` if files or folders changed
 - [ ] Validate: `scaffold-vault.sh --upgrade` against a test vault
-- [ ] `git add` all release files
+- [ ] `git add .`
 - [ ] `scripts/ci/release.sh` — commit, tag, push
 - [ ] Clear `docs/next-release.md`
