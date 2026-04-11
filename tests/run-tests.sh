@@ -159,9 +159,9 @@ PERSONAL_VAULT="$(new_vault)"
 
 # Shared folders
 for d in \
-  "Process/Weekly" "Process/Drafts" "Process/Meridian Documentation" \
+  "Process/Weekly" "Process/Meridian Documentation" \
   "Work/CurrentCompany/Projects" "Work/CurrentCompany/People" "Work/CurrentCompany/Reference" \
-  "Work/CurrentCompany/Incidents" "Work/CurrentCompany/Vendors" \
+  "Work/CurrentCompany/Incidents" "Work/CurrentCompany/Vendors" "Work/CurrentCompany/Goals" \
   "Work/CurrentCompany/Daily" "Work/CurrentCompany/Knowledge/Technical" \
   "_templates" ".scripts"; do
   assert_exists "  folder: $d" "$PERSONAL_VAULT/$d"
@@ -191,9 +191,15 @@ done
 
 # Process MOCs
 for f in "Process/Active Projects.md" "Process/Action Items.md" "Process/Open Loops.md" \
-          "Process/Review Queue.md" "Process/Current Priorities.md" "Process/Weekly Outtake.md"; do
+          "Process/Review Queue.md" "Process/Weekly Outtake.md"; do
   assert_exists "  MOC: $f" "$PERSONAL_VAULT/$f"
 done
+
+# Current Priorities seeded under Work/Goals (not Process/)
+assert_exists "  Work/CurrentCompany/Goals/Current Priorities.md" \
+  "$PERSONAL_VAULT/Work/CurrentCompany/Goals/Current Priorities.md"
+assert_absent "  Process/Current Priorities.md absent (moved to Work/Goals/)" \
+  "$PERSONAL_VAULT/Process/Current Priorities.md"
 
 # Source tag notes
 assert_exists "  source tag: Process/email.md" "$PERSONAL_VAULT/Process/email.md"
@@ -238,7 +244,7 @@ WORK_VAULT="$(new_vault)"
 "$SCAFFOLD" --vault "$WORK_VAULT" --profile work > /dev/null 2>&1
 
 # Shared folders present
-for d in "Work/CurrentCompany/Projects" "Work/CurrentCompany/Daily" \
+for d in "Work/CurrentCompany/Projects" "Work/CurrentCompany/Daily" "Work/CurrentCompany/Goals" \
           "Work/CurrentCompany/Knowledge/Technical" "_templates" ".scripts"; do
   assert_exists "  work folder present: $d" "$WORK_VAULT/$d"
 done
@@ -293,10 +299,13 @@ COMPANY_SCRIPT="$COMPANY_VAULT/.scripts/new-company.sh"
 
 printf "%s\n%s\n" "$COMPANY_VAULT" "Acme Corp" | bash "$COMPANY_SCRIPT" > /dev/null 2>&1
 
-for d in "Incidents" "People" "Projects" "Reference" "Vendors" \
+for d in "Incidents" "People" "Projects" "Reference" "Vendors" "Goals" \
           "Daily" "Knowledge/Technical" "Knowledge/Leadership" "Knowledge/Industry"; do
   assert_exists "  Work/Acme Corp/$d created" "$COMPANY_VAULT/Work/Acme Corp/$d"
 done
+
+assert_exists "  Work/Acme Corp/Goals/Current Priorities.md seeded" \
+  "$COMPANY_VAULT/Work/Acme Corp/Goals/Current Priorities.md"
 
 assert_file_contains "  daily-notes.json updated to new company" \
   "$COMPANY_VAULT/.obsidian/daily-notes.json" '"folder": "Work/Acme Corp/Daily"'

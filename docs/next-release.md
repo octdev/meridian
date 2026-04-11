@@ -21,16 +21,7 @@ _None pending._
 ### Per-company changes
 _(Changes inside Work/[Company]/: new subfolders, new seed files)_
 
-**Move Current Priorities.md from Process/ to Work/[Company]/Goals/**
-
-- Source: `Process/Current Priorities.md`
-- Destination: `Work/[Company]/Goals/Current Priorities.md`
-- Action: if `Process/Current Priorities.md` exists, move it to
-  `Work/$COMPANY/Goals/Current Priorities.md` (use `mv`, skip if destination
-  already exists). If `Work/$COMPANY/Goals/` does not exist, create it first.
-- Note: if the user has content in `Process/Current Priorities.md`, it must be
-  preserved — this is not a copy_if_new, it is a move. Warn the user to review
-  after migration.
+_None pending._
 
 ---
 
