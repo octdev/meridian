@@ -148,12 +148,6 @@ Configure these before enabling plugins. Order matters.
 2. **Settings → Appearance → Show tab title bar → ON**
    Shows the tab bar for navigating open notes.
 
-Optional User Preferences for flow:
-
-1. **Settings → Editor → Behavior → Auto-pair Brackets → OFF**
-
-2. **Settings → Editor → Behavior → Auto-pair Markdown Syntax → OFF**
-
 ---
 
 ## Editor Settings
@@ -164,6 +158,15 @@ Optional User Preferences for flow:
 2. **Settings → Editor → Properties in document → Source**
    Renders frontmatter as editable YAML inline.
    **Important:** this setting must remain Source. Changing it to Visible breaks the Front Matter Timestamps → Linter chain. If frontmatter stops populating after changing this setting, revert to Source.
+
+Optional preferences for flow:
+
+3. **Settings → Editor → Display → Readable Line Length → OFF**
+   Disables the centered, narrow reading column so notes use the full pane width.
+
+4. **Settings → Editor → Behavior → Auto-pair Brackets → OFF**
+
+5. **Settings → Editor → Behavior → Auto-pair Markdown Syntax → OFF**
 
 ---
 
