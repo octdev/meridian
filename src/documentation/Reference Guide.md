@@ -14,7 +14,7 @@ Process/
   Active Projects · Action Items · Open Loops · Review Queue
   Weekly Outtake · Current Priorities
   Meridian Documentation/   User Setup · User Handbook · Reference Guide
-                            Architecture · Design Decision · Security · Sync · Roadmap · Upgrades · PDF
+                            Architecture · Design Decision · Security · Sync · Roadmap · Upgrading · PDF
 Knowledge/       Technical/ · Leadership/ · Industry/ · General/
 Work/
   CurrentCompany/
@@ -40,7 +40,7 @@ Process/
   Weekly/        auto-generated snapshots
   Active Projects · Action Items · Open Loops · Review Queue
   Weekly Outtake · Current Priorities
-  Meridian Documentation/   (same as personal vault, including Upgrades)
+  Meridian Documentation/   (same as personal vault, including Upgrading)
 Work/
   CurrentCompany/
     Projects/ · People/ · Reference/ · Incidents/ · Vendors/

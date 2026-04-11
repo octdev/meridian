@@ -85,7 +85,7 @@ To upgrade an existing vault to the latest Meridian version:
 ./src/bin/scaffold-vault.sh --upgrade
 ```
 
-The script will prompt you to select a vault and which company folders to upgrade. See [[Upgrades]] for the full upgrade guide.
+The script will prompt you to select a vault and which company folders to upgrade. See [[Upgrading]] for the full upgrade guide.
 
 ### Step 2: Open the vault in Obsidian
 
@@ -381,7 +381,7 @@ To upgrade an existing vault to the latest Meridian version:
 
 The script will prompt you to select a vault and which company folders to upgrade. It runs all applicable migration scripts in order, then overwrites `Process/Meridian Documentation/` with the latest docs.
 
-See [[Upgrades]] for the full upgrade guide, including what happens when upgrading across multiple versions and how per-company version tracking works.
+See [[Upgrading]] for the full upgrade guide, including what happens when upgrading across multiple versions and how per-company version tracking works.
 
 ### Rename CurrentCompany
 

@@ -167,8 +167,8 @@ vault/
     Weekly Outtake.md             Tasks MOC (rolling 7-day)
     email.md                      source tag note
     teams.md                      source tag note
-    Meridian Documentation/
-      User Setup.md
+    Meridian Documentation/       Meridian-managed — overwritten on upgrade and refresh
+      User Setup.md               do not store personal notes here
       User Handbook.md
       Reference Guide.md
       Architecture.md

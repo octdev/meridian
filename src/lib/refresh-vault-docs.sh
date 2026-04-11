@@ -3,14 +3,17 @@
 # Provides refresh_vault_docs() for copying the latest documentation
 # from the repo into a vault's Process/Meridian Documentation/ folder.
 #
-# Always overwrites existing documentation files with the latest source.
+# Always overwrites existing documentation files with the latest source,
+# and removes any files in the directory that are not part of the current
+# documentation set. The directory is entirely Meridian-managed.
 #
 # Requires:
 #   logging.sh — sourced before this library (_pass, _warn)
 
 # Copies all documentation source files into the vault's documentation folder,
-# overwriting any existing files. Soft-skips if the destination folder is absent
-# (callers that require it should validate before calling).
+# overwriting any existing files and removing any stale ones. Soft-skips if
+# the destination folder is absent (callers that require it should validate
+# before calling).
 #
 # Usage: refresh_vault_docs <vault_root> <repo_dir>
 refresh_vault_docs() {
@@ -52,5 +55,27 @@ refresh_vault_docs() {
     cp "${repo_dir}/Meridian System.pdf" "$docs_dest/Meridian System.pdf"
     _pass "Updated: Process/Meridian Documentation/Meridian System.pdf"
   fi
+
+  # Remove any files not in the current documentation set.
+  # Process/Meridian Documentation/ is entirely Meridian-managed, so stale
+  # files from renamed or removed docs should not persist across refreshes.
+  local -a _current=(
+    "User Setup.md" "User Handbook.md" "Reference Guide.md" "Architecture.md"
+    "Design Decision.md" "Security.md" "Sync.md" "Roadmap.md" "Upgrading.md"
+    "Meridian System.pdf"
+  )
+  while IFS= read -r -d '' _f; do
+    local _base _known
+    _base="$(basename "$_f")"
+    _known=false
+    for _cf in "${_current[@]}"; do
+      [[ "$_base" == "$_cf" ]] && _known=true && break
+    done
+    if [[ "$_known" == false ]]; then
+      rm "$_f"
+      _pass "Removed stale: ${_f#$vault_root/}"
+    fi
+  done < <(find "$docs_dest" -maxdepth 1 -type f -print0)
+
   echo ""
 }

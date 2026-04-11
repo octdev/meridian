@@ -608,6 +608,24 @@ else
 fi
 
 # ============================================================
+section "refresh-documentation.sh — removes stale files"
+
+STALE_VAULT="$(new_vault)"
+"$SCAFFOLD" --vault "$STALE_VAULT" --profile personal > /dev/null 2>&1
+echo "stale content" > "$STALE_VAULT/Process/Meridian Documentation/Upgrades.md"
+
+rc=0; output="$(echo "Y" | "$REFRESH_SCRIPT" --vault "$STALE_VAULT" 2>&1)" || rc=$?
+if [[ $rc -eq 0 ]] && echo "$output" | grep -q "Removed stale:"; then
+  pass "  stale file triggers Removed stale message"
+else
+  fail "  stale file triggers Removed stale message"
+fi
+assert_absent "  stale file removed after refresh" \
+  "$STALE_VAULT/Process/Meridian Documentation/Upgrades.md"
+assert_exists "  current docs still present after stale removal" \
+  "$STALE_VAULT/Process/Meridian Documentation/Upgrading.md"
+
+# ============================================================
 section "upgrade-runner.sh — lib extraction"
 
 assert_file_contains "  upgrade-runner sources refresh-vault-docs.sh" \
