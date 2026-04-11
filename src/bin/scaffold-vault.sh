@@ -363,7 +363,7 @@ copy_with_timestamps "$REPO_DIR/src/templates/mocs/active-projects.md"    "$VAUL
 copy_with_timestamps "$REPO_DIR/src/templates/mocs/action-items.md"       "$VAULT_ROOT/Process/Action Items.md"         "$_now"
 copy_with_timestamps "$REPO_DIR/src/templates/mocs/open-loops.md"         "$VAULT_ROOT/Process/Open Loops.md"           "$_now"
 copy_with_timestamps "$REPO_DIR/src/templates/mocs/review-queue.md"       "$VAULT_ROOT/Process/Review Queue.md"         "$_now"
-copy_with_timestamps "$REPO_DIR/src/templates/mocs/current-priorities.md" "$VAULT_ROOT/Process/Current Priorities.md"  "$_now"
+copy_with_timestamps "$REPO_DIR/src/templates/mocs/current-priorities.md" "$VAULT_ROOT/Work/$COMPANY/Goals/Current Priorities.md"  "$_now"
 copy_with_timestamps "$REPO_DIR/src/templates/mocs/weekly-outtake.md"     "$VAULT_ROOT/Process/Weekly Outtake.md"       "$_now"
 
 echo ""

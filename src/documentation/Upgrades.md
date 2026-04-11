@@ -218,6 +218,7 @@ fi
 
 ### Checklist for a New Release
 
+- [ ] Review `docs/next-release.md` — translate accumulated migration notes into the scripts below, then clear the file
 - [ ] Create `scripts/upgrade/migrations/vX.Y.Z.sh` with global and per-company sections
 - [ ] Create `scripts/upgrade/upgrade-to-X.Y.Z.sh` entry point
 - [ ] Update `config/base/version.json` to `X.Y.Z`

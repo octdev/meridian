@@ -165,7 +165,6 @@ vault/
     Open Loops.md                 Tasks MOC
     Review Queue.md               Tasks MOC
     Weekly Outtake.md             Tasks MOC (rolling 7-day)
-    Current Priorities.md         Manual MOC
     email.md                      source tag note
     teams.md                      source tag note
     Meridian Documentation/
@@ -192,6 +191,7 @@ vault/
       Incidents/
       Vendors/
       Goals/
+        Current Priorities.md     Manual note
       Finances/
       General/
       Daily/                      YYYY-MM-DD.md files
@@ -251,7 +251,6 @@ vault/
     Open Loops.md                 Tasks MOC
     Review Queue.md               Tasks MOC
     Weekly Outtake.md             Tasks MOC (rolling 7-day)
-    Current Priorities.md         Manual MOC
     email.md                      source tag note
     teams.md                      source tag note
     Meridian Documentation/       (same docs as personal vault, including Upgrades.md)
@@ -263,6 +262,7 @@ vault/
       Incidents/
       Vendors/
       Goals/
+        Current Priorities.md     Manual note
       Finances/
       General/
       Daily/                      YYYY-MM-DD.md files
@@ -351,9 +351,8 @@ The script runs on vault open and every 4 hours via Shell Commands. It discovers
 
 ```
 Work laptop ──Syncthing──► Personal machine ──iCloud──► Phone
-  Process/: Send & Receive   Send & Receive              full vault
-  Work/:    Send & Receive   (includes Work/*/Daily/ and Work/*/Knowledge/)
-  (Life/, Northstar/, References/ not configured on work laptop)
+  Work/:    Send & Receive   (includes Work/*/Daily/, Work/*/Knowledge/, Work/*/Goals/)
+  (Process/, Life/, Northstar/, References/ not configured on work laptop)
 ```
 
 See [Sync.md](Sync.md) for full configuration.

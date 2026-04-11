@@ -24,14 +24,16 @@ The work laptop is scaffolded with `--profile work`, which means `Northstar/`, `
 
 | Folder | Work laptop | Personal machine | Phone |
 |--------|-------------|------------------|-------|
-| `Process/` | Send & Receive | Send & Receive | Send & Receive (iCloud) |
 | `Work/` | Send & Receive | Send & Receive | Send & Receive (iCloud) |
 | `Knowledge/` | Not synced | Send & Receive | Send & Receive (iCloud) |
 | `Life/` | Not synced | Send & Receive | Send & Receive (iCloud) |
 | `Northstar/` | Not synced | Send & Receive | Send & Receive (iCloud) |
 | `References/` | Not synced | Send & Receive | Send & Receive (iCloud) |
+| `Process/` | Not synced | Not synced | Send & Receive (iCloud) |
 
-`Work/` is Send & Receive and includes `Work/<Company>/Daily/` and `Work/<Company>/Knowledge/`. Work-originated knowledge syncs bidirectionally as part of `Work/` — there is no separate Syncthing entry for it. The top-level `Knowledge/` folder is personal-only and not present on the work machine.
+`Work/` is Send & Receive and includes `Work/<Company>/Daily/`, `Work/<Company>/Knowledge/`, and `Work/<Company>/Goals/` (which contains `Current Priorities.md`). Work-originated knowledge and priorities sync bidirectionally as part of `Work/` — there is no separate Syncthing entry for any subfolder.
+
+`Process/` contains only query-based MOCs, generated weekly snapshots, and Meridian documentation — all of which are either rebuilt locally from vault content or refreshed on upgrade. It is not synced between machines.
 
 ---
 
@@ -65,10 +67,10 @@ Open the Syncthing web UI: http://127.0.0.1:8384
 
 ### Configure folders
 
-For each folder in the sync matrix above:
+Only `Work/` is synced between the work laptop and personal machine. Configure it as a single folder share:
 
-1. On the personal machine: Add Folder → set path to the vault subfolder → share with work laptop device
-2. On the work laptop: accept the folder share → set the folder type per the matrix
+1. On the personal machine: Add Folder → set path to `Work/` → share with work laptop device
+2. On the work laptop: accept the folder share → set type to Send & Receive
 
 Folder type settings in Syncthing:
 - **Send & Receive** — bidirectional (default)

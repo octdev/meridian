@@ -106,6 +106,33 @@ mkdir -p "${company_dir}/Knowledge/Industry"
 _pass "Finances/ created."
 _pass "General/ created."
 _pass "Goals/ created."
+# Seed Current Priorities note
+_priorities_file="${company_dir}/Goals/Current Priorities.md"
+if [[ ! -f "$_priorities_file" ]]; then
+  _now="$(date '+%Y-%m-%d %H:%M:%S')"
+  cat > "$_priorities_file" <<PRIORITIES
+---
+title: Current Priorities
+created: $_now
+modified: $_now
+---
+
+# Current Priorities
+
+## Annual
+-
+
+## Quarter
+-
+
+## Month
+-
+
+## Week
+-
+PRIORITIES
+  _pass "Goals/Current Priorities.md created."
+fi
 _pass "Incidents/ created."
 _pass "People/ created."
 _pass "Projects/ created."
