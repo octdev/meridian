@@ -62,7 +62,7 @@
 
 ## DD-08: Work profile flag omits personal folders at scaffold time
 
-**Decision:** A `--profile work` flag on `scaffold-vault.sh` creates only `Process/`, `Work/`, `Knowledge/`, `_templates/`, and `.scripts/`. `Northstar/`, `Life/`, and `References/` are never written to disk on a work machine.
+**Decision:** A `--profile work` flag on `scaffold-vault.sh` creates only `Process/`, `Work/`, `_templates/`, and `.scripts/`. `Northstar/`, `Life/`, `References/`, and the top-level `Knowledge/` are never written to disk on a work machine. Work-generated knowledge lives at `Work/<Company>/Knowledge/`.
 
 **Rationale:** The most reliable way to keep personal content off an employer machine is to never create it there. Relying on Syncthing exclusions alone means the folders could exist briefly or be created by other means. With `--profile work`, the personal folders are structurally absent — there is nothing to accidentally sync, expose, or misconfigure. The work and personal vault structures remain in sync for work-relevant folders while enforcing a hard boundary at the filesystem level.
 
@@ -229,6 +229,26 @@
 **Rationale:** DD-21 moved daily notes to domain folders; DD-23 established `Process/` as a pure aggregation layer. `Process/Drafts/` was the last remaining capture surface in `Process/`, creating an inconsistency. Scoping Drafts to its domain (`Life/` or `Work/<Company>/`) completes the model. The same `Life/` presence detection already used for daily notes and `daily-notes.json` drives the selection. On a personal machine, the vast majority of ad-hoc notes are personal in intent; on a work machine, everything is work-scoped. The frictionless single-default is preserved: Obsidian's "Default location for new notes" is written automatically by the scaffold to the correct folder per profile via `.obsidian/app.json`.
 
 **Tradeoff:** A note created on a personal machine that turns out to be work-related lands in `Life/Drafts/` and must be manually relocated during weekly filing. This is acceptable — Drafts is processed during weekly review regardless, so the extra move is already part of the existing workflow.
+
+---
+
+## DD-25: Current Priorities in Work/Goals, not Process
+
+**Decision:** `Current Priorities.md` lives at `Work/<Company>/Goals/Current Priorities.md`, not in `Process/`.
+
+**Rationale:** Work priorities are work-scoped content, not an aggregation surface. `Process/` is a pure retrieval layer — MOCs, generated snapshots, and documentation. Current Priorities is a note the user actively writes and updates; it belongs in the domain that owns it. `Work/<Company>/Goals/` is the right home: it sits alongside performance goals and other work-scoped forward-looking material, syncs bidirectionally to the work machine via Syncthing, and is clearly absent from the personal Northstar system. Personal life goals live in `Northstar/Goals.md`. Work priorities live in `Work/<Company>/Goals/Current Priorities.md`. The two systems are related but distinct.
+
+**Tradeoff:** Unlike `Process/` content (not synced), `Work/<Company>/Goals/` syncs with the work machine. This is intentional — current work priorities are relevant on both machines. Users upgrading from a prior version will have `Process/Current Priorities.md` orphaned and must manually move it to `Work/<Company>/Goals/Current Priorities.md`.
+
+---
+
+## DD-26: Personal device sync — Yaos for all-device, Syncthing for laptop/NAS
+
+**Decision:** Personal vault sync across personal devices uses Yaos (https://yaos.dev) as the primary recommendation, with Syncthing as an alternative for laptop-to-laptop and NAS scenarios. iCloud is documented as a legacy fallback only.
+
+**Rationale:** The personal vault sync requirement is fundamentally different from the work↔personal sync requirement. Work↔personal sync needs folder-level access control (Syncthing's strength). Personal device sync needs reliable mobile support and conflict-free merging. iCloud provides neither reliably for Obsidian. Syncthing has no viable iOS client. Yaos uses CRDTs, which eliminate the conflict files that both iCloud and Syncthing produce — meaning no `.sync-conflict` orphans appearing as notes in Obsidian. Yaos deploys to the user's own Cloudflare account with no central server dependency, stays within Cloudflare's free tier for typical vault sizes, and supports every platform Obsidian runs on. For setups that don't involve mobile devices, Syncthing remains a valid and simpler option.
+
+**Tradeoff:** Yaos requires a Cloudflare account and a one-time deployment step. The setup cost is low (under 60 seconds per the Yaos documentation) but it is a new dependency outside the Obsidian ecosystem. Users who are already running Syncthing for their work↔personal sync may prefer to extend it for personal devices rather than introduce a second sync tool.
 
 ---
 

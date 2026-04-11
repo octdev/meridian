@@ -2,11 +2,11 @@
 
 ## NAS sync hub (v2)
 
-**Current:** Syncthing syncs directly between work laptop and personal machine. Personal machine must be on for the full chain to stay current.
+**Current:** Syncthing syncs `Work/<Company>/` directly between work laptop and personal machine. Personal machine must be on for the full chain to stay current. Personal device sync uses Yaos.
 
-**Future:** TrueNAS NAS acts as the always-on Syncthing hub. Work laptop syncs to NAS immediately. Personal machine and phone sync from NAS via Nextcloud. Personal machine power state does not affect sync latency.
+**Future:** TrueNAS NAS acts as the always-on Syncthing hub. Work laptop syncs to NAS immediately. Personal machine syncs from NAS. Personal machine power state does not affect sync latency.
 
-**Notes:** Requires NAS rebuild to complete. TrueNAS SCALE supports Syncthing via TrueCharts community app catalog. Nextcloud replaces iCloud for personal-to-phone sync. Migration is additive — add NAS as a new Syncthing peer, reconfigure folder targets, decommission direct laptop-to-laptop sync.
+**Notes:** Requires NAS rebuild to complete. TrueNAS SCALE supports Syncthing via TrueCharts community app catalog. Migration is additive — add NAS as a new Syncthing peer, reconfigure folder targets, decommission direct laptop-to-laptop sync. Yaos continues handling mobile sync independently of the NAS topology.
 
 ---
 
@@ -32,8 +32,8 @@
 
 ## Mobile capture improvements
 
-**Current:** Phone syncs via iCloud. Obsidian on iOS provides full vault access including daily notes and MOCs.
+**Current:** Phone syncs via Yaos. Obsidian on iOS provides full vault access including daily notes and MOCs.
 
 **Future:** Investigate a lightweight mobile capture shortcut (iOS Shortcut or Drafts integration) that appends a timestamped bullet to today's daily note without opening Obsidian. Reduces friction for quick captures during commutes or away from desk.
 
-**Notes:** Requires Obsidian's iCloud vault path to be stable and accessible from Shortcuts. The append-to-file approach avoids sync conflicts with desktop edits.
+**Notes:** Requires a stable, Shortcuts-accessible path to today's daily note. With Yaos, the vault path on iOS may differ from the iCloud path; verify before building the shortcut. The append-to-file approach avoids sync conflicts with desktop edits.

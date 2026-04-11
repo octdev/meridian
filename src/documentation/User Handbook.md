@@ -68,9 +68,29 @@ Work outward from the most stable to the most concrete:
 You don't open these files every morning. They anchor two things you do touch every day:
 
 - **Top 3 Goals** in the daily note. These should connect to your 12-month goals or current mission. If you consistently fill in goals that have nothing to do with your Northstar, either the daily goals are noise or the Northstar is out of date.
-- **Current Priorities MOC** in `Process/`. This is a manually maintained note where you write what you're focused on this week or month. Keep it honest — it should reflect your actual priorities, not your aspirational ones.
+- **Current Priorities** in `Work/<Company>/Goals/Current Priorities.md`. This is a manually maintained note where you write what you're focused on this week, month, and quarter at work. Keep it honest — it should reflect your actual priorities, not your aspirational ones. See [[#Northstar vs. Work Goals]] for the distinction between these two systems.
 
 Review the Northstar once a quarter. Update Mission and Goals if things have shifted. Purpose and Values rarely change.
+
+### Northstar vs. Work Goals
+
+The Northstar and your work goals are related but distinct systems operating at different scopes.
+
+**Northstar** (`Northstar/`) is personal and life-wide. It lives only on your personal machine — it is never created on the work machine and never syncs there. It answers questions about who you are and where you are going across your entire life, independent of any single employer: purpose, values, long-term vision, personal goals, career trajectory.
+
+**Work Goals** (`Work/<Company>/Goals/`) is job-scoped. It lives under your active company folder and syncs bidirectionally between your work and personal machines via Syncthing. It answers the operational question: *what am I focused on right now at this job?* — this week, this month, this quarter, this performance cycle.
+
+The intended connection: your work priorities should trace back to your Northstar. If your Northstar mission is "become an engineering leader who builds high-performing teams," your annual work goal might be "lead the platform migration end-to-end" and your quarterly priority "close the three open engineering manager hires." The work goals are the operational expression of the Northstar at your current job.
+
+When that connection breaks — when you are consistently busy but the work doesn't trace to anything in your Northstar — it is worth noticing. Either the work has drifted, the Northstar is out of date, or you are in the wrong job.
+
+| Content | Location | Syncs to work machine |
+|---------|----------|-----------------------|
+| Purpose, values, vision | `Northstar/Purpose.md`, `Northstar/Values.md`, `Northstar/Vision.md` | No |
+| Personal life goals (1-year, 3-year) | `Northstar/Goals.md` | No |
+| Career trajectory and aspirations | `Northstar/Career.md` | No |
+| Current work priorities (week/month/quarter) | `Work/<Company>/Goals/Current Priorities.md` | Yes |
+| Performance goals for this employer | `Work/<Company>/Goals/` | Yes |
 
 ---
 
@@ -337,7 +357,7 @@ Open `Process/Open Loops.md`. These are the `~` items — things waiting on some
 
 ### 5. Update Current Priorities (~3 min)
 
-Open `Process/Current Priorities.md` and update it to reflect what actually matters this coming week. Compare it to your Northstar goals. If you're consistently busy but your priorities don't connect to your goals, something needs to change — either the goals aren't real or you're not working on the right things.
+Open `Work/<Company>/Goals/Current Priorities.md` and update it to reflect what actually matters this coming week. Compare it against your Northstar goals (`Northstar/Goals.md`). If you're consistently busy but your priorities don't connect to your goals, something needs to change — either the goals aren't real or you're not working on the right things.
 
 ---
 

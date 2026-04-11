@@ -350,8 +350,8 @@ The script runs on vault open and every 4 hours via Shell Commands. It discovers
 ### Sync data flow (v1)
 
 ```
-Work laptop ──Syncthing──► Personal machine ──iCloud──► Phone
-  Work/:    Send & Receive   (includes Work/*/Daily/, Work/*/Knowledge/, Work/*/Goals/)
+Work laptop ──Syncthing──► Personal machine ──Yaos/iCloud──► Phone/Tablet
+  Work/<Co>/: Send & Receive  (includes Daily/, Knowledge/, Goals/, and the rest)
   (Process/, Life/, Northstar/, References/ not configured on work laptop)
 ```
 

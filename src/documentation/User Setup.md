@@ -69,7 +69,7 @@ cd meridian
 ./src/bin/scaffold-vault.sh --vault /path/to/WorkVault --profile work
 ```
 
-The `--profile work` flag creates only the folders appropriate for an employer-managed machine — `Process/`, `Work/`, and `Knowledge/`. `Northstar/`, `Life/`, and `References/` are never created. See [Work Machine Setup](#work-machine-setup) for the full workflow.
+The `--profile work` flag creates only the folders appropriate for an employer-managed machine — `Process/` and `Work/`. `Northstar/`, `Life/`, `References/`, and the top-level `Knowledge/` are never created. See [Work Machine Setup](#work-machine-setup) for the full workflow.
 
 Default path is `~/Documents/Meridian` if `--vault` is omitted (the script will prompt to confirm).
 
@@ -106,7 +106,7 @@ Meridian is designed to run on both personal and work machines simultaneously, w
 |--------|---------------|------------|
 | `Process/` | Yes | Yes |
 | `Work/` | Yes | Yes |
-| `Knowledge/` | Yes | Yes |
+| `Knowledge/` | Yes | **No** (lives at `Work/<Company>/Knowledge/`) |
 | `_templates/` | Yes | Yes |
 | `.scripts/` | Yes | Yes |
 | `Northstar/` | Yes | **No** |
@@ -125,15 +125,16 @@ Then follow the standard setup from [Step 1: Run the scaffold script](#initial-s
 
 ### Syncthing configuration for the work machine
 
+Only the active company folder syncs between the work machine and personal machine. Configure a single Syncthing share for `Work/<Company>/` — not the `Work/` parent.
+
 | Folder | Mode |
 |--------|------|
-| `Process/` | Send & Receive |
-| `Work/` | Send & Receive |
+| `Work/<Company>/` | Send & Receive |
 | `Life/` | Not configured |
 | `Northstar/` | Not configured |
 | `References/` | Not configured |
 
-`Work/` is Send & Receive and includes `Work/<Company>/Daily/` and `Work/<Company>/Knowledge/`. Work knowledge syncs bidirectionally as part of the `Work/` folder — there is no separate `Knowledge/` Syncthing entry on the work machine. See [Sync.md](Sync.md) for the full Syncthing setup.
+`Work/<Company>/` includes all subfolders: `Daily/`, `Knowledge/`, `Goals/`, `Projects/`, `People/`, `Meetings/`, and the rest. Everything under the company folder travels as one share. `Process/` is not synced — its contents are rebuilt locally or refreshed on upgrade. See [Sync.md](Sync.md) for full setup instructions.
 
 ---
 
@@ -570,7 +571,7 @@ Work/[Company]/
   Vendors/
 ```
 
-No content files are seeded — notes are added individually as work begins. Run `new-project.sh` afterward to add a project under the new company's `Projects/` folder.
+`Goals/Current Priorities.md` is seeded automatically. All other notes are added individually as work begins. Run `new-project.sh` afterward to add a project under the new company's `Projects/` folder.
 
 ---
 

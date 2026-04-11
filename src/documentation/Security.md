@@ -34,15 +34,15 @@ The `--profile work` flag ensures personal folders are never created on the work
 
 The sync configuration ensures `Life/`, `Northstar/`, and `References/` are never configured as sync targets on the work machine. Because these folders do not exist on the work machine (Layer 1), they cannot appear in its Syncthing folder list.
 
-Work-originated knowledge lives at `Work/<Company>/Knowledge/` and syncs bidirectionally as part of the `Work/` folder. The top-level `Knowledge/` folder is personal-only and is not configured on the work machine.
+Work-originated knowledge lives at `Work/<Company>/Knowledge/` and syncs bidirectionally as part of the `Work/<Company>/` share. The top-level `Knowledge/` folder is personal-only and is never created on the work machine.
 
-`Process/` and `Work/` sync bidirectionally — these are expected to be accessible on the work machine.
+Only `Work/<Company>/` syncs bidirectionally — this is the expected work-accessible content. `Process/` is not synced between machines.
 
 See [Sync.md](Sync.md) for the full folder sync matrix.
 
-### Layer 3: iCloud for personal-to-phone sync
+### Layer 3: Personal device sync is outside the Syncthing mesh
 
-Personal machine to phone sync uses iCloud, which is entirely outside the Syncthing mesh. The work laptop has no iCloud configuration for this vault.
+Personal machine to phone/tablet sync (via Yaos or iCloud) is entirely outside the Syncthing mesh. The work laptop has no configuration for personal device sync and is not a peer in that topology.
 
 ### Layer 4: No vault on employer cloud storage
 
