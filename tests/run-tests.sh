@@ -586,7 +586,7 @@ else
 fi
 
 for f in "User Setup.md" "User Handbook.md" "Reference Guide.md" "Architecture.md" \
-          "Design Decision.md" "Security.md" "Sync.md" "Roadmap.md" "Upgrades.md"; do
+          "Design Decision.md" "Security.md" "Sync.md" "Roadmap.md" "Upgrading.md"; do
   assert_exists "  doc refreshed: $f" "$REFRESH_VAULT/Process/Meridian Documentation/$f"
 done
 

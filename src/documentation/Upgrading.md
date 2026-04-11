@@ -1,13 +1,34 @@
-# Upgrades
+# Upgrading
 
 This document covers how to upgrade an existing Meridian vault, how work vault versioning works across multiple employers, and the technical mechanics behind the upgrade system — including enough detail for a developer to write upgrade scripts for future versions.
 
 ## Table of Contents
 
-1. [[#Running an Upgrade]]
-2. [[#Work Vaults and Version Eligibility]]
-3. [[#How the Upgrade System Works]]
-4. [[#Writing Upgrade Scripts (Developer Guide)]]
+1. [[#Before You Start]]
+2. [[#Running an Upgrade]]
+3. [[#Work Vaults and Version Eligibility]]
+4. [[#How the Upgrade System Works]]
+5. [[#Refreshing Documentation Only]]
+
+---
+
+## Before You Start
+
+Before running an upgrade, pull the latest Meridian scripts into your local repo:
+
+```bash
+cd meridian
+git pull
+```
+
+Your vault — and everything in it — is stored separately and is not affected by this step. The Meridian repo contains only the scripts used to scaffold and upgrade your vault.
+
+If you no longer have the local repo, re-clone it from the parent directory:
+
+```bash
+git clone --branch latest --depth 1 https://github.com/your-username/meridian.git
+cd meridian
+```
 
 ---
 
@@ -121,107 +142,22 @@ As the final step, the runner updates `config/base/version.json` in the repo to 
 
 ---
 
-## Writing Upgrade Scripts (Developer Guide)
+## Refreshing Documentation Only
 
-### When to Create an Upgrade Script
+A full upgrade always refreshes `Process/Meridian Documentation/` as part of its final step — you do not need to run anything extra after an upgrade.
 
-Every release that changes anything inside a vault — new files, new folders, new templates, changed configuration — requires an upgrade script. Releases with no structural vault changes (docs-only, repo reorganization) do not need an entry point or migration script; the runner handles them automatically.
-
-Create upgrade scripts as part of the same commit that bumps `config/base/version.json`.
-
-### File Naming and Location
-
-```
-scripts/upgrade/upgrade-to-X.Y.Z.sh     # entry point (structural releases only)
-scripts/upgrade/migrations/vX.Y.Z.sh    # migration logic (structural releases only)
-```
-
-Replace `X.Y.Z` with the new semantic version.
-
-### The Entry Point
-
-The entry point is always three lines:
+If you want to pull in minor documentation fixes without running a full upgrade, use the standalone refresh script:
 
 ```bash
-#!/usr/bin/env bash
-# upgrade-to-1.3.0.sh — upgrades a Meridian vault to version 1.3.0
-#
-# Usage:
-#   upgrade-to-1.3.0.sh [--vault <path>]
-#
-# Automatically chains all migrations between the vault's installed
-# version and 1.3.0 in order. Each migration updates .scripts/.vault-version
-# on success. A failure halts the chain at the last successful version.
-#
-# Exit codes:
-#   0 — success (or already at target)
-#   1 — failure
-
-set -euo pipefail
-
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-source "${SCRIPT_DIR}/upgrade-runner.sh"
-run_upgrade_to "1.3.0" "${SCRIPT_DIR}/migrations" "$@"
+./scripts/local/refresh-documentation.sh
 ```
 
-Change the version string in two places (the comment and the `run_upgrade_to` call) and nothing else.
+The script will present your registered vaults for selection, confirm the target before making any changes, and overwrite every file in `Process/Meridian Documentation/` with the current version from the repo. Your own notes are never touched.
 
-### The Migration Script
+If you prefer to skip the interactive vault selection:
 
 ```bash
-#!/usr/bin/env bash
-# migrations/v1.3.0.sh — vault changes for Meridian 1.3.0
-#
-# Called by upgrade-runner.sh. Do not run directly.
-#
-# Arguments:
-#   $1  VAULT_ROOT — absolute path to the vault
-#   $2  REPO_DIR   — absolute path to the repo root
-#   $3  COMPANY    — (optional) company name; absent = global, set = per-company
-
-set -euo pipefail
-
-readonly VAULT_ROOT="$1"
-readonly REPO_DIR="$2"
-readonly COMPANY="${3:-}"
-
-source "${REPO_DIR}/src/lib/logging.sh"
-source "${REPO_DIR}/src/lib/errors.sh"
-
-# Define helpers inline — each migration is self-contained.
-copy_if_new() { ... }
-write_if_new() { ... }
-
-# --- global changes ---
-if [[ -z "$COMPANY" ]]; then
-  echo "[meridian] v1.3.0 global migrations..."
-  # Apply vault-wide changes here.
-  _pass "v1.3.0 global migrations complete."
-
-# --- per-company changes ---
-else
-  echo "[meridian] v1.3.0 company migrations: $COMPANY..."
-  COMPANY_DIR="${VAULT_ROOT}/Work/${COMPANY}"
-  # Apply changes inside Work/$COMPANY/ here.
-  _pass "v1.3.0 company migrations complete: $COMPANY"
-fi
+./scripts/local/refresh-documentation.sh --vault ~/Documents/Meridian
 ```
 
-### Rules
-
-- **Never touch a previous migration script.** Each script is a sealed record of what that version required. If a prior migration had a bug, write a corrective step in the next version's script.
-- **Never overwrite user content.** Use `copy_if_new` and `write_if_new` (skip-if-exists) for all vault files. The only exception is documentation in `Process/Meridian Documentation/`, which the runner always overwrites automatically — do not replicate that logic in migration scripts.
-- **Define helpers inline.** Each migration script sources only `logging.sh` and `errors.sh` from `src/lib/`. If you need `copy_if_new`, `write_if_new`, or similar helpers, define them in the script. This keeps every migration self-contained and prevents cross-script dependencies.
-- **Do not refresh docs or bump the version.** The runner handles both of these after all migrations complete. Migration scripts apply vault changes only.
-- **Global changes before per-company changes.** The runner applies global migrations first across all versions in the chain, then per-company migrations. Write each script so it behaves correctly in this order.
-
-### Checklist for a New Release
-
-- [ ] Review `docs/next-release.md` — translate accumulated migration notes into the scripts below, then clear the file
-- [ ] Create `scripts/upgrade/migrations/vX.Y.Z.sh` with global and per-company sections
-- [ ] Create `scripts/upgrade/upgrade-to-X.Y.Z.sh` entry point
-- [ ] Update `config/base/version.json` to `X.Y.Z`
-- [ ] Add `Upgrades.md` copy call to `scaffold-vault.sh` and `_refresh_vault_docs` in `upgrade-runner.sh` if new doc files were added
-- [ ] Update `src/documentation/Architecture.md` repo and vault structure diagrams if files or folders changed
-- [ ] Commit all four changes together
+**When this is useful:** Meridian occasionally issues documentation corrections that do not require any structural vault changes — no new files, no config updates, nothing that would justify a full version bump. Rather than waiting for the next release, you can run this script any time to bring your documentation current.

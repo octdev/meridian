@@ -47,7 +47,7 @@ refresh_vault_docs() {
   _overwrite_doc "$docs_src/Security.md"        "$docs_dest/Security.md"        "Security"
   _overwrite_doc "$docs_src/Sync.md"            "$docs_dest/Sync.md"            "Sync"
   _overwrite_doc "$docs_src/Roadmap.md"         "$docs_dest/Roadmap.md"         "Roadmap"
-  _overwrite_doc "$docs_src/Upgrades.md"        "$docs_dest/Upgrades.md"        "Upgrades"
+  _overwrite_doc "$docs_src/Upgrading.md"       "$docs_dest/Upgrading.md"       "Upgrading"
   if [[ -f "${repo_dir}/Meridian System.pdf" ]]; then
     cp "${repo_dir}/Meridian System.pdf" "$docs_dest/Meridian System.pdf"
     _pass "Updated: Process/Meridian Documentation/Meridian System.pdf"

@@ -74,7 +74,7 @@ git push origin "$NEW_TAG"
 echo "done."
 
 printf "Moving latest tag...  "
-git tag -f latest
+git branch -f latest
 git push origin latest --force
 echo "done."
 

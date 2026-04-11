@@ -74,7 +74,7 @@ meridian/
       Security.md
       Sync.md
       Roadmap.md
-      Upgrades.md                   upgrade system: user guide and developer reference
+      Upgrading.md                  upgrade system: user guide and developer reference
   scripts/
     ci/
       release.sh                  version tagging and README update script
@@ -96,7 +96,7 @@ meridian/
 
 `scripts/local/` holds one-off utilities run directly from the repo, not copied to the vault. `backfill-timestamps.sh` is used when migrating an existing vault: it walks all Markdown files and populates any empty `created:` or `modified:` frontmatter fields, leaving existing timestamps untouched.
 
-`scripts/upgrade/` contains the versioned upgrade system. `upgrade-runner.sh` is a sourced library that orchestrates discovery, ordering, and execution of migration scripts. Each release gets one entry point (`upgrade-to-X.Y.Z.sh`) and one migration script (`migrations/vX.Y.Z.sh`). Users run upgrades via `scaffold-vault.sh --upgrade`, which delegates to the appropriate entry point. See `src/documentation/Upgrades.md` for full details.
+`scripts/upgrade/` contains the versioned upgrade system. `upgrade-runner.sh` is a sourced library that orchestrates discovery, ordering, and execution of migration scripts. Each release gets one entry point (`upgrade-to-X.Y.Z.sh`) and one migration script (`migrations/vX.Y.Z.sh`). Users run upgrades via `scaffold-vault.sh --upgrade`, which delegates to the appropriate entry point. See `src/documentation/Upgrading.md` for full details.
 
 ---
 
@@ -176,7 +176,7 @@ vault/
       Security.md
       Sync.md
       Roadmap.md
-      Upgrades.md
+      Upgrading.md
       Meridian System.pdf
   Knowledge/
     Technical/
@@ -253,7 +253,7 @@ vault/
     Weekly Outtake.md             Tasks MOC (rolling 7-day)
     email.md                      source tag note
     teams.md                      source tag note
-    Meridian Documentation/       (same docs as personal vault, including Upgrades.md)
+    Meridian Documentation/       (same docs as personal vault, including Upgrading.md)
   Work/
     CurrentCompany/
       Projects/
