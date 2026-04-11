@@ -148,7 +148,6 @@ title: ${project_name}
 created: ${today}
 modified: ${today}
 ---
-
 # ${project_name}
 
 ## Files
@@ -201,7 +200,6 @@ title: \"Architecture — ${project_name}\"
 created: ${today}
 modified: ${today}
 ---
-
 # Architecture — ${project_name}
 
 ## Conceptual Model
@@ -222,7 +220,6 @@ title: \"Design Decisions — ${project_name}\"
 created: ${today}
 modified: ${today}
 ---
-
 # Design Decisions — ${project_name}
 
 ## DD-01: <Short Decision Title>
@@ -241,7 +238,6 @@ title: \"Security — ${project_name}\"
 created: ${today}
 modified: ${today}
 ---
-
 # Security — ${project_name}
 
 ## Threat Model
@@ -262,7 +258,6 @@ title: \"BRD — ${project_name}\"
 created: ${today}
 modified: ${today}
 ---
-
 # BRD — ${project_name}
 
 ## Overview
@@ -295,7 +290,6 @@ title: \"User Guide — ${project_name}\"
 created: ${today}
 modified: ${today}
 ---
-
 # User Guide — ${project_name}
 
 ## How It Works
@@ -318,7 +312,6 @@ title: \"Roadmap — ${project_name}\"
 created: ${today}
 modified: ${today}
 ---
-
 # Roadmap — ${project_name}
 
 ## <Feature Name>
@@ -337,7 +330,6 @@ title: \"Scratch — ${project_name}\"
 created: ${today}
 modified: ${today}
 ---
-
 # Scratch
 
 ## ${today}

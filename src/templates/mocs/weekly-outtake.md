@@ -3,7 +3,6 @@ title:
 created:
 modified:
 ---
-
 # Weekly Outtake
 
 Rolling 7-day view of completed tasks. For permanent weekly records, see `Process/Weekly/`.

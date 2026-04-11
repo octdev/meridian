@@ -3,7 +3,6 @@ title:
 created:
 modified:
 ---
-
 # Active Projects
 
 ## Work Projects

@@ -3,7 +3,6 @@ title:
 created:
 modified:
 ---
-
 # Open Loops
 
 ## Waiting

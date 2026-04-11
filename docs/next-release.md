@@ -6,7 +6,7 @@ release and creating the migration scripts.
 
 Format mirrors the migration script structure (global vs. per-company) so
 entries can be copied directly into `scripts/upgrade/migrations/vX.Y.Z.sh`.
-See `src/documentation/Upgrades.md` — Writing Upgrade Scripts for the script
+See `docs/Developer_Guide.md` — Writing Upgrade Scripts for the script
 template and rules.
 
 ---
@@ -28,4 +28,4 @@ _None pending._
 ## Release checklist reminder
 
 When cutting the release, complete all items in the checklist at the bottom of
-`src/documentation/Upgrades.md` — then delete the relevant entries above.
+`docs/Developer_Guide.md` — then delete the relevant entries above.

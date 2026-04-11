@@ -148,6 +148,12 @@ Configure these before enabling plugins. Order matters.
 2. **Settings → Appearance → Show tab title bar → ON**
    Shows the tab bar for navigating open notes.
 
+Optional User Preferences for flow:
+
+1. **Settings → Editor → Behavior → Auto-pair Brackets → OFF**
+
+2. **Settings → Editor → Behavior → Auto-pair Markdown Syntax → OFF**
+
 ---
 
 ## Editor Settings

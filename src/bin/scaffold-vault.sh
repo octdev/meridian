@@ -212,7 +212,7 @@ copy_doc_with_frontmatter() {
   fi
   if [[ ! -f "$dest" ]]; then
     {
-      printf -- '---\ntitle: %s\ncreated: %s\nmodified: %s\n---\n\n' "$title" "$ts" "$ts"
+      printf -- '---\ntitle: %s\ncreated: %s\nmodified: %s\n---\n' "$title" "$ts" "$ts"
       cat "$src"
     } > "$dest" || die "copy-doc" "Could not write: $dest"
     _pass "Created: ${dest#$VAULT_ROOT/}"
@@ -377,7 +377,6 @@ title:
 created: $_now
 modified: $_now
 ---
-
 # email
 
 
@@ -390,7 +389,6 @@ title:
 created: $_now
 modified: $_now
 ---
-
 # teams
 
 

@@ -3,7 +3,6 @@ title:
 created:
 modified:
 ---
-
 # Current Priorities
 
 ## Annual

@@ -119,7 +119,6 @@ title: $SERIES
 created: $NOW
 modified: $NOW
 ---
-
 # $SERIES
 
 ## Purpose
@@ -154,7 +153,6 @@ title: $SERIES $DATE
 created: $NOW
 modified: $NOW
 ---
-
 # $SERIES $DATE
 
 ## Purpose

@@ -3,7 +3,6 @@ title:
 created:
 modified:
 ---
-
 # Action Items
 
 ## Urgent

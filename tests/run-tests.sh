@@ -126,7 +126,24 @@ assert_file_not_contains() {
 
 # --- temp dir management ---
 TEST_TMPDIR="$(mktemp -d)"
-cleanup() { rm -rf "$TEST_TMPDIR"; }
+
+# Preserve config/vaults.txt so scaffold calls during tests don't register
+# temp vault paths as known vaults, which would accumulate as stale entries.
+VAULTS_FILE="$REPO_DIR/config/vaults.txt"
+VAULTS_FILE_BACKUP=""
+if [[ -f "$VAULTS_FILE" ]]; then
+  VAULTS_FILE_BACKUP="$(mktemp)"
+  cp "$VAULTS_FILE" "$VAULTS_FILE_BACKUP"
+fi
+
+cleanup() {
+  rm -rf "$TEST_TMPDIR"
+  if [[ -n "$VAULTS_FILE_BACKUP" ]]; then
+    mv "$VAULTS_FILE_BACKUP" "$VAULTS_FILE"
+  else
+    rm -f "$VAULTS_FILE"
+  fi
+}
 trap cleanup EXIT
 
 new_vault() {
@@ -505,6 +522,98 @@ done
 
 # Verify PDF exists
 assert_exists "  Meridian System.pdf exists" "$REPO_DIR/Meridian System.pdf"
+
+# ============================================================
+# refresh-documentation.sh
+# ============================================================
+
+REFRESH_SCRIPT="$REPO_DIR/scripts/local/refresh-documentation.sh"
+
+section "refresh-documentation.sh — help and argument errors"
+
+check "  -h exits 0" 0 "Usage:" -- "$REFRESH_SCRIPT" -h
+check "  --help exits 0" 0 "Usage:" -- "$REFRESH_SCRIPT" --help
+check "  unknown flag exits 1" 1 "unknown argument" -- "$REFRESH_SCRIPT" --unknown
+check "  --vault with no value exits 1" 1 "--vault requires a path" -- "$REFRESH_SCRIPT" --vault
+
+# ============================================================
+section "refresh-documentation.sh — vault validation"
+
+rc=0; output="$(echo "Y" | "$REFRESH_SCRIPT" --vault "/nonexistent/path" 2>&1)" || rc=$?
+if [[ $rc -eq 1 ]] && echo "$output" | grep -q "not found"; then
+  pass "  nonexistent vault exits 1"
+else
+  fail "  nonexistent vault exits 1"
+fi
+
+NO_DOCS_VAULT="$(mktemp -d)"
+rc=0; output="$(echo "Y" | "$REFRESH_SCRIPT" --vault "$NO_DOCS_VAULT" 2>&1)" || rc=$?
+if [[ $rc -eq 1 ]] && echo "$output" | grep -q "not found"; then
+  pass "  vault missing docs dir exits 1"
+else
+  fail "  vault missing docs dir exits 1"
+fi
+rm -rf "$NO_DOCS_VAULT"
+
+# ============================================================
+section "refresh-documentation.sh — confirmation abort"
+
+ABORT_VAULT="$(new_vault)"
+"$SCAFFOLD" --vault "$ABORT_VAULT" --profile personal > /dev/null 2>&1
+echo "SENTINEL_ABORT_TEST" >> "$ABORT_VAULT/Process/Meridian Documentation/User Setup.md"
+
+rc=0; output="$(echo "n" | "$REFRESH_SCRIPT" --vault "$ABORT_VAULT" 2>&1)" || rc=$?
+if [[ $rc -eq 0 ]] && echo "$output" | grep -q "Cancelled"; then
+  pass "  n at confirmation exits 0 with Cancelled"
+else
+  fail "  n at confirmation exits 0 with Cancelled"
+fi
+assert_file_contains "  sentinel preserved after abort" \
+  "$ABORT_VAULT/Process/Meridian Documentation/User Setup.md" "SENTINEL_ABORT_TEST"
+
+# ============================================================
+section "refresh-documentation.sh — happy path"
+
+REFRESH_VAULT="$(new_vault)"
+"$SCAFFOLD" --vault "$REFRESH_VAULT" --profile personal > /dev/null 2>&1
+echo "SENTINEL_REFRESH_TEST" >> "$REFRESH_VAULT/Process/Meridian Documentation/User Setup.md"
+
+rc=0; output="$(echo "Y" | "$REFRESH_SCRIPT" --vault "$REFRESH_VAULT" 2>&1)" || rc=$?
+if [[ $rc -eq 0 ]]; then
+  pass "  exits 0"
+else
+  fail "  exits 0"
+fi
+
+for f in "User Setup.md" "User Handbook.md" "Reference Guide.md" "Architecture.md" \
+          "Design Decision.md" "Security.md" "Sync.md" "Roadmap.md" "Upgrades.md"; do
+  assert_exists "  doc refreshed: $f" "$REFRESH_VAULT/Process/Meridian Documentation/$f"
+done
+
+UG_REFRESH="$REFRESH_VAULT/Process/Meridian Documentation/User Setup.md"
+assert_file_contains  "  User Setup.md has title frontmatter"    "$UG_REFRESH" "title: User Setup"
+assert_file_contains  "  User Setup.md has created frontmatter"  "$UG_REFRESH" "created:"
+assert_file_contains  "  User Setup.md has modified frontmatter" "$UG_REFRESH" "modified:"
+assert_file_contains  "  User Setup.md has --- delimiter"        "$UG_REFRESH" "---"
+assert_file_not_contains "  sentinel removed (file was overwritten)" "$UG_REFRESH" "SENTINEL_REFRESH_TEST"
+
+# ============================================================
+section "refresh-documentation.sh — re-run overwrites again"
+
+rc=0; output="$(echo "Y" | "$REFRESH_SCRIPT" --vault "$REFRESH_VAULT" 2>&1)" || rc=$?
+if [[ $rc -eq 0 ]] && echo "$output" | grep -q "Updated:"; then
+  pass "  second run reports Updated (not Skipped)"
+else
+  fail "  second run reports Updated (not Skipped)"
+fi
+
+# ============================================================
+section "upgrade-runner.sh — lib extraction"
+
+assert_file_contains "  upgrade-runner sources refresh-vault-docs.sh" \
+  "$REPO_DIR/scripts/upgrade/upgrade-runner.sh" "refresh-vault-docs.sh"
+assert_file_not_contains "  upgrade-runner no longer defines _refresh_vault_docs()" \
+  "$REPO_DIR/scripts/upgrade/upgrade-runner.sh" "_refresh_vault_docs()"
 
 # ============================================================
 # Summary

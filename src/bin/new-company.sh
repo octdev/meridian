@@ -116,7 +116,6 @@ title: Current Priorities
 created: $_now
 modified: $_now
 ---
-
 # Current Priorities
 
 ## Annual
