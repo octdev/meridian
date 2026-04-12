@@ -107,4 +107,4 @@ git checkout src/documentation/
 | [RELEASING.md](RELEASING.md) | Release process: version bumping, migration scripts, validation, and tagging |
 | [CLAUDE.md](CLAUDE.md) | Agent working guide: constraints, conventions, and task-specific read lists |
 | [docs/next-release.md](docs/next-release.md) | Accumulated migration notes for the next release |
-| [docs/work-scaffold.md](docs/work-scaffold.md) | Planning notes for the work profile feature |
+| [docs/work-scaffold.md](docs/work-scaffold.md) | Reference notes for the work profile feature |
