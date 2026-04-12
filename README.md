@@ -81,10 +81,16 @@ All documentation is also available inside the vault at `Process/Meridian Docume
 Documentation is updated between releases. To pull the latest version into your vault without changing your code:
 
 ```bash
-scripts/local/refresh-documentation.sh --from-remote
+scripts/local/refresh-documentation.sh
 ```
 
-To review what changed before copying to your vault:
+The script fetches current docs from `origin/main` on GitHub by default, then copies them to the vault. If GitHub is unreachable it falls back to the docs bundled with your installed version. To skip the network fetch entirely:
+
+```bash
+scripts/local/refresh-documentation.sh --from-local
+```
+
+To review what changed before the vault copy runs:
 ```bash
 git diff src/documentation/
 ```

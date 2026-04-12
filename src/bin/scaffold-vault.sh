@@ -503,7 +503,7 @@ _hint "2. Follow Process/Meridian Documentation/User Setup.md from Step 3 (Renam
 echo ""
 _warn "Rename Work/CurrentCompany/ to your actual company name after opening the vault."
 echo ""
-_hint "Tip: run scripts/local/refresh-documentation.sh --from-remote to get the latest documentation."
+_hint "Tip: run scripts/local/refresh-documentation.sh to get the latest documentation."
 echo ""
 
 register_vault "$VAULT_ROOT"
