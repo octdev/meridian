@@ -40,10 +40,12 @@ source "$REPO_DIR/src/lib/colors.sh"
 source "$REPO_DIR/src/lib/logging.sh"
 source "$REPO_DIR/src/lib/errors.sh"
 source "$REPO_DIR/src/lib/vault-select.sh"
+source "$REPO_DIR/src/lib/shell-exports.sh"
 
 usage() {
   cat <<EOF
 Usage: scaffold-vault.sh [--vault <path>] [--profile personal|work] [--upgrade]
+       scaffold-vault.sh --setup-shell [--vault <path>]
        scaffold-vault.sh --version
        scaffold-vault.sh -h | --help
 
@@ -53,6 +55,9 @@ Options:
   --vault <path>           Path to vault root directory. Default: ~/Documents/Meridian
   --profile personal|work  Scaffold profile. Default: personal
   --upgrade                Upgrade an existing vault instead of creating a new one.
+  --setup-shell            Add MERIDIAN_PROJECT and MERIDIAN_VAULT to your shell
+                           profile (~/.zshrc or ~/.bash_profile). Safe to re-run —
+                           skips variables that already exist.
   --version                Print the Meridian project version and the installed
                            vault version, then exit. Accepts --vault <path>;
                            defaults to the first registered vault.
@@ -72,6 +77,7 @@ Examples:
   scaffold-vault.sh --vault ~/Documents/MyVault
   scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
   scaffold-vault.sh --vault ~/Documents/MyVault --upgrade
+  scaffold-vault.sh --setup-shell --vault ~/Documents/MyVault
 
 EOF
 }
@@ -95,6 +101,7 @@ VAULT_ROOT_SET=false
 PROFILE="personal"
 UPGRADE=false
 SHOW_VERSION=false
+SETUP_SHELL=false
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -109,6 +116,8 @@ while [[ $# -gt 0 ]]; do
       esac ;;
     --upgrade)
       UPGRADE=true; shift ;;
+    --setup-shell)
+      SETUP_SHELL=true; shift ;;
     --version)
       SHOW_VERSION=true; shift ;;
     -h|--help)
@@ -151,6 +160,17 @@ if [[ "$SHOW_VERSION" == true ]]; then
   fi
 
   echo ""
+  exit 0
+fi
+
+# --- setup-shell ---
+
+if [[ "$SETUP_SHELL" == true ]]; then
+  if [[ "$VAULT_ROOT_SET" == false ]]; then
+    select_vault
+  fi
+  echo ""
+  _offer_shell_exports "$REPO_DIR" "$VAULT_ROOT"
   exit 0
 fi
 
@@ -240,7 +260,6 @@ copy_with_timestamps() {
     echo "  — Skipped (exists): ${dest#$VAULT_ROOT/}"
   fi
 }
-
 
 # --- main ---
 
@@ -443,6 +462,7 @@ copy_if_new "$REPO_DIR/src/bin/weekly-snapshot.py"      "$VAULT_ROOT/.scripts/we
 copy_if_new "$REPO_DIR/src/bin/new-company.sh"          "$VAULT_ROOT/.scripts/new-company.sh"
 copy_if_new "$REPO_DIR/src/bin/new-project.sh"          "$VAULT_ROOT/.scripts/new-project.sh"
 copy_if_new "$REPO_DIR/src/bin/new-meeting-series.sh"   "$VAULT_ROOT/.scripts/new-meeting-series.sh"
+copy_if_new "$REPO_DIR/src/bin/new-1on1.sh"             "$VAULT_ROOT/.scripts/new-1on1.sh"
 
 copy_if_new "$REPO_DIR/src/lib/colors.sh"  "$VAULT_ROOT/.scripts/lib/colors.sh"
 copy_if_new "$REPO_DIR/src/lib/logging.sh" "$VAULT_ROOT/.scripts/lib/logging.sh"
@@ -451,6 +471,7 @@ copy_if_new "$REPO_DIR/src/lib/errors.sh"  "$VAULT_ROOT/.scripts/lib/errors.sh"
 chmod +x "$VAULT_ROOT/.scripts/new-company.sh"        2>/dev/null || true
 chmod +x "$VAULT_ROOT/.scripts/new-project.sh"        2>/dev/null || true
 chmod +x "$VAULT_ROOT/.scripts/new-meeting-series.sh" 2>/dev/null || true
+chmod +x "$VAULT_ROOT/.scripts/new-1on1.sh"           2>/dev/null || true
 
 echo ""
 
@@ -503,6 +524,7 @@ _hint "2. Follow Process/Meridian Documentation/User Setup.md from Step 3 (Renam
 echo ""
 _warn "Rename Work/CurrentCompany/ to your actual company name after opening the vault."
 echo ""
+_offer_shell_exports "$REPO_DIR" "$VAULT_ROOT"
 _hint "Tip: run scripts/local/refresh-documentation.sh to get the latest documentation."
 echo ""
 

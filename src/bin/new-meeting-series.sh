@@ -20,13 +20,15 @@ source "$LIB_DIR/errors.sh"
 
 VAULT=""
 SERIES=""
-DATE=""
+PURPOSE=""
+CADENCE=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --vault)  VAULT="${2:?--vault requires a path}";  shift 2 ;;
-    --series) SERIES="${2:?--series requires a name}"; shift 2 ;;
-    --date)   DATE="${2:?--date requires YYYY-MM-DD}"; shift 2 ;;
+    --vault)   VAULT="${2:?--vault requires a path}";      shift 2 ;;
+    --series)  SERIES="${2:?--series requires a name}";    shift 2 ;;
+    --purpose) PURPOSE="${2:?--purpose requires a value}"; shift 2 ;;
+    --cadence) CADENCE="${2:?--cadence requires a value}"; shift 2 ;;
     *) die "Unknown argument: $1" "" ;;
   esac
 done
@@ -58,23 +60,9 @@ fi
 
 [[ -n "$SERIES" ]] || die "Series name cannot be empty." ""
 
-# ── Date ──────────────────────────────────────────────────────────────────────
-
-if [[ -z "$DATE" ]]; then
-  DEFAULT_DATE=$(date +%Y-%m-%d)
-  read -rp "$(printf "${_C_CYAN}Meeting date [${DEFAULT_DATE}]:${_C_RESET} ")" DATE
-  DATE="${DATE:-$DEFAULT_DATE}"
-fi
-
-# Validate date format
-if ! date -j -f "%Y-%m-%d" "$DATE" "+%Y-%m-%d" &>/dev/null 2>&1; then
-  # Try GNU date fallback (Linux)
-  if ! date -d "$DATE" "+%Y-%m-%d" &>/dev/null 2>&1; then
-    die "Invalid date format: $DATE" "Use YYYY-MM-DD"
-  fi
-fi
-
 # ── Path construction ─────────────────────────────────────────────────────────
+
+DATE=$(date +%Y-%m-%d)
 
 SERIES_DIR="$MEETINGS_DIR/$SERIES"
 INSTANCE_DIR="$SERIES_DIR/$DATE"
@@ -108,10 +96,14 @@ read -rp "$(printf "${_C_CYAN}Create? [y/N]:${_C_RESET} ")" CONFIRM
 if [[ "$NEW_SERIES" == true ]]; then
   mkdir -p "$SERIES_DIR"
 
-  SERIES_PURPOSE=""
-  SERIES_CADENCE=""
-  read -rp "$(printf "${_C_CYAN}Series purpose (one line, or Enter to fill in later):${_C_RESET} ")" SERIES_PURPOSE
-  read -rp "$(printf "${_C_CYAN}Cadence (e.g. Monthly, Biweekly, or Enter to fill in later):${_C_RESET} ")" SERIES_CADENCE
+  SERIES_PURPOSE="$PURPOSE"
+  SERIES_CADENCE="$CADENCE"
+  if [[ -z "$SERIES_PURPOSE" ]]; then
+    read -rp "$(printf "${_C_CYAN}Series purpose (one line, or Enter to fill in later):${_C_RESET} ")" SERIES_PURPOSE
+  fi
+  if [[ -z "$SERIES_CADENCE" ]]; then
+    read -rp "$(printf "${_C_CYAN}Cadence (e.g. Monthly, Biweekly, or Enter to fill in later):${_C_RESET} ")" SERIES_CADENCE
+  fi
 
   cat > "$SERIES_INDEX" <<EOF
 ---

@@ -243,6 +243,7 @@ run_upgrade_to() {
   source "${_repo_dir}/src/lib/errors.sh"
   source "${_repo_dir}/src/lib/vault-select.sh"
   source "${_repo_dir}/src/lib/refresh-vault-docs.sh"
+  source "${_repo_dir}/src/lib/shell-exports.sh"
 
   # --- parse --vault ---
   local vault_root=""
@@ -438,4 +439,5 @@ run_upgrade_to() {
 
   printf "${_C_GREEN}[meridian] Vault upgraded to %s successfully.${_C_RESET}\n" "$target_version"
   echo ""
+  _offer_shell_exports "$_repo_dir" "$vault_root"
 }

@@ -57,17 +57,28 @@ python3 --version
 ```bash
 git clone --branch latest --depth 1 https://github.com/your-username/meridian.git
 cd meridian
+export MERIDIAN_PROJECT="$(pwd)"
 ```
 
 **Personal machine:**
 ```bash
-./src/bin/scaffold-vault.sh --vault /path/to/MyVault
+$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --vault ~/Documents/Meridian
+export MERIDIAN_VAULT=~/Documents/Meridian
 ```
 
 **Work machine:**
 ```bash
-./src/bin/scaffold-vault.sh --vault /path/to/WorkVault --profile work
+$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
+export MERIDIAN_VAULT=~/Documents/WorkVault
 ```
+
+The scaffold script prompts you to add the `export` lines to `~/.zshrc` or `~/.bash_profile` automatically. After confirming, reload your shell before using them:
+
+```bash
+source ~/.zshrc   # or ~/.bash_profile for bash
+```
+
+The variables are also set inline above for the current session. The `source` step (or opening a new terminal) is what makes them available in every future session. All the command examples in this file assume both variables are set.
 
 The `--profile work` flag creates only the folders appropriate for an employer-managed machine — `Process/` and `Work/`. `Northstar/`, `Life/`, `References/`, and the top-level `Knowledge/` are never created. See [Work Machine Setup](#work-machine-setup) for the full workflow.
 
@@ -82,7 +93,7 @@ The scaffold script automatically copies all scripts (`weekly-snapshot.py`, `new
 To upgrade an existing vault to the latest Meridian version:
 
 ```bash
-./src/bin/scaffold-vault.sh --upgrade
+$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --upgrade
 ```
 
 The script will prompt you to select a vault and which company folders to upgrade. See [[Upgrading]] for the full upgrade guide.
@@ -118,7 +129,8 @@ The three omitted folders are intentionally absent — not excluded by a setting
 ### Work machine scaffold
 
 ```bash
-./scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
+$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
+export MERIDIAN_VAULT=~/Documents/WorkVault
 ```
 
 Then follow the standard setup from [Step 1: Run the scaffold script](#initial-setup) → [Appearance Settings](#appearance-settings) onward. The plugin stack, hotkeys, and daily workflow are identical between profiles — the only difference is which folders exist.
@@ -333,6 +345,46 @@ If Python 3 is not in PATH, use the full path: `/usr/bin/python3`
 
 After adding: open the command palette (`Cmd+P`) and confirm **New Meeting Series** appears. Run it once against your vault to verify the series and instance folders are created correctly before relying on it in a live meeting prep flow.
 
+#### Command 3: New 1:1 (palette)
+
+1. Click **New command**
+2. Enter: `bash "{{vault_path}}/.scripts/new-1on1.sh" --vault "{{vault_path}}"`
+3. Set **Working directory**: `{{vault_path}}`
+4. Click gear icon → **Events** tab: leave all disabled (palette-only, not automatic)
+5. **Output** tab → Output channel for stdout: **Show in notification** (or **Ask after execution**)
+6. Set alias: "New 1:1"
+
+After adding: open the command palette (`Cmd+P`) and confirm **New 1:1** appears. The script creates a new note on first run for a given person, and appends a dated entry on subsequent runs — so the same command handles both first-time setup and recurring meetings.
+
+#### Command 4: New Company (palette)
+
+1. Click **New command**
+2. Enter: `bash "{{vault_path}}/.scripts/new-company.sh" --vault "{{vault_path}}"`
+3. Set **Working directory**: `{{vault_path}}`
+4. Click gear icon → **Events** tab: leave all disabled (palette-only, not automatic)
+5. **Output** tab → Output channel for stdout: **Show in notification** (or **Ask after execution**)
+6. Set alias: "New Company"
+
+#### Command 5: New Project (palette)
+
+1. Click **New command**
+2. Enter: `bash "{{vault_path}}/.scripts/new-project.sh" --vault "{{vault_path}}"`
+3. Set **Working directory**: `{{vault_path}}`
+4. Click gear icon → **Events** tab: leave all disabled (palette-only, not automatic)
+5. **Output** tab → Output channel for stdout: **Show in notification** (or **Ask after execution**)
+6. Set alias: "New Project"
+
+#### Troubleshooting Shell Commands
+
+If a command silently does nothing when run from the palette, the most common cause is that Shell Commands is not configured to open a terminal. Interactive scripts (anything that prompts for input) require a real terminal session:
+
+1. Open Shell Commands settings → find the command → click the gear icon
+2. Go to the **Environments** tab
+3. Under **Shell**, confirm it is set to your system shell (e.g. `/bin/bash` or `/bin/zsh`)
+4. Under **Execute in**, select **New terminal** (not "Background")
+
+Re-run from the palette — a terminal window should open and display the prompts.
+
 ### 9. Scroller
 
 Search "Scroller" → Install → Enable
@@ -376,10 +428,23 @@ Assign the Templates hotkey to quickly insert the Reflection template at end of 
 To upgrade an existing vault to the latest Meridian version:
 
 ```bash
-./src/bin/scaffold-vault.sh --upgrade
+$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --upgrade
 ```
 
-The script will prompt you to select a vault and which company folders to upgrade. It runs all applicable migration scripts in order, then overwrites `Process/Meridian Documentation/` with the latest docs.
+The script will prompt you to select a vault and which company folders to upgrade. It runs all applicable migration scripts in order, then overwrites `Process/Meridian Documentation/` with the latest docs. The shell variable prompt runs at the end of every upgrade — if you skipped it during initial setup, upgrading is the other way to get it.
+
+If you want to set up the shell variables without upgrading:
+
+```bash
+cd /path/to/meridian
+./src/bin/scaffold-vault.sh --setup-shell
+```
+
+After the script writes to your rc file, reload your shell:
+
+```bash
+source ~/.zshrc   # or ~/.bash_profile for bash
+```
 
 See [[Upgrading]] for the full upgrade guide, including what happens when upgrading across multiple versions and how per-company version tracking works.
 
@@ -391,9 +456,9 @@ The scaffold creates a placeholder folder at `Work/CurrentCompany/`. Rename it t
 2. Right-click `Work/CurrentCompany` → **Rename**
 3. Enter your company name exactly as you want it to appear (e.g. `Acme Corp`) and press Enter
 
-Alternatively, open a terminal in the vault directory:
+Alternatively, open a terminal:
 ```bash
-mv Work/CurrentCompany "Work/Your Company Name"
+mv "$MERIDIAN_VAULT/Work/CurrentCompany" "$MERIDIAN_VAULT/Work/Your Company Name"
 ```
 
 ---
@@ -543,32 +608,36 @@ Output filename format: `YYYY-MM-DD–DD Weekly Outtake.md`
 
 Run manually:
 ```bash
-python3 .scripts/weekly-snapshot.py /path/to/vault
-python3 .scripts/weekly-snapshot.py /path/to/vault --dry-run
-python3 .scripts/weekly-snapshot.py /path/to/vault --date 2026-03-10
-python3 .scripts/weekly-snapshot.py /path/to/vault --force
+python3 "$MERIDIAN_VAULT/.scripts/weekly-snapshot.py" "$MERIDIAN_VAULT"
+python3 "$MERIDIAN_VAULT/.scripts/weekly-snapshot.py" "$MERIDIAN_VAULT" --dry-run
+python3 "$MERIDIAN_VAULT/.scripts/weekly-snapshot.py" "$MERIDIAN_VAULT" --date 2026-03-10
+python3 "$MERIDIAN_VAULT/.scripts/weekly-snapshot.py" "$MERIDIAN_VAULT" --force
 ```
 
 ---
 
 ## Managing Companies
 
-Run `new-company.sh` when you start a new job or add a client. It creates the standard folder structure under `Work/`.
-
-Open a terminal in the vault directory and run:
+Run **New Company** from the command palette (or `new-company.sh`) when you start a new job or add a client. The script prompts for company name, checks for collisions, and creates the standard folder structure under `Work/`.
 
 ```bash
-bash .scripts/new-company.sh
+bash "$MERIDIAN_VAULT/.scripts/new-company.sh" --vault "$MERIDIAN_VAULT"
 ```
 
-The script prompts for vault root and company name, checks for collisions, and creates:
+Created folders:
 
 ```
 Work/[Company]/
+  Daily/
+  Drafts/
   Finances/
   General/
   Goals/
   Incidents/
+  Knowledge/
+    Technical/
+    Leadership/
+    Industry/
   Meetings/
     1on1s/
   People/
@@ -577,21 +646,19 @@ Work/[Company]/
   Vendors/
 ```
 
-`Goals/Current Priorities.md` is seeded automatically. All other notes are added individually as work begins. Run `new-project.sh` afterward to add a project under the new company's `Projects/` folder.
+`Goals/Current Priorities.md` is seeded automatically. The daily notes config is updated to point to the new company's `Daily/` folder. Run **New Project** afterward to add a project under the new company's `Projects/` folder.
 
 ---
 
 ## Managing Projects
 
-Run `new-project.sh` when starting a new project. It scaffolds the standard project structure under any `Projects/` directory — either `Work/[Company]/Projects/` or `Life/Projects/`.
-
-Open a terminal in the vault directory and run:
+Run **New Project** from the command palette (or `new-project.sh`) when starting a new project. It scaffolds the standard project structure under any `Projects/` directory — either `Work/[Company]/Projects/` or `Life/Projects/`.
 
 ```bash
-bash .scripts/new-project.sh
+bash "$MERIDIAN_VAULT/.scripts/new-project.sh" --vault "$MERIDIAN_VAULT"
 ```
 
-The script prompts for project name, vault root, and target Projects directory, then creates:
+The script prompts for project name and target Projects directory, then creates:
 
 ```
 [ProjectName]/
@@ -616,21 +683,39 @@ The script warns if the Projects directory you provide doesn't match the expecte
 
 ## Managing Meetings
 
-Run `new-meeting-series.sh` when creating a new meeting instance (or a new recurring series for the first time). It handles both the series-level index and the per-date instance folder.
+Meridian has two meeting workflows, each with a dedicated script. Both are available from the Obsidian command palette via Shell Commands and can also be run directly from a terminal.
 
-Open a terminal in the vault directory and run:
+### Meeting series and instances
+
+Run **New Meeting Series** from the command palette (or `new-meeting-series.sh`) when scheduling a recurring meeting — the first time for a new series, or any time you need to prep an instance of an existing one.
 
 ```bash
-bash .scripts/new-meeting-series.sh --vault .
+bash "$MERIDIAN_VAULT/.scripts/new-meeting-series.sh" --vault "$MERIDIAN_VAULT"
 ```
 
-Or invoke from the Obsidian command palette: **New Meeting Series**.
-
 The script prompts for series name and date, then creates or updates:
-- `Meetings/[Series]/[Series].md` — series index (first time only; prompts for purpose and cadence)
-- `Meetings/[Series]/YYYY-MM-DD/[Series] YYYY-MM-DD.md` — instance index
+- `Meetings/[Series]/[Series].md` — series index (first run only; prompts for purpose and cadence)
+- `Meetings/[Series]/YYYY-MM-DD/[Series] YYYY-MM-DD.md` — per-date instance note
 
 If the instance folder already exists, the script aborts without modifying any files.
+
+### 1:1 notes
+
+Run **New 1:1** from the command palette (or `new-1on1.sh`) to create or update a running 1:1 note for a person.
+
+```bash
+bash "$MERIDIAN_VAULT/.scripts/new-1on1.sh" --vault "$MERIDIAN_VAULT"
+```
+
+The script prompts for the person's name and meeting date, then:
+- **First run for a person:** creates `Meetings/1on1s/[Name]/[Name] 1on1s.md` with a header and the first dated entry
+- **Subsequent runs:** appends a new dated entry to the bottom of the existing note
+
+Unlike meeting-series instances (one file per date), a 1:1 note is a single rolling document per person. Each meeting adds an `## YYYY-MM-DD` section with Agenda and Notes fields. Open the note before the meeting to fill in the agenda; add notes during or after.
+
+### Why not use the Templates plugin for meeting notes?
+
+The meeting templates in `_templates/` use placeholders like `{{NAME}}` and `{{SERIES}}` that the core Templates plugin does not substitute (it only handles `{{date}}`, `{{time}}`, and `{{title}}`). Inserting them via `Cmd+Shift+T` into a new note also creates an H1 conflict with the heading that Filename Heading Sync adds automatically. The shell scripts bypass both problems by creating the file directly with the correct content and frontmatter.
 
 ---
 
