@@ -95,7 +95,13 @@ if [[ "$FROM_REMOTE" == true ]]; then
 
   echo "  Fetching documentation from origin/main..."
 
-  _COMMIT=$(curl -sf "$_API_REF" \
+  # Pre-flight: verify GitHub is reachable before touching any local files.
+  # A failed curl here means network is down, DNS failed, or GitHub is unavailable.
+  if ! _API_RESPONSE=$(curl -sf "$_API_REF" 2>/dev/null); then
+    die "remote-unavailable" "Could not reach GitHub. Check your network connection and try again."
+  fi
+
+  _COMMIT=$(echo "$_API_RESPONSE" \
     | python3 -c "import sys,json; r=json.load(sys.stdin); print(r['object']['sha'][:7])" \
     2>/dev/null || echo "unknown")
 
@@ -103,10 +109,16 @@ if [[ "$FROM_REMOTE" == true ]]; then
     "User Setup.md" "User Handbook.md" "Reference Guide.md" "Architecture.md"
     "Design Decision.md" "Security.md" "Sync.md" "Roadmap.md" "Upgrading.md"
   )
+  # Write to a temp file first; move into place only on success.
+  # This prevents truncating the existing file if curl fails mid-fetch.
+  _TMP=$(mktemp)
+  trap 'rm -f "$_TMP"' EXIT
   _FETCH_ERRORS=0
   for _f in "${_DOC_FILES[@]}"; do
     _encoded=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$_f")
-    if ! curl -sf "${_RAW_BASE}/${_encoded}" > "${_DOCS_SRC}/${_f}"; then
+    if curl -sf "${_RAW_BASE}/${_encoded}" > "$_TMP"; then
+      mv "$_TMP" "${_DOCS_SRC}/${_f}"
+    else
       _warn "Failed to fetch: $_f"
       _FETCH_ERRORS=$(( _FETCH_ERRORS + 1 ))
     fi

@@ -134,7 +134,9 @@ The runner calls each applicable migration script twice per company: once for gl
 
 ### Documentation Refresh
 
-After all migrations complete successfully, the runner **always** overwrites every file in `Process/Meridian Documentation/` with the latest version from the repo. This happens regardless of whether there were any migration scripts to run. Documentation is always current after an upgrade.
+After all migrations complete successfully, the runner **always** overwrites every file in `Process/Meridian Documentation/`. This happens regardless of whether there were any migration scripts to run.
+
+The runner first attempts to fetch the current documentation from `origin/main` on GitHub via the raw content API — no git objects are fetched, only the `src/documentation/` files are updated locally. If GitHub is unreachable or any file fetch fails, it falls back silently to the documentation bundled with the installed version. The upgrade output reports which source was used: `Documentation: origin/main @ abc1234` on success, or `Documentation: local` if the remote was unavailable.
 
 ### Version Bump
 

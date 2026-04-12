@@ -393,7 +393,45 @@ run_upgrade_to() {
   done
 
   # --- refresh docs (always, after all migrations) ---
+  # Attempt to fetch the latest documentation from origin/main before refreshing
+  # the vault. Falls back to the bundled local docs if GitHub is unreachable or
+  # any file fetch fails. No git objects are fetched.
+
+  _RAW_BASE="https://raw.githubusercontent.com/octdev/meridian/main/src/documentation"
+  _API_REF="https://api.github.com/repos/octdev/meridian/git/refs/heads/main"
+  _DOCS_SRC="${_repo_dir}/src/documentation"
+  _UPGRADE_DOC_FILES=(
+    "User Setup.md" "User Handbook.md" "Reference Guide.md" "Architecture.md"
+    "Design Decision.md" "Security.md" "Sync.md" "Roadmap.md" "Upgrading.md"
+  )
+  _doc_source="local"
+
+  _api_response=""
+  if _api_response=$(curl -sf "$_API_REF" 2>/dev/null); then
+    _commit=$(echo "$_api_response" \
+      | python3 -c "import sys,json; r=json.load(sys.stdin); print(r['object']['sha'][:7])" \
+      2>/dev/null || echo "unknown")
+    _tmp=$(mktemp)
+    _fetch_errors=0
+    for _f in "${_UPGRADE_DOC_FILES[@]}"; do
+      _encoded=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$_f")
+      if curl -sf "${_RAW_BASE}/${_encoded}" > "$_tmp"; then
+        mv "$_tmp" "${_DOCS_SRC}/${_f}"
+      else
+        _fetch_errors=$(( _fetch_errors + 1 ))
+      fi
+    done
+    rm -f "$_tmp"
+    if [[ "$_fetch_errors" -eq 0 ]]; then
+      _doc_source="origin/main @ ${_commit}"
+    else
+      _doc_source="local (remote fetch incomplete)"
+    fi
+  fi
+
   refresh_vault_docs "$vault_root" "$_repo_dir"
+  _detail "Documentation: ${_doc_source}"
+  echo ""
 
   # --- bump repo version ---
   _write_version_json "${_repo_dir}/config/base/version.json" "$target_version"
