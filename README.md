@@ -76,6 +76,24 @@ Meridian is designed to keep personal knowledge off employer-managed machines. T
 
 All documentation is also available inside the vault at `Process/Meridian Documentation/` after running `scaffold-vault.sh`.
 
+## Keeping Documentation Current
+
+Documentation is updated between releases. To pull the latest version into your vault without changing your code:
+
+```bash
+scripts/local/refresh-documentation.sh --from-remote
+```
+
+To review what changed before copying to your vault:
+```bash
+git diff src/documentation/
+```
+
+To revert to the documentation bundled with your installed version:
+```bash
+git checkout src/documentation/
+```
+
 ## Project Documentation
 
 | File | Purpose |

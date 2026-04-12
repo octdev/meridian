@@ -161,3 +161,27 @@ If you prefer to skip the interactive vault selection:
 ```
 
 **When this is useful:** Meridian occasionally issues documentation corrections that do not require any structural vault changes — no new files, no config updates, nothing that would justify a full version bump. Rather than waiting for the next release, you can run this script any time to bring your documentation current.
+
+### Fetching Documentation from GitHub
+
+If you are on the `latest` branch, your local `src/documentation/` only reflects what was current at the time of the last release. Documentation is updated on `main` between releases, but those updates do not land on `latest` until a new version is cut.
+
+To pull the current documentation from `main` directly — without switching branches or fetching any git objects — add `--from-remote`:
+
+```bash
+./scripts/local/refresh-documentation.sh --from-remote
+```
+
+This fetches each documentation file from GitHub's raw content API into your local `src/documentation/`, reports the commit hash it pulled from, lists any changed files, and then proceeds with the normal vault refresh. Your git history and branch state are not affected.
+
+To review what changed before the vault refresh runs:
+
+```bash
+git diff src/documentation/
+```
+
+To revert to the documentation that shipped with your installed version:
+
+```bash
+git checkout src/documentation/
+```

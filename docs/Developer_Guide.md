@@ -4,6 +4,74 @@ Reference for contributors and maintainers working on the Meridian project itsel
 
 ---
 
+## Branch Model
+
+**Trunk-based development.** All work happens on `main`. The `latest` branch always points to the most recent release tag and is what users clone and pull from — it exists purely so `git pull` works smoothly for users without them knowing about tags.
+
+- `main` — active development; may be unstable between releases
+- `latest` — always points to the most recent release tag; never committed to directly
+
+Users do not track `main`. They clone:
+```bash
+git clone --branch latest --depth 1 https://github.com/octdev/meridian.git
+```
+
+---
+
+## Release Process
+
+Releases are semver tags on `main`. The process is:
+
+### 1. Bump the version
+
+```bash
+scripts/ci/version.sh
+```
+
+This script interactively bumps `config/base/version.json` and updates the `README.md` clone command. It also prints the upgrade script filenames you need to create.
+
+### 2. Create upgrade scripts (structural releases only)
+
+If the release touches vault structure, create the migration scripts. See [Writing Upgrade Scripts](#writing-upgrade-scripts) below.
+
+Docs-only releases skip this step entirely.
+
+### 3. Stage everything and run the release script
+
+```bash
+git add config/base/version.json scripts/upgrade/ ...
+scripts/ci/release.sh
+```
+
+`release.sh` reads the version from `version.json`, confirms with you, commits any staged changes as `Release vX.Y.Z`, creates an annotated tag, pushes the commit and tag to `origin`, then force-updates the `latest` branch — all in one step.
+
+### Semantic versioning rules
+
+| Change | Bump |
+|---|---|
+| Breaking vault or API change | Major |
+| New features, backward-compatible | Minor |
+| Bug fixes | Patch |
+| Documentation only | None |
+
+---
+
+## Documentation Refresh
+
+Documentation lives in `src/documentation/` and is distributed into the vault at `Process/Meridian Documentation/`. Doc updates land on `main` between releases and don't need a version bump.
+
+Users refresh their vault docs with:
+```bash
+scripts/local/refresh-documentation.sh [--vault <path>] [--from-remote]
+```
+
+- Without `--from-remote`: copies docs from the local repo into the vault.
+- With `--from-remote`: first fetches the latest docs from `origin/main` via the GitHub raw API (updates `src/documentation/` in place), then copies to the vault. No git objects are fetched.
+
+After running with `--from-remote`, review changes with `git diff src/documentation/` and commit or discard as appropriate.
+
+---
+
 ## Writing Upgrade Scripts
 
 ### When to Create an Upgrade Script
