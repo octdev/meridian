@@ -109,7 +109,7 @@ The scaffold script supports two profiles via `--profile personal|work`.
 Full vault. All folders and seed files are created.
 
 ```bash
-src/bin/scaffold-vault.sh --vault ~/Documents/MyVault
+$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --vault ~/Documents/Meridian
 ```
 
 ### Work profile
@@ -117,7 +117,7 @@ src/bin/scaffold-vault.sh --vault ~/Documents/MyVault
 Work-only vault. Creates `Process/`, `Work/`, `_templates/`, and `.scripts/`. Omits `Northstar/`, `Life/`, `References/`, and the top-level `Knowledge/` entirely — they are never written to disk and cannot be accidentally synced to an employer machine. Knowledge generated at work lives at `Work/<Company>/Knowledge/`.
 
 ```bash
-src/bin/scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
+$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
 ```
 
 The daily note template, all MOCs, and the Reflection template are identical between profiles. The plugin stack, hotkeys, and workflow are the same. Only the knowledge layer folders differ.

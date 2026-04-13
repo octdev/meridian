@@ -83,7 +83,7 @@ fi
 
 echo ""
 read -rp "$(printf "${_C_CYAN}Continue? [y/N]:${_C_RESET} ")" CONFIRM
-[[ "${CONFIRM,,}" == "y" ]] || { echo "Aborted."; exit 0; }
+[[ "$CONFIRM" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
 
 # ── Create or append ──────────────────────────────────────────────────────────
 

@@ -100,7 +100,7 @@ if [[ "$PROJECTS_DIR" != "$LIFE_PATTERN" ]] && \
   _hint "Expected: $VAULT/Work/[Company]/Projects/ or $VAULT/Life/Projects/"
   echo ""
   read -rp "$(printf "${_C_CYAN}Continue anyway? [y/N]:${_C_RESET} ")" _override
-  [[ "${_override,,}" == "y" ]] || { echo "Aborted."; exit 0; }
+  [[ "$_override" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 1; }
 fi
 
 # ── Collision check ───────────────────────────────────────────────────────────
@@ -118,7 +118,7 @@ _detail "Project:  $PROJECT_NAME"
 _detail "Location: $PROJECT_DIR"
 echo ""
 read -rp "$(printf "${_C_CYAN}Create? [y/N]:${_C_RESET} ")" CONFIRM
-[[ "${CONFIRM,,}" == "y" ]] || { echo "Aborted."; exit 0; }
+[[ "$CONFIRM" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
 
 # ── Scaffold ──────────────────────────────────────────────────────────────────
 

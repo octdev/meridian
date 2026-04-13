@@ -155,7 +155,7 @@ read -rp "  Proceed? [Y/n]: " _confirm
 echo ""
 
 if [[ "$_confirm" =~ ^[Nn] ]]; then
-  echo "[meridian] Cancelled."
+  echo "Aborted."
   echo ""
   exit 0
 fi

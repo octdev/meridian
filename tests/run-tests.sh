@@ -314,7 +314,7 @@ COMPANY_VAULT="$(new_vault)"
 "$SCAFFOLD" --vault "$COMPANY_VAULT" --profile personal > /dev/null 2>&1
 COMPANY_SCRIPT="$COMPANY_VAULT/.scripts/new-company.sh"
 
-printf "%s\n%s\n" "$COMPANY_VAULT" "Acme Corp" | bash "$COMPANY_SCRIPT" > /dev/null 2>&1
+printf "%s\n%s\ny\n" "$COMPANY_VAULT" "Acme Corp" | bash "$COMPANY_SCRIPT" > /dev/null 2>&1
 
 for d in "Incidents" "People" "Projects" "Reference" "Vendors" "Goals" \
           "Daily" "Knowledge/Technical" "Knowledge/Leadership" "Knowledge/Industry"; do
@@ -348,7 +348,7 @@ fi
 
 # Invalid vault path
 rc=0; output="$(printf "%s\n%s\n" "/nonexistent/path" "TestCo" | bash "$COMPANY_SCRIPT" 2>&1)" || rc=$?
-if [[ $rc -eq 1 ]] && echo "$output" | grep -q "does not exist"; then
+if [[ $rc -eq 1 ]] && echo "$output" | grep -q "not found"; then
   pass "  invalid vault exits 1"
 else
   fail "  invalid vault exits 1"
@@ -372,10 +372,10 @@ section "new-project.sh — work project happy path"
 
 PROJECT_VAULT="$(new_vault)"
 "$SCAFFOLD" --vault "$PROJECT_VAULT" --profile personal > /dev/null 2>&1
-printf "%s\n%s\n" "$PROJECT_VAULT" "Acme Corp" | bash "$PROJECT_VAULT/.scripts/new-company.sh" > /dev/null 2>&1
+printf "%s\n%s\ny\n" "$PROJECT_VAULT" "Acme Corp" | bash "$PROJECT_VAULT/.scripts/new-company.sh" > /dev/null 2>&1
 PROJECT_SCRIPT="$PROJECT_VAULT/.scripts/new-project.sh"
 
-printf "%s\n%s\n%s\n" "Alpha Project" "$PROJECT_VAULT" "$PROJECT_VAULT/Work/Acme Corp/Projects" \
+printf "%s\n%s\n%s\ny\n" "$PROJECT_VAULT" "Alpha Project" "$PROJECT_VAULT/Work/Acme Corp/Projects" \
   | bash "$PROJECT_SCRIPT" > /dev/null 2>&1
 
 PD="$PROJECT_VAULT/Work/Acme Corp/Projects/Alpha Project"
@@ -413,7 +413,7 @@ assert_file_contains "  MOC has decisions dataview" "$MOC" "design-decisions"
 # ============================================================
 section "new-project.sh — Life project happy path"
 
-printf "%s\n%s\n%s\n" "Home Reno" "$PROJECT_VAULT" "$PROJECT_VAULT/Life/Projects" \
+printf "%s\n%s\n%s\ny\n" "$PROJECT_VAULT" "Home Reno" "$PROJECT_VAULT/Life/Projects" \
   | bash "$PROJECT_SCRIPT" > /dev/null 2>&1
 
 LPD="$PROJECT_VAULT/Life/Projects/Home Reno"
@@ -425,7 +425,7 @@ assert_file_contains "  Life MOC path is vault-relative" "$LPD/Home Reno.md" 'LI
 section "new-project.sh — error cases"
 
 # Collision
-rc=0; output="$(printf "%s\n%s\n%s\n" "Alpha Project" "$PROJECT_VAULT" "$PROJECT_VAULT/Work/Acme Corp/Projects" \
+rc=0; output="$(printf "%s\n%s\n%s\n" "$PROJECT_VAULT" "Alpha Project" "$PROJECT_VAULT/Work/Acme Corp/Projects" \
   | bash "$PROJECT_SCRIPT" 2>&1)" || rc=$?
 if [[ $rc -eq 1 ]] && echo "$output" | grep -q "already exists"; then
   pass "  collision exits 1 with message"
@@ -434,7 +434,7 @@ else
 fi
 
 # Empty project name
-rc=0; output="$(printf "%s\n%s\n%s\n" "" "$PROJECT_VAULT" "$PROJECT_VAULT/Work/Acme Corp/Projects" \
+rc=0; output="$(printf "%s\n%s\n%s\n" "$PROJECT_VAULT" "" "$PROJECT_VAULT/Work/Acme Corp/Projects" \
   | bash "$PROJECT_SCRIPT" 2>&1)" || rc=$?
 if [[ $rc -eq 1 ]] && echo "$output" | grep -q "cannot be empty"; then
   pass "  empty name exits 1"
@@ -443,18 +443,18 @@ else
 fi
 
 # Nonexistent projects directory
-rc=0; output="$(printf "%s\n%s\n%s\n" "TestProj" "$PROJECT_VAULT" "$PROJECT_VAULT/Work/Acme Corp/NoSuchDir" \
+rc=0; output="$(printf "%s\n%s\n%s\n" "$PROJECT_VAULT" "TestProj" "$PROJECT_VAULT/Work/Acme Corp/NoSuchDir" \
   | bash "$PROJECT_SCRIPT" 2>&1)" || rc=$?
-if [[ $rc -eq 1 ]] && echo "$output" | grep -q "does not exist"; then
+if [[ $rc -eq 1 ]] && echo "$output" | grep -q "not found"; then
   pass "  nonexistent dir exits 1"
 else
   fail "  nonexistent dir exits 1"
 fi
 
 # Invalid vault root
-rc=0; output="$(printf "%s\n%s\n%s\n" "TestProj" "/no/such/vault" "/no/such/vault/Work/Acme Corp/Projects" \
+rc=0; output="$(printf "%s\n%s\n%s\n" "/no/such/vault" "TestProj" "/no/such/vault/Work/Acme Corp/Projects" \
   | bash "$PROJECT_SCRIPT" 2>&1)" || rc=$?
-if [[ $rc -eq 1 ]] && echo "$output" | grep -q "does not exist"; then
+if [[ $rc -eq 1 ]] && echo "$output" | grep -q "not found"; then
   pass "  invalid vault root exits 1"
 else
   fail "  invalid vault root exits 1"
@@ -463,7 +463,7 @@ fi
 # ============================================================
 section "new-project.sh — unexpected path: abort"
 
-rc=0; output="$(printf "%s\n%s\n%s\nN\n" "TestProj" "$PROJECT_VAULT" "$PROJECT_VAULT/Knowledge/Technical" \
+rc=0; output="$(printf "%s\n%s\n%s\nN\n" "$PROJECT_VAULT" "TestProj" "$PROJECT_VAULT/Knowledge/Technical" \
   | bash "$PROJECT_SCRIPT" 2>&1)" || rc=$?
 if [[ $rc -eq 1 ]] && echo "$output" | grep -q "Unexpected" && echo "$output" | grep -q "Aborted"; then
   pass "  unexpected path + N aborts with exit 1"
@@ -474,7 +474,7 @@ fi
 # ============================================================
 section "new-project.sh — unexpected path: confirm and proceed"
 
-rc=0; output="$(printf "%s\n%s\n%s\nY\n" "UnconvProj" "$PROJECT_VAULT" "$PROJECT_VAULT/Knowledge/Technical" \
+rc=0; output="$(printf "%s\n%s\n%s\nY\ny\n" "$PROJECT_VAULT" "UnconvProj" "$PROJECT_VAULT/Knowledge/Technical" \
   | bash "$PROJECT_SCRIPT" 2>&1)" || rc=$?
 if [[ $rc -eq 0 ]] && echo "$output" | grep -q "scaffolded"; then
   pass "  unexpected path + Y proceeds with exit 0"
@@ -562,11 +562,11 @@ ABORT_VAULT="$(new_vault)"
 "$SCAFFOLD" --vault "$ABORT_VAULT" --profile personal > /dev/null 2>&1
 echo "SENTINEL_ABORT_TEST" >> "$ABORT_VAULT/Process/Meridian Documentation/User Setup.md"
 
-rc=0; output="$(echo "n" | "$REFRESH_SCRIPT" --vault "$ABORT_VAULT" 2>&1)" || rc=$?
-if [[ $rc -eq 0 ]] && echo "$output" | grep -q "Cancelled"; then
-  pass "  n at confirmation exits 0 with Cancelled"
+rc=0; output="$(echo "n" | "$REFRESH_SCRIPT" --vault "$ABORT_VAULT" --from-local 2>&1)" || rc=$?
+if [[ $rc -eq 0 ]] && echo "$output" | grep -q "Aborted"; then
+  pass "  n at confirmation exits 0 with Aborted"
 else
-  fail "  n at confirmation exits 0 with Cancelled"
+  fail "  n at confirmation exits 0 with Aborted"
 fi
 assert_file_contains "  sentinel preserved after abort" \
   "$ABORT_VAULT/Process/Meridian Documentation/User Setup.md" "SENTINEL_ABORT_TEST"
@@ -578,7 +578,7 @@ REFRESH_VAULT="$(new_vault)"
 "$SCAFFOLD" --vault "$REFRESH_VAULT" --profile personal > /dev/null 2>&1
 echo "SENTINEL_REFRESH_TEST" >> "$REFRESH_VAULT/Process/Meridian Documentation/User Setup.md"
 
-rc=0; output="$(echo "Y" | "$REFRESH_SCRIPT" --vault "$REFRESH_VAULT" 2>&1)" || rc=$?
+rc=0; output="$(echo "Y" | "$REFRESH_SCRIPT" --vault "$REFRESH_VAULT" --from-local 2>&1)" || rc=$?
 if [[ $rc -eq 0 ]]; then
   pass "  exits 0"
 else
@@ -600,7 +600,7 @@ assert_file_not_contains "  sentinel removed (file was overwritten)" "$UG_REFRES
 # ============================================================
 section "refresh-documentation.sh — re-run overwrites again"
 
-rc=0; output="$(echo "Y" | "$REFRESH_SCRIPT" --vault "$REFRESH_VAULT" 2>&1)" || rc=$?
+rc=0; output="$(echo "Y" | "$REFRESH_SCRIPT" --vault "$REFRESH_VAULT" --from-local 2>&1)" || rc=$?
 if [[ $rc -eq 0 ]] && echo "$output" | grep -q "Updated:"; then
   pass "  second run reports Updated (not Skipped)"
 else
@@ -614,7 +614,7 @@ STALE_VAULT="$(new_vault)"
 "$SCAFFOLD" --vault "$STALE_VAULT" --profile personal > /dev/null 2>&1
 echo "stale content" > "$STALE_VAULT/Process/Meridian Documentation/Upgrades.md"
 
-rc=0; output="$(echo "Y" | "$REFRESH_SCRIPT" --vault "$STALE_VAULT" 2>&1)" || rc=$?
+rc=0; output="$(echo "Y" | "$REFRESH_SCRIPT" --vault "$STALE_VAULT" --from-local 2>&1)" || rc=$?
 if [[ $rc -eq 0 ]] && echo "$output" | grep -q "Removed stale:"; then
   pass "  stale file triggers Removed stale message"
 else

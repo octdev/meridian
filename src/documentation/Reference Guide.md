@@ -326,36 +326,44 @@ Archive: Static snapshot in Process/Weekly/
 ```bash
 git clone --branch latest --depth 1 https://github.com/your-username/meridian.git
 cd meridian
+export MERIDIAN_PROJECT="$(pwd)"
 ```
 
 **Personal machine (full vault):**
 ```bash
-./src/bin/scaffold-vault.sh --vault /path/to/MyVault
+$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --vault ~/Documents/Meridian
+export MERIDIAN_VAULT=~/Documents/Meridian
 ```
 
 **Work machine (work vault — omits Northstar, Life, References):**
 ```bash
-./src/bin/scaffold-vault.sh --vault /path/to/WorkVault --profile work
+$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
+export MERIDIAN_VAULT=~/Documents/WorkVault
 ```
 
-The scaffold script automatically copies all scripts into `.scripts/` and all documentation into `Process/Meridian Documentation/`.
+The scaffold script automatically copies all scripts into `.scripts/` and all documentation into `Process/Meridian Documentation/`. It will offer to persist `MERIDIAN_PROJECT` and `MERIDIAN_VAULT` to your shell profile — after confirming, run `source ~/.zshrc` (or open a new terminal).
 
 **Upgrade an existing vault:**
 ```bash
-./src/bin/scaffold-vault.sh --upgrade
+$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --upgrade
 ```
 
 **Check vault and Meridian versions:**
 ```bash
-./src/bin/scaffold-vault.sh --version
+$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --version
+```
+
+**Set up shell variables for an existing vault (if skipped during scaffold):**
+```bash
+$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --setup-shell
 ```
 
 ## Vault Management Scripts
 
 ```bash
-bash .scripts/new-company.sh          # add a new employer/client under Work/
-bash .scripts/new-project.sh          # scaffold a new project under any Projects/ folder
-bash .scripts/new-meeting-series.sh --vault <path>   # scaffold a meeting series instance
+bash "$MERIDIAN_VAULT/.scripts/new-company.sh"                                       # add a new employer/client under Work/
+bash "$MERIDIAN_VAULT/.scripts/new-project.sh"                                       # scaffold a new project under any Projects/ folder
+bash "$MERIDIAN_VAULT/.scripts/new-meeting-series.sh" --vault "$MERIDIAN_VAULT"      # scaffold a meeting series instance
 ```
 
 Flags for `new-meeting-series.sh`:
@@ -370,7 +378,7 @@ Or invoke from the Obsidian command palette: **New Company**, **New Project**, *
 ## Repo Utilities (not copied to vault)
 
 ```bash
-bash scripts/local/backfill-timestamps.sh --vault <path>
+bash "$MERIDIAN_PROJECT/scripts/local/backfill-timestamps.sh" --vault "$MERIDIAN_VAULT"
 ```
 
 Populates empty `created:` and `modified:` frontmatter fields in all Markdown files in the vault. Only touches fields that are completely empty — existing timestamps are left unchanged. Run once when migrating an existing vault to Meridian or after a bulk import.
@@ -382,10 +390,10 @@ Populates empty `created:` and `modified:` frontmatter fields in all Markdown fi
 The weekly snapshot runs automatically every Monday via the Shell Commands plugin. These flags are available if you need to trigger or inspect it manually:
 
 ```bash
-python3 .scripts/weekly-snapshot.py <vault>              # previous week
-python3 .scripts/weekly-snapshot.py <vault> --dry-run    # preview without writing
-python3 .scripts/weekly-snapshot.py <vault> --date DATE  # specific week
-python3 .scripts/weekly-snapshot.py <vault> --force      # overwrite existing snapshot
+python3 "$MERIDIAN_VAULT/.scripts/weekly-snapshot.py" "$MERIDIAN_VAULT"              # previous week
+python3 "$MERIDIAN_VAULT/.scripts/weekly-snapshot.py" "$MERIDIAN_VAULT" --dry-run    # preview without writing
+python3 "$MERIDIAN_VAULT/.scripts/weekly-snapshot.py" "$MERIDIAN_VAULT" --date DATE  # specific week
+python3 "$MERIDIAN_VAULT/.scripts/weekly-snapshot.py" "$MERIDIAN_VAULT" --force      # overwrite existing snapshot
 ```
 
 ---

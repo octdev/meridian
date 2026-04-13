@@ -89,7 +89,7 @@ if [[ ! -f "$SERIES_INDEX" ]]; then
 fi
 echo ""
 read -rp "$(printf "${_C_CYAN}Create? [y/N]:${_C_RESET} ")" CONFIRM
-[[ "${CONFIRM,,}" == "y" ]] || { echo "Aborted."; exit 0; }
+[[ "$CONFIRM" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
 
 # ── Create series index if new ────────────────────────────────────────────────
 

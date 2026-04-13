@@ -7,6 +7,13 @@ _offer_shell_exports() {
   local project_path="$1"
   local vault_path="$2"
 
+  # Non-interactive sessions (pipes, test runners, CI) get a hint only.
+  if [[ ! -t 0 ]]; then
+    _hint "Shell profile not updated (non-interactive). Run --setup-shell to add MERIDIAN_PROJECT and MERIDIAN_VAULT."
+    echo ""
+    return
+  fi
+
   local rc_file
   case "$SHELL" in
     */zsh)  rc_file="$HOME/.zshrc" ;;

@@ -8,19 +8,22 @@ A personal knowledge management system built on Obsidian. Designed for executive
 ```bash
 git clone --branch latest --depth 1 https://github.com/your-username/meridian.git
 cd meridian
+export MERIDIAN_PROJECT="$(pwd)"
 ```
 
 **2. Personal machine:**
 ```bash
-src/bin/scaffold-vault.sh
+$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh
 ```
 Prompts for a vault path (default: `~/Documents/Meridian`). Creates the full vault including `Northstar/`, `Life/`, and `References/`.
 
 **3. Work machine:**
 ```bash
-src/bin/scaffold-vault.sh --profile work
+$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --profile work
 ```
 Creates only `Process/` and `Work/`. Personal folders are never created, so personal content cannot exist on the work machine.
+
+The scaffold script will offer to write `MERIDIAN_PROJECT` and `MERIDIAN_VAULT` to your shell profile. After confirming, run `source ~/.zshrc` (or open a new terminal) so the variables are available in every future session.
 
 ---
 
@@ -81,23 +84,23 @@ All documentation is also available inside the vault at `Process/Meridian Docume
 Documentation is updated between releases. To pull the latest version into your vault without changing your code:
 
 ```bash
-scripts/local/refresh-documentation.sh
+$MERIDIAN_PROJECT/scripts/local/refresh-documentation.sh
 ```
 
 The script fetches current docs from `origin/main` on GitHub by default, then copies them to the vault. If GitHub is unreachable it falls back to the docs bundled with your installed version. To skip the network fetch entirely:
 
 ```bash
-scripts/local/refresh-documentation.sh --from-local
+$MERIDIAN_PROJECT/scripts/local/refresh-documentation.sh --from-local
 ```
 
 To review what changed before the vault copy runs:
 ```bash
-git diff src/documentation/
+git -C "$MERIDIAN_PROJECT" diff src/documentation/
 ```
 
 To revert to the documentation bundled with your installed version:
 ```bash
-git checkout src/documentation/
+git -C "$MERIDIAN_PROJECT" checkout src/documentation/
 ```
 
 ## Project Documentation
