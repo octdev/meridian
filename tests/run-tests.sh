@@ -186,7 +186,7 @@ for d in \
   "Work/CurrentCompany/Projects" "Work/CurrentCompany/People" "Work/CurrentCompany/Reference" \
   "Work/CurrentCompany/Incidents" "Work/CurrentCompany/Vendors" "Work/CurrentCompany/Goals" \
   "Work/CurrentCompany/Daily" "Work/CurrentCompany/Knowledge/Technical" \
-  "_templates" ".scripts"; do
+  "_templates" ".scripts" ".backups"; do
   assert_exists "  folder: $d" "$PERSONAL_VAULT/$d"
 done
 
@@ -269,7 +269,7 @@ WORK_VAULT="$(new_vault)"
 
 # Shared folders present
 for d in "Work/CurrentCompany/Projects" "Work/CurrentCompany/Daily" "Work/CurrentCompany/Goals" \
-          "Work/CurrentCompany/Knowledge/Technical" "_templates" ".scripts"; do
+          "Work/CurrentCompany/Knowledge/Technical" "_templates" ".scripts" ".backups"; do
   assert_exists "  work folder present: $d" "$WORK_VAULT/$d"
 done
 
@@ -975,6 +975,89 @@ assert_file_contains "  upgrade-runner sources refresh-vault-docs.sh" \
   "$REPO_DIR/scripts/upgrade/upgrade-runner.sh" "refresh-vault-docs.sh"
 assert_file_not_contains "  upgrade-runner no longer defines _refresh_vault_docs()" \
   "$REPO_DIR/scripts/upgrade/upgrade-runner.sh" "_refresh_vault_docs()"
+
+# ============================================================
+section "upgrade-runner.sh — backup: static checks"
+
+assert_file_contains "  _backup_vault() is defined" \
+  "$REPO_DIR/scripts/upgrade/upgrade-runner.sh" "_backup_vault()"
+assert_file_contains "  _backup_vault is called in run_upgrade_to" \
+  "$REPO_DIR/scripts/upgrade/upgrade-runner.sh" '_backup_vault "$vault_root"'
+
+# ============================================================
+section "upgrade-runner.sh — backup: zip creation"
+
+BACKUP_VAULT="$(new_vault)"
+"$SCAFFOLD" --vault "$BACKUP_VAULT" --profile personal > /dev/null 2>&1
+
+rc=0
+output="$(bash -c "
+  source \"$REPO_DIR/src/lib/colors.sh\"
+  source \"$REPO_DIR/src/lib/logging.sh\"
+  source \"$REPO_DIR/scripts/upgrade/upgrade-runner.sh\"
+  MERIDIAN_YES=1 _backup_vault \"$BACKUP_VAULT\" \"1.5.0\"
+" 2>&1)" || rc=$?
+
+if [[ $rc -eq 0 ]]; then
+  pass "  _backup_vault exits 0"
+else
+  fail "  _backup_vault exits 0 (got $rc)"
+  if $VERBOSE; then echo "    output: $output"; fi
+fi
+
+assert_exists "  backup zip created at expected path" \
+  "$BACKUP_VAULT/.backups/1.5.0_Vault_Backup.zip"
+
+_zip_list="$(unzip -l "$BACKUP_VAULT/.backups/1.5.0_Vault_Backup.zip" 2>/dev/null || true)"
+# grep -v "^Archive:" strips the header line that contains the archive's own path
+if echo "$_zip_list" | grep -v "^Archive:" | grep -qE "\.backups/.*\.zip"; then
+  fail "  backup zip does not contain backup zip files inside .backups/"
+else
+  pass "  backup zip does not contain backup zip files inside .backups/"
+fi
+
+# ============================================================
+section "upgrade-runner.sh — backup: n-1 pruning"
+
+# Use a fresh vault for pruning tests; run three sequential real backups so
+# modification time ordering is deterministic (each run creates a newer file).
+PRUNE_VAULT="$(new_vault)"
+"$SCAFFOLD" --vault "$PRUNE_VAULT" --profile personal > /dev/null 2>&1
+
+_run_backup() {
+  bash -c "
+    source \"$REPO_DIR/src/lib/colors.sh\"
+    source \"$REPO_DIR/src/lib/logging.sh\"
+    source \"$REPO_DIR/scripts/upgrade/upgrade-runner.sh\"
+    MERIDIAN_YES=1 _backup_vault \"$PRUNE_VAULT\" \"$1\"
+  " > /dev/null 2>&1
+}
+
+_run_backup "1.5.0"
+_run_backup "1.5.1"
+# After two backups, pruning should not yet trigger (still at 2)
+_zip_count="$(ls "$PRUNE_VAULT/.backups/"*.zip 2>/dev/null | wc -l | tr -d ' ')"
+if [[ "$_zip_count" -eq 2 ]]; then
+  pass "  two backups exist before pruning threshold"
+else
+  fail "  two backups exist before pruning threshold (found $_zip_count)"
+fi
+
+_run_backup "1.5.2"
+# Third backup → 3 total → prune to 2 most recent
+_zip_count="$(ls "$PRUNE_VAULT/.backups/"*.zip 2>/dev/null | wc -l | tr -d ' ')"
+if [[ "$_zip_count" -eq 2 ]]; then
+  pass "  pruning leaves exactly 2 backups"
+else
+  fail "  pruning leaves exactly 2 backups (found $_zip_count)"
+fi
+
+assert_exists "  newest backup retained after pruning" \
+  "$PRUNE_VAULT/.backups/1.5.2_Vault_Backup.zip"
+assert_exists "  previous backup retained after pruning" \
+  "$PRUNE_VAULT/.backups/1.5.1_Vault_Backup.zip"
+assert_absent "  oldest backup removed by pruning" \
+  "$PRUNE_VAULT/.backups/1.5.0_Vault_Backup.zip"
 
 # ============================================================
 # set-default-vault.sh

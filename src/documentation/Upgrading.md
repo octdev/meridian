@@ -8,7 +8,8 @@ This document covers how to upgrade an existing Meridian vault, how work vault v
 2. [[#Running an Upgrade]]
 3. [[#Work Vaults and Version Eligibility]]
 4. [[#How the Upgrade System Works]]
-5. [[#Refreshing Documentation Only]]
+5. [[#Vault Backups]]
+6. [[#Refreshing Documentation Only]]
 
 ---
 
@@ -48,11 +49,13 @@ The script will:
 
 3. **Prompt for company vault selection.** Any companies under `Work/` that are eligible for upgrade are listed. You can upgrade all of them, a subset, or none. See [[#Work Vaults and Version Eligibility]] for what eligibility means and why it matters.
 
-4. **Apply migrations.** Version-specific changes are applied in order from your installed version to the target. Each step is confirmed before the next begins.
+4. **Prompt for backup.** Before any changes are made, you are asked whether to back up the vault. The default is Yes. A zip of the full vault is saved to `.backups/<version>_Vault_Backup.zip` inside your vault. See [[#Vault Backups]] for details.
 
-5. **Refresh documentation.** All files in `Process/Meridian Documentation/` are replaced with the latest versions from the repo. Your own notes are never touched.
+5. **Apply migrations.** Version-specific changes are applied in order from your installed version to the target. Each step is confirmed before the next begins.
 
-6. **Report success.** The vault version and repo version are updated to reflect the new version.
+6. **Refresh documentation.** All files in `Process/Meridian Documentation/` are replaced with the latest versions from the repo. Your own notes are never touched.
+
+7. **Report success.** The vault version and repo version are updated to reflect the new version.
 
 To check your current versions at any time:
 
@@ -137,6 +140,18 @@ The runner calls each applicable migration script twice per company: once for gl
 After all migrations complete successfully, the runner **always** overwrites every file in `Process/Meridian Documentation/`. This happens regardless of whether there were any migration scripts to run.
 
 The runner first attempts to fetch the current documentation from `origin/main` on GitHub via the raw content API — no git objects are fetched, only the `src/documentation/` files are updated locally. If GitHub is unreachable or any file fetch fails, it falls back silently to the documentation bundled with the installed version. The upgrade output reports which source was used: `Documentation: origin/main @ abc1234` on success, or `Documentation: local` if the remote was unavailable.
+
+#### Vault Backups
+
+Before any migrations run, the upgrade prompt offers to back up your vault. The default is Yes. A zip of the entire vault is written to `.backups/<installed_version>_Vault_Backup.zip` inside the vault — the `.backups/` directory itself is excluded from the zip to avoid recursion.
+
+After the backup is created, the runner checks for older backups. It keeps at most two: the one just created and the one immediately before it. If older backups exist you are prompted to delete them, also defaulting to Yes. This means routine upgrades require no manual housekeeping.
+
+The `.backups/` folder is created by `scaffold-vault.sh` at setup time and is always present before the first upgrade.
+
+To skip the backup prompt in a non-interactive context, set `MERIDIAN_YES=1` before running the upgrade. The backup will be created and any excess pruned automatically with no prompts.
+
+If the backup itself fails, the upgrade continues — a failed backup is never a reason to abort.
 
 #### Version Bump
 

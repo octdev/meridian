@@ -178,6 +178,7 @@ vault/
   .obsidian/
     daily-notes.json
     templates.json
+  .backups/                       pre-upgrade vault backups (zip archives, n-1 retention)
   .scripts/
     .vault-version                key=value version file (vault= and Company-vault= entries)
     weekly-snapshot.py
@@ -274,6 +275,7 @@ vault/
   .obsidian/
     daily-notes.json
     templates.json
+  .backups/                       pre-upgrade vault backups (zip archives, n-1 retention)
   .scripts/
     .vault-version                key=value version file (vault= and Company-vault= entries)
     weekly-snapshot.py

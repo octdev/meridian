@@ -32,6 +32,7 @@ _templates/      Daily Note.md · Generic Note.md · Reflection.md
                  Meeting Instance.md · Meeting Series.md · 1on1.md
 .scripts/        weekly-snapshot.py · new-company.sh · new-project.sh · new-meeting-series.sh · new-1on1.sh
                  new-standalone-meeting.sh · set-default-company.sh · .vault-version
+.backups/        pre-upgrade zip archives (n-1 retention — two most recent kept)
 ```
 
 **Work vault (`--profile work`) — Northstar, Life, top-level Knowledge absent:**
@@ -54,6 +55,7 @@ _templates/      Daily Note.md · Generic Note.md · Reflection.md
                  Meeting Instance.md · Meeting Series.md · 1on1.md
 .scripts/        weekly-snapshot.py · new-company.sh · new-project.sh · new-meeting-series.sh · new-1on1.sh
                  new-standalone-meeting.sh · set-default-company.sh · .vault-version
+.backups/        pre-upgrade zip archives (n-1 retention — two most recent kept)
 ```
 
 ---

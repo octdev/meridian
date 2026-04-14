@@ -207,11 +207,15 @@ _backup_vault() {
   # Safety net: create .backups/ if absent (canonical creation is scaffold-vault.sh)
   mkdir -p "$_backup_dir"
 
-  # Create backup first (exclude .backups/ directory)
+  # Create backup first (zip to a temp file, then move into .backups/ to
+  # avoid the destination appearing inside the archive while it is being written)
+  local _tmp_zip="${TMPDIR:-/tmp}/meridian-backup-$$.zip"
   _detail "Creating backup: .backups/${_backup_name}"
-  if (cd "$_vault_root" && zip -qr "$_backup_path" . -x ".backups/*"); then
+  if (cd "$_vault_root" && zip -qr "$_tmp_zip" . -x ".backups" -x ".backups/*") \
+      && mv "$_tmp_zip" "$_backup_path"; then
     _pass "Vault backed up to: .backups/${_backup_name}"
   else
+    rm -f "$_tmp_zip"
     _warn "Backup failed — continuing with upgrade."
     echo ""
     return 0
