@@ -4,23 +4,23 @@ This document explains how to think about and use Meridian day-to-day. For insta
 
 ## Table of Contents
 
-**Part I — Philosophy**
-1. [[#The Mental Model]]
-2. [[#Capture Mindset: Fast In, Filed Later]]
-3. [[#The Three Domains]]
+1. **Philosophy**
+	1. [[#The Mental Model]]
+	2. [[#Capture Mindset: Fast In, Filed Later]]
+	3. [[#The Three Domains]]
 
-**Part II — Structure**
-4. [[#The Northstar]]
-5. [[#Life: Everything Else That Matters]]
-6. [[#Work: Structured and Ephemeral]]
-7. [[#Knowledge: What Transcends Context]]
-8. [[#People Notes: When to Move Them]]
+2. **Structure**
+	1. [[#The Northstar]]
+	2. [[#Life: Everything Else That Matters]]
+	3. [[#Work: Structured and Ephemeral]]
+	4. [[#Knowledge: What Transcends Context]]
+	5. [[#People Notes: When to Move Them]]
 
-**Part III — Process**
-9. [[#Vault Management]]
-10. [[#Running a Meeting]]
-11. [[#The Weekly Rhythm]]
-12. [[#Building a Connected Graph Over Time]]
+3. **Process**
+	1. [[#Vault Management]]
+	2. [[#Running a Meeting]]
+	3. [[#The Weekly Rhythm]]
+	4. [[#Building a Connected Graph Over Time]]
 
 ---
 
