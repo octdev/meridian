@@ -28,11 +28,11 @@ The `--profile work` flag ensures personal folders are never created on the work
 ./scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
 ```
 
-`Northstar/`, `Life/`, and `References/` are structurally absent — not excluded, not hidden, not gitignored. They do not exist on disk. This is the strongest guarantee: content that was never written cannot be exposed.
+`Northstar/` and `Life/` are structurally absent — not excluded, not hidden, not gitignored. They do not exist on disk. The top-level `Knowledge/` folder is also absent; work-generated knowledge lives at `Work/<Company>/Knowledge/`. This is the strongest guarantee: content that was never written cannot be exposed.
 
 ### Layer 2: Syncthing folder-level access control
 
-The sync configuration ensures `Life/`, `Northstar/`, and `References/` are never configured as sync targets on the work machine. Because these folders do not exist on the work machine (Layer 1), they cannot appear in its Syncthing folder list.
+The sync configuration ensures `Life/`, `Northstar/`, and the top-level `Knowledge/` are never configured as sync targets on the work machine. Because these folders do not exist on the work machine (Layer 1), they cannot appear in its Syncthing folder list.
 
 Work-originated knowledge lives at `Work/<Company>/Knowledge/` and syncs bidirectionally as part of the `Work/<Company>/` share. The top-level `Knowledge/` folder is personal-only and is never created on the work machine.
 
@@ -64,7 +64,7 @@ The vault is never stored in employer-managed cloud storage (OneDrive, SharePoin
 
 Before using on a new work machine, verify:
 
-- [ ] Vault was scaffolded with `--profile work` — confirm `Northstar/`, `Life/`, `References/` are absent
-- [ ] `Life/`, `Northstar/`, `References/`, and top-level `Knowledge/` are not present in Syncthing folder list on work laptop
+- [ ] Vault was scaffolded with `--profile work` — confirm `Northstar/`, `Life/`, and top-level `Knowledge/` are absent
+- [ ] `Life/`, `Northstar/`, and top-level `Knowledge/` are not present in Syncthing folder list on work laptop
 - [ ] Vault is stored in a personally-owned storage location, not employer cloud storage
 - [ ] Full-disk encryption is enabled on both machines (FileVault on macOS)

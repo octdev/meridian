@@ -80,7 +80,7 @@ source ~/.zshrc   # or ~/.bash_profile for bash
 
 The variables are also set inline above for the current session. The `source` step (or opening a new terminal) is what makes them available in every future session. All the command examples in this file assume both variables are set.
 
-The `--profile work` flag creates only the folders appropriate for an employer-managed machine — `Process/` and `Work/`. `Northstar/`, `Life/`, `References/`, and the top-level `Knowledge/` are never created. See [Work Machine Setup](#work-machine-setup) for the full workflow.
+The `--profile work` flag creates only the folders appropriate for an employer-managed machine — `Process/` and `Work/`. `Northstar/`, `Life/`, and the top-level `Knowledge/` are never created. See [Work Machine Setup](#work-machine-setup) for the full workflow.
 
 Default path is `~/Documents/Meridian` if `--vault` is omitted (the script will prompt to confirm).
 
@@ -122,9 +122,8 @@ Meridian is designed to run on both personal and work machines simultaneously, w
 | `.scripts/` | Yes | Yes |
 | `Northstar/` | Yes | **No** |
 | `Life/` | Yes | **No** |
-| `References/` | Yes | **No** |
 
-The three omitted folders are intentionally absent — not excluded by a setting, not gitignored, not hidden. They simply do not exist on the work machine. Syncthing is then configured to never introduce them.
+The two omitted folders (`Northstar/` and `Life/`) are intentionally absent — not excluded by a setting, not gitignored, not hidden. They simply do not exist on the work machine. The top-level `Knowledge/` folder is also absent from the work vault; work-generated knowledge lives at `Work/<Company>/Knowledge/`. `References/` no longer exists as a top-level folder in either profile — it lives at `Knowledge/References/` in the personal vault only. Syncthing is configured to never introduce personal folders on the work machine.
 
 ### Work machine scaffold
 
@@ -144,7 +143,6 @@ Only the active company folder syncs between the work machine and personal machi
 | `Work/<Company>/` | Send & Receive |
 | `Life/` | Not configured |
 | `Northstar/` | Not configured |
-| `References/` | Not configured |
 
 `Work/<Company>/` includes all subfolders: `Daily/`, `Knowledge/`, `Goals/`, `Projects/`, `People/`, `Meetings/`, and the rest. Everything under the company folder travels as one share. `Process/` is not synced — its contents are rebuilt locally or refreshed on upgrade. See [Sync.md](Sync.md) for full setup instructions.
 
@@ -189,7 +187,7 @@ The scaffold sets **Default location for new notes** and **Default location for 
 |---------|-------|
 | Default file to open | Daily note |
 | Default location for new notes | `Life/Drafts` (personal) or `Work/<Company>/Drafts` (work) — **In the folder specified below** |
-| Default location for new attachments | `References` (personal) or `Work/<Company>/Reference` (work) — **In the folder specified below** |
+| Default location for new attachments | `Knowledge/References` (personal) or `Work/<Company>/Reference` (work) — **In the folder specified below** |
 | Confirm file deletion | OFF |
 
 ---
@@ -373,6 +371,15 @@ After adding: open the command palette (`Cmd+P`) and confirm **New 1:1** appears
 4. Click gear icon → **Events** tab: leave all disabled (palette-only, not automatic)
 5. **Output** tab → Output channel for stdout: **Show in notification** (or **Ask after execution**)
 6. Set alias: "New Project"
+
+#### Command 6: New Meeting (palette)
+
+1. Click **New command**
+2. Enter: `bash "{{vault_path}}/.scripts/new-standalone-meeting.sh" --vault "{{vault_path}}"`
+3. Set **Working directory**: `{{vault_path}}`
+4. Click gear icon → **Events** tab: leave all disabled (palette-only, not automatic)
+5. **Output** tab → Output channel for stdout: **Show in notification** (or **Ask after execution**)
+6. Set alias: "New Meeting"
 
 #### Troubleshooting Shell Commands
 
@@ -640,6 +647,8 @@ Work/[Company]/
     Industry/
   Meetings/
     1on1s/
+    Series/
+    Single/
   People/
   Projects/
   Reference/
@@ -683,7 +692,7 @@ The script warns if the Projects directory you provide doesn't match the expecte
 
 ## Managing Meetings
 
-Meridian has two meeting workflows, each with a dedicated script. Both are available from the Obsidian command palette via Shell Commands and can also be run directly from a terminal.
+Meridian has three types of meeting notes — series instances, 1:1 rolling notes, and standalone single notes — and three scripts to manage them. All are available from the Obsidian command palette via Shell Commands and can also be run directly from a terminal.
 
 ### Meeting series and instances
 
@@ -694,8 +703,8 @@ bash "$MERIDIAN_VAULT/.scripts/new-meeting-series.sh" --vault "$MERIDIAN_VAULT"
 ```
 
 The script prompts for series name and date, then creates or updates:
-- `Meetings/[Series]/[Series].md` — series index (first run only; prompts for purpose and cadence)
-- `Meetings/[Series]/YYYY-MM-DD/[Series] YYYY-MM-DD.md` — per-date instance note
+- `Meetings/Series/[Series]/[Series].md` — series index (first run only; prompts for purpose and cadence)
+- `Meetings/Series/[Series]/YYYY-MM-DD/[Series] YYYY-MM-DD.md` — per-date instance note
 
 If the instance folder already exists, the script aborts without modifying any files.
 
@@ -708,10 +717,26 @@ bash "$MERIDIAN_VAULT/.scripts/new-1on1.sh" --vault "$MERIDIAN_VAULT"
 ```
 
 The script prompts for the person's name and meeting date, then:
-- **First run for a person:** creates `Meetings/1on1s/[Name]/[Name] 1on1s.md` with a header and the first dated entry
+- **First run for a person:** creates `Meetings/1on1s/[Name] 1on1s.md` with a header and the first dated entry
 - **Subsequent runs:** appends a new dated entry to the bottom of the existing note
 
 Unlike meeting-series instances (one file per date), a 1:1 note is a single rolling document per person. Each meeting adds an `## YYYY-MM-DD` section with Agenda and Notes fields. Open the note before the meeting to fill in the agenda; add notes during or after.
+
+### Standalone meeting notes
+
+Run **New Meeting** from the command palette (or `new-standalone-meeting.sh`) for any meeting that warrants its own record but is not a recurring series or 1:1.
+
+```bash
+bash "$MERIDIAN_VAULT/.scripts/new-standalone-meeting.sh" --vault "$MERIDIAN_VAULT"
+```
+
+The script creates a single note in `Meetings/Single/`. Use `--folder` for meetings where you expect prep materials or artifacts to be co-located:
+
+```bash
+bash "$MERIDIAN_VAULT/.scripts/new-standalone-meeting.sh" --vault "$MERIDIAN_VAULT" --name "Budget Review" --folder
+```
+
+No series index is created. The note links back to the daily note for the meeting date.
 
 ### Why not use the Templates plugin for meeting notes?
 
@@ -725,7 +750,7 @@ The meeting templates in `_templates/` use placeholders like `{{NAME}}` and `{{S
 |----------|-------------|
 | Would I care about this at a different company? | `Knowledge/` |
 | Is it specific to my current company? | `Work/Reference/` |
-| Is it someone else's artifact? | `References/` |
+| Is it someone else's artifact? | `Knowledge/References/` |
 | Is it about a colleague? | `Work/People/` |
 | Is it a personal relationship? | `Life/People/` |
 | Is it an active scoped effort? | `Work` or `Life/Projects/` |

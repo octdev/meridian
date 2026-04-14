@@ -15,7 +15,7 @@ export MERIDIAN_PROJECT="$(pwd)"
 ```bash
 $MERIDIAN_PROJECT/src/bin/scaffold-vault.sh
 ```
-Prompts for a vault path (default: `~/Documents/Meridian`). Creates the full vault including `Northstar/`, `Life/`, and `References/`.
+Prompts for a vault path (default: `~/Documents/Meridian`). Creates the full vault including `Northstar/`, `Life/`, and `Knowledge/References/`.
 
 **3. Work machine:**
 ```bash
@@ -42,6 +42,7 @@ Then follow `Process/Meridian Documentation/User Setup.md` in the vault from Ste
 | Run weekly snapshot manually | Command palette → "Generate Weekly Outtake" |
 | Add a new company under Work/ | Command palette → "New Company" |
 | Scaffold a new project | Command palette → "New Project" |
+| Create a standalone meeting note | Command palette → "New Meeting" |
 
 ## Prerequisites
 
@@ -55,7 +56,7 @@ Then follow `Process/Meridian Documentation/User Setup.md` in the vault from Ste
 - **Automated MOCs** — 7 Maps of Content powered by Tasks and Dataview query the vault live. See [src/documentation/User Setup.md](src/documentation/User%20Setup.md#mocs).
 - **Frontmatter automation** — `title`, `created`, and `modified` fields populate automatically on every note. See [src/documentation/Architecture.md](src/documentation/Architecture.md#frontmatter-chain).
 - **Weekly snapshots** — a Python script generates static Mon–Sun completed-task reports automatically. See [src/documentation/User Setup.md](src/documentation/User%20Setup.md#weekly-snapshots).
-- **Work machine profile** — `--profile work` scaffolds a work-only vault that omits all personal folders. Personal content is never created and cannot be accidentally synced to an employer machine. See [src/documentation/User Setup.md](src/documentation/User%20Setup.md#work-machine-setup).
+- **Work machine profile** — `--profile work` scaffolds a work-only vault that omits `Northstar/`, `Life/`, and the top-level `Knowledge/`. Personal content is never created and cannot be accidentally synced to an employer machine. See [src/documentation/User Setup.md](src/documentation/User%20Setup.md#work-machine-setup).
 - **Sync architecture** — Syncthing enforces the work/personal boundary at the filesystem level across machines. See [src/documentation/Sync.md](src/documentation/Sync.md).
 - **Vault management scripts** — `new-company.sh` scaffolds a new employer or client under `Work/`. `new-project.sh` scaffolds a new project with a full MOC, Design, Requirements, and Prompts structure. Both are accessible from the Obsidian command palette.
 - **Documentation in vault** — the full documentation suite is copied into `Process/Meridian Documentation/` at scaffold time, including a markdown cheat sheet and the quick-reference PDF.

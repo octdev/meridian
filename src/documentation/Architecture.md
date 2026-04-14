@@ -13,7 +13,7 @@ Meridian has three layers:
 │  Daily notes + inline markers                        │
 ├─────────────────────────────────────────────────────┤
 │  Knowledge layer                                     │
-│  Northstar, Knowledge, Work, Life, References        │
+│  Northstar, Knowledge, Work, Life                    │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -36,6 +36,8 @@ meridian/
       new-company.sh              scaffolds a new employer/client under Work/
       new-project.sh              scaffolds a new project under any Projects/ folder
       new-meeting-series.sh       scaffolds a meeting series instance (and series index if new)
+      new-1on1.sh                 creates or appends to a rolling 1:1 note
+      new-standalone-meeting.sh   creates a standalone one-off meeting note in Meetings/Single/
       weekly-snapshot.py          weekly task report generator
     lib/
       colors.sh                   TTY-aware color variable definitions
@@ -157,7 +159,7 @@ src/bin/scaffold-vault.sh --vault ~/Documents/MyVault
 
 ### Work profile
 
-Work-only vault. Creates `Process/`, `Work/`, `_templates/`, and `.scripts/`. Omits `Northstar/`, `Life/`, `References/`, and the top-level `Knowledge/` entirely — they are never written to disk and cannot be accidentally synced to an employer machine. Knowledge generated at work lives at `Work/<Company>/Knowledge/`.
+Work-only vault. Creates `Process/`, `Work/`, `_templates/`, and `.scripts/`. Omits `Northstar/`, `Life/`, and the top-level `Knowledge/` entirely — they are never written to disk and cannot be accidentally synced to an employer machine. Knowledge generated at work lives at `Work/<Company>/Knowledge/`.
 
 ```bash
 src/bin/scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
@@ -226,6 +228,7 @@ vault/
     Leadership/
     Industry/
     General/
+    References/                   external source material — unstructured
   Work/
     CurrentCompany/
       Projects/
@@ -245,10 +248,12 @@ vault/
         Industry/
       Meetings/
         1on1s/                    rolling 1:1 notes, one file per direct report or tracked peer
-        [Series Name]/            one folder per recurring series (created by new-meeting-series.sh)
-          [Series Name].md        series index note
-          YYYY-MM-DD/             one folder per instance (created by new-meeting-series.sh)
-            [Series] YYYY-MM-DD.md
+        Series/                   one folder per recurring series
+          [Series Name]/
+            [Series Name].md      series index note
+            YYYY-MM-DD/           one folder per instance (created by new-meeting-series.sh)
+              [Series] YYYY-MM-DD.md
+        Single/                   standalone one-off meeting notes
   Life/
     Daily/                        YYYY-MM-DD.md files
     Drafts/                       default location for new notes (personal vault)
@@ -260,7 +265,6 @@ vault/
     Development/
     Fun/
     General/
-  References/
 ```
 
 ### Work vault (`--profile work`)
@@ -316,13 +320,15 @@ vault/
         Industry/
       Meetings/
         1on1s/                    rolling 1:1 notes, one file per direct report or tracked peer
-        [Series Name]/            one folder per recurring series (created by new-meeting-series.sh)
-          [Series Name].md        series index note
-          YYYY-MM-DD/             one folder per instance (created by new-meeting-series.sh)
-            [Series] YYYY-MM-DD.md
+        Series/                   one folder per recurring series
+          [Series Name]/
+            [Series Name].md      series index note
+            YYYY-MM-DD/           one folder per instance (created by new-meeting-series.sh)
+              [Series] YYYY-MM-DD.md
+        Single/                   standalone one-off meeting notes
 ```
 
-`Northstar/`, `Life/`, `References/`, and the top-level `Knowledge/` are absent — not excluded, not hidden. They do not exist. `Process/Meridian Documentation/` is present in both profiles.
+`Northstar/`, `Life/`, and the top-level `Knowledge/` are absent — not excluded, not hidden. They do not exist. `Process/Meridian Documentation/` is present in both profiles.
 
 ---
 
@@ -338,7 +344,7 @@ vault/
 | 6 | Linter | Community | Frontmatter | Writes `title` frontmatter from H1 on save |
 | 7 | Front Matter Timestamps | Community | Frontmatter | Auto-inserts and maintains `created` and `modified` |
 | 8 | Scroller | Community | UX | Moves cursor to bottom of note on open and title rename |
-| 9 | Shell Commands | Community | Automation | Triggers weekly snapshot; palette entries for new-company, new-project, and new-meeting-series |
+| 9 | Shell Commands | Community | Automation | Triggers weekly snapshot; palette entries for new-company, new-project, new-meeting-series, new-1on1, and new-standalone-meeting |
 
 ---
 
@@ -395,7 +401,7 @@ The script runs on vault open and every 4 hours via Shell Commands. It discovers
 ```
 Work laptop ──Syncthing──► Personal machine ──Yaos/iCloud──► Phone/Tablet
   Work/<Co>/: Send & Receive  (includes Daily/, Knowledge/, Goals/, and the rest)
-  (Process/, Life/, Northstar/, References/ not configured on work laptop)
+  (Process/, Life/, Northstar/ not configured on work laptop)
 ```
 
 See [Sync.md](Sync.md) for full configuration.
@@ -437,17 +443,18 @@ Not all meetings generate files. The decision rule:
 
 | Meeting type | Output |
 |---|---|
-| Artifact-generating recurring meeting | `Meetings/[Series]/[Date]/` folder + instance index note |
+| Artifact-generating recurring meeting | `Meetings/Series/[Series]/[Date]/` folder + instance index note |
 | Project-related meeting | Note filed under `Projects/[Project]/`, not under Meetings |
 | 1:1 with ongoing tracking | Rolling note appended in `Meetings/1on1s/` |
+| Standalone one-off meeting | `Meetings/Single/YYYY-MM-DD <Name>.md` (or folder with `--folder`) |
 | Daily-note-sufficient meeting | Timestamped `###` heading in daily note only |
 | No notes required | Nothing |
 
 ### Series index vs. instance index
 
-The **series index** (`Meetings/[Series]/[Series].md`) is the permanent record of what the meeting is: its purpose, cadence, standing attendees, and format. It lists every instance as a wikilink. It is created once by `new-meeting-series.sh` on first use.
+The **series index** (`Meetings/Series/[Series]/[Series].md`) is the permanent record of what the meeting is: its purpose, cadence, standing attendees, and format. It lists every instance as a wikilink. It is created once by `new-meeting-series.sh` on first use.
 
-The **instance index** (`Meetings/[Series]/[Date]/[Series] [Date].md`) is the canonical record of a single meeting: what was discussed, decided, and assigned. All prep materials and output artifacts are co-located in the same date folder and linked from this note.
+The **instance index** (`Meetings/Series/[Series]/[Date]/[Series] [Date].md`) is the canonical record of a single meeting: what was discussed, decided, and assigned. All prep materials and output artifacts are co-located in the same date folder and linked from this note.
 
 ### Rolling 1:1 notes
 
@@ -461,15 +468,15 @@ The 1:1 rolling note links to the People note (`Work/CurrentCompany/People/[Name
 Daily note (YYYY-MM-DD)
   └─ [[Series YYYY-MM-DD]]          reference on meeting day
 
-Instance index (Series YYYY-MM-DD)
+Instance index (Meetings/Series/[Series]/[Date]/Series YYYY-MM-DD)
   └─ [[Series]]                     up-link to series index
   └─ [[YYYY-MM-DD]]                 back-link to daily note
   └─ prep file links                co-located artifacts
 
-Series index (Series)
+Series index (Meetings/Series/[Series]/Series)
   └─ [[Series YYYY-MM-DD]]          one entry per instance
 
-1:1 rolling note (Name 1on1s)
+1:1 rolling note (Meetings/1on1s/Name 1on1s)
   └─ [[Name]]                       link to People note
 
 People note (Name)

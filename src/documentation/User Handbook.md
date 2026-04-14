@@ -4,16 +4,21 @@ This document explains how to think about and use Meridian day-to-day. For insta
 
 ## Table of Contents
 
+**Part I — Philosophy**
 1. [[#The Mental Model]]
-2. [[#The Northstar]]
+2. [[#Capture Mindset: Fast In, Filed Later]]
 3. [[#The Three Domains]]
-4. [[#The Daily Note as Capture Surface]]
-5. [[#Work: Structured and Ephemeral]]
-6. [[#Meetings: Operational Records at Executive Scale]]
-7. [[#Life: Everything Else That Matters]]
-8. [[#Knowledge: What Transcends Context]]
-9. [[#People Notes: When to Move Them]]
-10. [[#Capture Mindset: Fast In, Filed Later]]
+
+**Part II — Structure**
+4. [[#The Northstar]]
+5. [[#Life: Everything Else That Matters]]
+6. [[#Work: Structured and Ephemeral]]
+7. [[#Knowledge: What Transcends Context]]
+8. [[#People Notes: When to Move Them]]
+
+**Part III — Process**
+9. [[#Vault Management]]
+10. [[#Running a Meeting]]
 11. [[#The Weekly Rhythm]]
 12. [[#Building a Connected Graph Over Time]]
 
@@ -26,6 +31,49 @@ Meridian is built on one observation: most productivity systems fail because the
 Meridian separates capture from filing. The daily note is a frictionless inbox — everything that happens to you lands there. Filing happens during review, when you have context and calm. The system stays useful because the MOCs surface what matters without requiring you to browse the inbox manually.
 
 This only works if you actually capture everything. Half-capture breaks the loop. The sections below explain how to build that habit and where things eventually land.
+
+---
+
+## Capture Mindset: Fast In, Filed Later
+
+The single habit that makes Meridian work is this: **capture without filing decisions.**
+
+The daily note is always open. `Cmd+D` returns you to it from anywhere. When something happens — a meeting, a call, a message, a realization — it goes in the log, with a marker if it needs follow-up. No folder navigation, no "where does this belong," no context switch.
+
+The markers tell the system what kind of thing it is:
+
+```
+- [ ] !   needs doing (not urgent)
+- [ ] !!  needs doing now
+- [ ] ~   waiting on someone else
+- [ ] >>  interesting or uncertain — process at review time
+```
+
+The `>>` marker is especially important. It is the bridge between "I don't know where this goes" and "I'll figure it out later." Use it freely. During the weekly review, the Review Queue MOC surfaces everything you've marked `>>` so you can promote, file, or discard.
+
+**What goes in the daily note vs. directly in the vault:**
+
+The core rule from the reference guide applies here:
+
+> Things that *happen to you* go in the daily note. Things you *intentionally create* go directly where they belong.
+
+If you're sitting down to write a project design document, don't start in the daily note — start directly in `Work/[Company]/Projects/[Project]/`. If a conversation triggers an important technical insight you want to capture as a standing note, write it directly in `Work/[Company]/Knowledge/Technical/` (or `Knowledge/Technical/` on a personal vault). The daily note is for reactive capture; intentional creation goes to its destination immediately.
+
+---
+
+## The Three Domains
+
+The vault's knowledge layer is divided into three domains: **Work**, **Life**, and **Knowledge**. Understanding the distinction between them is the most important conceptual piece of the system.
+
+```
+Work/       What you do for your current employer or clients
+Life/       Everything else — health, finances, relationships, projects
+Knowledge/  What you've learned that transcends any single job or context
+```
+
+These are not silos. A meeting note in Work might generate an insight that belongs in Knowledge. A personal project in Life might reference technical knowledge you built at work. The links between them are the point — Meridian becomes more valuable over time as the graph of connections grows.
+
+The filing heuristics in the reference guide give you the decision rules. The sections below explain the *reasoning* behind them.
 
 ---
 
@@ -94,19 +142,24 @@ When that connection breaks — when you are consistently busy but the work does
 
 ---
 
-## The Three Domains
+## Life: Everything Else That Matters
 
-The vault's knowledge layer is divided into three domains: **Work**, **Life**, and **Knowledge**. Understanding the distinction between them is the most important conceptual piece of the system.
+Life is where your personal existence lives. It has fewer prescribed subfolders because personal life is more varied than work, but the structure provided is a starting point:
 
 ```
-Work/       What you do for your current employer or clients
-Life/       Everything else — health, finances, relationships, projects
-Knowledge/  What you've learned that transcends any single job or context
+Projects/     Personal projects with defined scope
+People/       Personal relationships — family, friends, contacts
+Health/       Medical, fitness, nutrition, mental health
+Finances/     Personal accounts, investments, budgeting
+Social/       Events, social coordination, community
+Development/  Learning, skills, reading, growth
+Fun/          Hobbies, travel, entertainment — things worth remembering
+General/      Catch-all
 ```
 
-These are not silos. A meeting note in Work might generate an insight that belongs in Knowledge. A personal project in Life might reference technical knowledge you built at work. The links between them are the point — Meridian becomes more valuable over time as the graph of connections grows.
+One pattern that surprises people: Life gets used less than Work at first, but it grows to be just as valuable over time. Most people start capturing work things diligently and underuse the personal side of the vault. Resist this. A note about a health conversation with your doctor, a record of a meaningful trip, a note about a difficult family situation you navigated — these are the things you'll actually want to find in three years.
 
-The filing heuristics in the reference guide give you the decision rules. The sections below explain the *reasoning* behind them.
+The filing heuristic is simple: if it matters to you personally and would matter at a different company, it goes in Life.
 
 ---
 
@@ -131,13 +184,11 @@ A note belongs in Work if it is specific to your current employer. If you leave 
 
 **When you leave a company:** Run `new-company.sh` to scaffold the new one. The old company's folder stays in place — it's a record, not a live system. Move any notes from `Work/People/` for colleagues you'll stay in touch with over to `Life/People/`. Backlinks update automatically.
 
----
-
-## Meetings: Operational Records at Executive Scale
+### Meetings
 
 At executive scale, meetings are not incidental to work — they are a primary work surface. Decisions get made in them. Commitments get recorded in them. Artifacts get produced for them. The Meetings layer exists to make those records findable and connected, without forcing a filing decision in the middle of every calendar day.
 
-### The core distinction: which meetings get files
+#### Which meetings get files
 
 Not every meeting needs a note outside the daily note. The decision:
 
@@ -145,49 +196,30 @@ Not every meeting needs a note outside the daily note. The decision:
 
 **Project folder** — the meeting was primarily about a project. Notes go in `Work/CurrentCompany/Projects/[Project]/`. You would look for this note when thinking about the project, not when thinking about the meeting series. Filing it under Meetings would orphan it from its context.
 
-**Meetings folder** — any planned meeting that needs its own record: recurring operational cadences (all-hands, staff meeting, council, board review), but also one-off meetings that warrant more than a daily note entry. Two forms:
+**Meetings folder** — any planned meeting that needs its own record, where you'd look for it by the meeting rather than by the project. Three subfolders based on type: recurring series go under `Meetings/Series/`, standalone one-off meetings go under `Meetings/Single/`, and ongoing 1:1s go under `Meetings/1on1s/`.
 
-- **Single file** — a note at `Meetings/YYYY-MM-DD-meeting-name.md`. Use this when the meeting needs its own record but won't generate separate artifacts.
-- **Folder** — a directory at `Meetings/YYYY-MM-DD-meeting-name/` containing the note and whatever artifacts belong to it. Use this when prep materials, slides, references, or other files need to be co-located with the meeting record. There is no required artifact list — put whatever belongs there.
+```
+Meetings/
+  1on1s/     rolling 1:1 notes, one per person
+  Series/    recurring series — [Series]/ → index + dated instances
+  Single/    standalone one-off meeting notes
+```
 
 **1:1 rolling note** — one-on-ones with direct reports or tracked peers where you maintain an ongoing record of the working relationship. Not a per-meeting file — a single rolling document per person, appended over time.
 
 If you're unsure: does this meeting need a record you'd look for outside the daily note, and is it not primarily about a project? If yes, use Meetings.
 
-### Series index and instance index
+#### Series index and instance index
 
 Every recurring meeting in the Meetings layer has two levels of note.
 
-The **series index** lives at `Meetings/[Series]/[Series].md`. It is the permanent record of what the meeting is: its purpose, cadence, standing attendees, and typical agenda format. You create it once (via `new-meeting-series.sh`) and update it when the meeting's structure changes. It also serves as the navigable list of all instances — an entry point to the full history of the series.
+The **series index** lives at `Meetings/Series/[Series]/[Series].md`. It is the permanent record of what the meeting is: its purpose, cadence, standing attendees, and typical agenda format. You create it once (via `new-meeting-series.sh`) and update it when the meeting's structure changes. It also serves as the navigable list of all instances — an entry point to the full history of the series.
 
-The **instance index** lives at `Meetings/[Series]/[Date]/[Series] [Date].md`. It is the canonical record of one specific meeting. All prep materials, the deck, the PDF, and any other artifacts for that meeting are co-located in the same date folder and linked from the instance index. The instance index links up to the series index and back to the daily note on meeting day.
+The **instance index** lives at `Meetings/Series/[Series]/[Date]/[Series] [Date].md`. It is the canonical record of one specific meeting. All prep materials, the deck, the PDF, and any other artifacts for that meeting are co-located in the same date folder and linked from the instance index. The instance index links up to the series index and back to the daily note on meeting day.
 
 This two-level structure means: to understand what the meeting is, open the series index. To find what happened on a specific date, open the instance index. To find all instances, the series index lists them.
 
-### Preparing for a meeting
-
-Run `new-meeting-series.sh` (or invoke **New Meeting Series** from the command palette) before you start prep work — not after. The script creates the series folder, series index (if new), date folder, and instance index in one step.
-
-Once the instance index exists:
-1. Create prep notes directly in the date folder — they are co-located with the instance index and linked from it.
-2. Add the deck and PDF to the same folder when they exist.
-3. Reference the meeting from your daily note on the prep day and the meeting day: `Working on [[Org Associates 2026-04-01]]`.
-
-The instance index is your working document during prep and your archival record after. Fill in Purpose and Attendees before the meeting. Add Key Points, Decisions, and Action Items during or immediately after.
-
-### Linking during a meeting
-
-In the instance index, link people and projects inline as you normally would in a daily note:
-
-```markdown
-## Key Points
-- [[Alice Chen]] flagged capacity risk on Platform migration ^
-- Decision to defer [[Project Phoenix]] kickoff to May ?
-```
-
-Action items written in the instance index with standard markers surface in the Action Items MOC automatically. The Tasks plugin scans all vault files including nested Meetings folders — no special configuration needed.
-
-### Rolling 1:1 notes
+#### Rolling 1:1 notes
 
 For direct reports and peers where you maintain an ongoing record, use a rolling note at `Meetings/1on1s/[Name] 1on1s.md`. Each meeting appends a new `## YYYY-MM-DD` section with Agenda and Notes. The file grows over time — this is intentional. The full arc of a working relationship is more useful than a collection of isolated per-meeting snapshots.
 
@@ -198,7 +230,7 @@ The rolling note links to the People note (`[[Name]]`). The People note links ba
 
 When a colleague leaves the company (or you do), move their People note from `Work/CurrentCompany/People/` to `Life/People/`. The 1:1 rolling note stays in place as a historical record — or moves with the People note if you expect the relationship to continue.
 
-### What does not belong in Meetings
+#### What does not belong in Meetings
 
 - **Project meeting notes** — file under the project
 - **People profiles** — file under `Work/CurrentCompany/People/`
@@ -210,41 +242,23 @@ The Meetings layer is for operational cadences. Everything else has a more speci
 
 ---
 
-## Life: Everything Else That Matters
-
-Life is where your personal existence lives. It has fewer prescribed subfolders because personal life is more varied than work, but the structure provided is a starting point:
-
-```
-Projects/     Personal projects with defined scope
-People/       Personal relationships — family, friends, contacts
-Health/       Medical, fitness, nutrition, mental health
-Finances/     Personal accounts, investments, budgeting
-Social/       Events, social coordination, community
-Development/  Learning, skills, reading, growth
-Fun/          Hobbies, travel, entertainment — things worth remembering
-General/      Catch-all
-```
-
-One pattern that surprises people: Life gets used less than Work at first, but it grows to be just as valuable over time. Most people start capturing work things diligently and underuse the personal side of the vault. Resist this. A note about a health conversation with your doctor, a record of a meaningful trip, a note about a difficult family situation you navigated — these are the things you'll actually want to find in three years.
-
-The filing heuristic is simple: if it matters to you personally and would matter at a different company, it goes in Life.
-
----
-
 ## Knowledge: What Transcends Context
 
 Knowledge is the most important folder in the vault, and the most commonly underused one.
 
 Knowledge is not where you dump reference material. It is where you put things you've actually learned — insights, mental models, technical understanding, leadership observations — that you want to carry with you across jobs, across roles, across years.
 
-**Personal vault:** top-level `Knowledge/` with four subfolders:
+**Personal vault:** top-level `Knowledge/` with five subfolders:
 
 ```
 Technical/    Engineering, architecture, tooling, systems design
 Leadership/   Management, org dynamics, communication, team health
 Industry/     Market knowledge, domain expertise, trends
 General/      Everything else worth knowing
+References/   External artifacts — source material, not yet synthesized
 ```
+
+**References** (`Knowledge/References/`) is an unstructured subfolder for external artifacts — source material, whitepapers, PDFs, documents you collected but didn't write. It is the raw input layer; Knowledge is the synthesis layer. Unlike the other Knowledge subfolders, References has no internal structure — filing decisions inside it are not Meridian's concern.
 
 **Work vault:** knowledge starts at `Work/<Company>/Knowledge/` (Technical, Leadership, Industry) and is promoted to personal `Knowledge/` by deliberate choice. This scoping is intentional — work-generated knowledge is context-specific until you decide it is transferable.
 
@@ -297,73 +311,9 @@ The move preserves the history: your notes about working with someone at one com
 
 ---
 
-## Capture Mindset: Fast In, Filed Later
+## Vault Management
 
-The single habit that makes Meridian work is this: **capture without filing decisions.**
-
-The daily note is always open. `Cmd+D` returns you to it from anywhere. When something happens — a meeting, a call, a message, a realization — it goes in the log, with a marker if it needs follow-up. No folder navigation, no "where does this belong," no context switch.
-
-The markers tell the system what kind of thing it is:
-
-```
-- [ ] !   needs doing (not urgent)
-- [ ] !!  needs doing now
-- [ ] ~   waiting on someone else
-- [ ] >>  interesting or uncertain — process at review time
-```
-
-The `>>` marker is especially important. It is the bridge between "I don't know where this goes" and "I'll figure it out later." Use it freely. During the weekly review, the Review Queue MOC surfaces everything you've marked `>>` so you can promote, file, or discard.
-
-**What goes in the daily note vs. directly in the vault:**
-
-The core rule from the reference guide applies here:
-
-> Things that *happen to you* go in the daily note. Things you *intentionally create* go directly where they belong.
-
-If you're sitting down to write a project design document, don't start in the daily note — start directly in `Work/[Company]/Projects/[Project]/`. If a conversation triggers an important technical insight you want to capture as a standing note, write it directly in `Work/[Company]/Knowledge/Technical/` (or `Knowledge/Technical/` on a personal vault). The daily note is for reactive capture; intentional creation goes to its destination immediately.
-
----
-
-## The Weekly Rhythm
-
-The system's long-term health depends on a weekly review. Without it, `>>` items accumulate, action items go stale, and the vault becomes a write-only archive.
-
-The weekly review has five parts, in order:
-
-### 1. Scan the Weekly Outtake (~5 min)
-
-The Weekly Outtake MOC shows everything you completed in the last 7 days. Open it and read through. Note patterns: were most things urgent (`!!`)? Were there items you marked done but didn't actually finish? Did anything ship that you haven't acknowledged?
-
-The static weekly snapshot (`Process/Weekly/`) is the historical archive — one file per week, written Monday morning. The Outtake MOC is the live rolling view.
-
-### 2. Process the Review Queue (~5 min)
-
-Open `Process/Review Queue.md`. Every `>>` item you marked during the week is here. For each one:
-
-- **Promote to Knowledge** if it's a transferable insight or useful reference
-- **File to Work or Life** if it belongs somewhere specific
-- **Create a task** (`- [ ] !`) if it needs follow-up
-- **Check it off** if it was situational and no longer relevant
-
-The goal is to reach an empty queue by end of review.
-
-### 3. Sweep Action Items (~5 min)
-
-Open `Process/Action Items.md`. Look at everything in Urgent and Standard. Anything overdue? Either do it, re-date it with a realistic deadline, or accept that it's not happening and close it. Stale action items are worse than no action items — they create noise that buries real work.
-
-### 4. Check Open Loops (~2 min)
-
-Open `Process/Open Loops.md`. These are the `~` items — things waiting on someone else. Did any of them resolve? Were any forgotten? Follow up on anything that's been sitting more than a week.
-
-### 5. Update Current Priorities (~3 min)
-
-Open `Work/<Company>/Goals/Current Priorities.md` and update it to reflect what actually matters this coming week. Compare it against your Northstar goals (`Northstar/Goals.md`). If you're consistently busy but your priorities don't connect to your goals, something needs to change — either the goals aren't real or you're not working on the right things.
-
----
-
-## Vault Management Scripts
-
-Four scripts handle vault scaffolding and meeting management. They live in `.scripts/` inside the vault and can be run from a terminal or triggered via the Obsidian command palette (Shell Commands plugin). All scripts accept flags or run fully interactively — if you omit a flag, you will be prompted.
+Six scripts handle vault scaffolding and meeting management. They live in `.scripts/` inside the vault and can be run from a terminal or triggered via the Obsidian command palette (Shell Commands plugin). All scripts accept flags or run fully interactively — if you omit a flag, you will be prompted.
 
 All scripts resolve the vault from `--vault <path>`, the `$MERIDIAN_VAULT` environment variable, or an interactive picker, in that order.
 
@@ -386,7 +336,7 @@ Run this when you start at a new employer or take on a new client. It creates th
 Work/<Company>/
   Daily/    Drafts/    Finances/    General/    Goals/
   Incidents/    Knowledge/{Technical,Leadership,Industry}
-  Meetings/1on1s/    People/    Projects/    Reference/    Vendors/
+  Meetings/{1on1s,Series,Single}/    People/    Projects/    Reference/    Vendors/
 ```
 
 The script also sets this company as the `DefaultCompany` in `.scripts/.vault-version`, so subsequent scripts know which company to default to. It checks for an existing company with the same name and requires `[y/N]` confirmation before writing anything.
@@ -434,10 +384,10 @@ Run this before you start prep work for any recurring meeting — not after. It 
 
 **What it creates depends on whether the series exists:**
 
-- **New series:** creates `Meetings/<Series>/<Series>.md` (the series index) with Purpose, Cadence, Standing Attendees, and Format/Agenda Template sections. Prompts for purpose and cadence if not passed as flags.
+- **New series:** creates `Meetings/Series/<Series>/<Series>.md` (the series index) with Purpose, Cadence, Standing Attendees, and Format/Agenda Template sections. Prompts for purpose and cadence if not passed as flags.
 - **Existing series:** appends a new instance link to the existing series index.
 
-In both cases it creates today's instance at `Meetings/<Series>/YYYY-MM-DD/<Series> YYYY-MM-DD.md` with Purpose, Attendees, Agenda, Key Points, Decisions, Action Items, and Next Meeting sections. The instance links back to the series index and to the daily note for that date.
+In both cases it creates today's instance at `Meetings/Series/<Series>/YYYY-MM-DD/<Series> YYYY-MM-DD.md` with Purpose, Attendees, Agenda, Key Points, Decisions, Action Items, and Next Meeting sections. The instance links back to the series index and to the daily note for that date.
 
 The two-level structure means: open the series index to understand what the meeting is and see all instances; open the instance to see what happened on a specific date.
 
@@ -457,7 +407,32 @@ Run this before a 1:1 — either your first with someone or any subsequent one. 
 - **New note:** creates `Meetings/1on1s/<Name> 1on1s.md` with frontmatter, a link to the person's People note (`[[<Name>]]`), and the first dated entry.
 - **Existing note:** appends a new `---`-separated `## YYYY-MM-DD` entry with Agenda and Notes fields.
 
-One file per person, appended over time. This is intentional — the full arc of a working relationship is more useful in one scrollable document than scattered across per-meeting files. See [[#Meetings: Operational Records at Executive Scale]] for the reasoning behind rolling notes.
+One file per person, appended over time. This is intentional — the full arc of a working relationship is more useful in one scrollable document than scattered across per-meeting files. See the [[#Meetings]] subsection under Work for the reasoning behind rolling notes.
+
+---
+
+### `new-standalone-meeting.sh` — Create a standalone meeting note
+
+```bash
+bash .scripts/new-standalone-meeting.sh
+bash .scripts/new-standalone-meeting.sh --vault <path> --name <name> --date <YYYY-MM-DD> [--folder]
+```
+
+Run this for any meeting that warrants its own record but is not a recurring series or 1:1. The note is created in `Meetings/Single/`.
+
+| Flag | Default | Notes |
+|---|---|---|
+| `--vault` | `$MERIDIAN_VAULT` or picker | Required |
+| `--company` | Auto-resolved | Same resolution as other scripts |
+| `--name` | Prompted | Used in filename and H1 |
+| `--date` | Today | Allows prep for future meetings |
+| `--folder` | Off | Creates a folder + index note for artifact-heavy meetings |
+
+**Files created:**
+- Default: `Meetings/Single/YYYY-MM-DD <Name>.md`
+- With `--folder`: `Meetings/Single/YYYY-MM-DD <Name>/YYYY-MM-DD <Name>.md`
+
+No series backlink. The note links to the daily note for the meeting date.
 
 ---
 
@@ -482,7 +457,84 @@ Writes `DefaultCompany=<name>` to `.scripts/.vault-version`. The default company
 | `new-project.sh` | New scoped effort with deliverables | **New Project** |
 | `new-meeting-series.sh` | Before prep for any recurring meeting | **New Meeting Series** |
 | `new-1on1.sh` | Before any 1:1 | **New 1:1** |
+| `new-standalone-meeting.sh` | Before any one-off meeting needing its own note | **New Meeting** |
 | `set-default-company.sh` | Change which company scripts default to | — |
+
+---
+
+## Running a Meeting
+
+### Preparing for a Meeting
+
+Choose the scenario that matches your meeting type:
+
+1. **New recurring series (first instance)**
+   Run `new-meeting-series.sh` (or **New Meeting Series** from the palette). It creates the series index at `Meetings/Series/[Series]/[Series].md` and the first instance folder and note. Prompts for series name, purpose, and cadence on first run.
+
+2. **New instance of an existing series**
+   Run `new-meeting-series.sh` again with the same series name. It appends an instance link to the existing series index and creates a new dated instance folder and note. Does not re-prompt for purpose or cadence.
+
+3. **New 1:1 (first meeting with a person)**
+   Run `new-1on1.sh`. Creates `Meetings/1on1s/[Name] 1on1s.md` with frontmatter, a link to the person's People note, and the first dated entry.
+
+4. **Updating an existing 1:1**
+   Run `new-1on1.sh` again with the same person's name. Appends a new dated entry to the bottom of the existing rolling note.
+
+5. **Standalone one-off meeting**
+   Run `new-standalone-meeting.sh` (or invoke **New Meeting** from the palette). No series index is created — just a single note in `Meetings/Single/`. Use `--folder` if you expect prep materials or artifacts to accompany the note.
+
+   For very lightweight one-off meetings where you don't want a script, you can also create a note directly from the **Meeting Instance** template via `Cmd+Shift+T` in a new note. Note that template placeholders are not auto-substituted — you'll need to fill in the header fields manually.
+
+For all script-created notes: fill in Purpose and Attendees before the meeting. Add Key Points, Decisions, and Action Items during or immediately after.
+
+### Linking During a Meeting
+
+In the instance index, link people and projects inline as you normally would in a daily note:
+
+```markdown
+## Key Points
+- [[Alice Chen]] flagged capacity risk on Platform migration ^
+- Decision to defer [[Project Phoenix]] kickoff to May ?
+```
+
+Action items written in the instance index with standard markers surface in the Action Items MOC automatically. The Tasks plugin scans all vault files including nested Meetings folders — no special configuration needed.
+
+---
+
+## The Weekly Rhythm
+
+The system's long-term health depends on a weekly review. Without it, `>>` items accumulate, action items go stale, and the vault becomes a write-only archive.
+
+The weekly review has five parts, in order:
+
+### 1. Scan the Weekly Outtake (~5 min)
+
+The Weekly Outtake MOC shows everything you completed in the last 7 days. Open it and read through. Note patterns: were most things urgent (`!!`)? Were there items you marked done but didn't actually finish? Did anything ship that you haven't acknowledged?
+
+The static weekly snapshot (`Process/Weekly/`) is the historical archive — one file per week, written Monday morning. The Outtake MOC is the live rolling view.
+
+### 2. Process the Review Queue (~5 min)
+
+Open `Process/Review Queue.md`. Every `>>` item you marked during the week is here. For each one:
+
+- **Promote to Knowledge** if it's a transferable insight or useful reference
+- **File to Work or Life** if it belongs somewhere specific
+- **Create a task** (`- [ ] !`) if it needs follow-up
+- **Check it off** if it was situational and no longer relevant
+
+The goal is to reach an empty queue by end of review.
+
+### 3. Sweep Action Items (~5 min)
+
+Open `Process/Action Items.md`. Look at everything in Urgent and Standard. Anything overdue? Either do it, re-date it with a realistic deadline, or accept that it's not happening and close it. Stale action items are worse than no action items — they create noise that buries real work.
+
+### 4. Check Open Loops (~2 min)
+
+Open `Process/Open Loops.md`. These are the `~` items — things waiting on someone else. Did any of them resolve? Were any forgotten? Follow up on anything that's been sitting more than a week.
+
+### 5. Update Current Priorities (~3 min)
+
+Open `Work/<Company>/Goals/Current Priorities.md` and update it to reflect what actually matters this coming week. Compare it against your Northstar goals (`Northstar/Goals.md`). If you're consistently busy but your priorities don't connect to your goals, something needs to change — either the goals aren't real or you're not working on the right things.
 
 ---
 

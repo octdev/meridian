@@ -23,7 +23,7 @@ Only your active company folder syncs between the work laptop and personal machi
 | `Knowledge/` | Not present | Not in this share |
 | `Life/` | Not present | Not in this share |
 | `Northstar/` | Not present | Not in this share |
-| `References/` | Not present | Not in this share |
+| `Knowledge/` (top-level) | Not present | Not in this share |
 
 `Work/<Company>/` includes all subfolders: `Daily/`, `Knowledge/`, `Goals/`, `Projects/`, `People/`, `Meetings/`, and the rest. Everything under the company folder travels as one Syncthing share — no per-subfolder configuration needed.
 
@@ -37,7 +37,7 @@ The work laptop vault must be scaffolded with `--profile work` before configurin
 ./scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
 ```
 
-This ensures `Northstar/`, `Life/`, and `References/` do not exist on the work machine — there is nothing to accidentally sync. See [User Setup.md](User%20Setup.md#work-machine-setup) for the full work machine setup sequence.
+This ensures `Northstar/`, `Life/`, and the top-level `Knowledge/` do not exist on the work machine — there is nothing to accidentally sync. See [User Setup.md](User%20Setup.md#work-machine-setup) for the full work machine setup sequence.
 
 ### Install
 
@@ -114,7 +114,7 @@ iCloud offers no folder-level sync control, no conflict resolution strategy, and
 | `Knowledge/` | Not present | Personal vault sync | Via personal vault sync |
 | `Life/` | Not present | Personal vault sync | Via personal vault sync |
 | `Northstar/` | Not present | Personal vault sync | Via personal vault sync |
-| `References/` | Not present | Personal vault sync | Via personal vault sync |
+| `Knowledge/References/` | Not present | Personal vault sync | Via personal vault sync |
 | `Process/` | Not synced | Not synced | Via personal vault sync |
 
 The work laptop participates only in the Work↔Personal Syncthing share. Personal vault sync (Yaos or Syncthing) runs between personal devices only and is independent of the work machine.

@@ -15,7 +15,7 @@ Process/
   Weekly Outtake · Current Priorities
   Meridian Documentation/   User Setup · User Handbook · Reference Guide
                             Architecture · Design Decision · Security · Sync · Roadmap · Upgrading · PDF
-Knowledge/       Technical/ · Leadership/ · Industry/ · General/
+Knowledge/       Technical/ · Leadership/ · Industry/ · General/ · References/
 Work/
   CurrentCompany/
     Projects/ · People/ · Reference/ · Incidents/ · Vendors/
@@ -23,18 +23,18 @@ Work/
     Knowledge/     Technical/ · Leadership/ · Industry/
     Meetings/
       1on1s/         [Name] 1on1s.md — rolling notes, one per person
-      [Series]/      [Series].md · YYYY-MM-DD/ → [Series] YYYY-MM-DD.md
+      Series/        [Series]/ → [Series].md · YYYY-MM-DD/ → [Series] YYYY-MM-DD.md
+      Single/        YYYY-MM-DD <Name>.md — standalone one-off notes
 Life/
   Daily/         one file per day
   Projects/ · People/ · Health/ · Finances/ · Social/ · Development/ · Fun/
-References/      external artifacts, source material
 _templates/      Daily Note.md · Generic Note.md · Reflection.md
                  Meeting Instance.md · Meeting Series.md · 1on1.md
 .scripts/        weekly-snapshot.py · new-company.sh · new-project.sh · new-meeting-series.sh · new-1on1.sh
-                 set-default-company.sh · .vault-version
+                 new-standalone-meeting.sh · set-default-company.sh · .vault-version
 ```
 
-**Work vault (`--profile work`) — Northstar, Life, References, top-level Knowledge absent:**
+**Work vault (`--profile work`) — Northstar, Life, top-level Knowledge absent:**
 ```
 Process/
   Weekly/        auto-generated snapshots
@@ -48,11 +48,12 @@ Work/
     Knowledge/     Technical/ · Leadership/ · Industry/
     Meetings/
       1on1s/         [Name] 1on1s.md — rolling notes, one per person
-      [Series]/      [Series].md · YYYY-MM-DD/ → [Series] YYYY-MM-DD.md
+      Series/        [Series]/ → [Series].md · YYYY-MM-DD/ → [Series] YYYY-MM-DD.md
+      Single/        YYYY-MM-DD <Name>.md — standalone one-off notes
 _templates/      Daily Note.md · Generic Note.md · Reflection.md
                  Meeting Instance.md · Meeting Series.md · 1on1.md
 .scripts/        weekly-snapshot.py · new-company.sh · new-project.sh · new-meeting-series.sh · new-1on1.sh
-                 set-default-company.sh · .vault-version
+                 new-standalone-meeting.sh · set-default-company.sh · .vault-version
 ```
 
 ---
@@ -120,9 +121,10 @@ Each meeting appends a new `## YYYY-MM-DD` section. Never split the file.
 
 | Meeting type | Where output goes |
 |---|---|
-| Recurring series with artifacts | `Meetings/[Series]/[Date]/` |
+| Recurring series with artifacts | `Meetings/Series/[Series]/[Date]/` |
 | Project-related meeting | `Projects/[Project]/` |
 | 1:1 with ongoing tracking | `Meetings/1on1s/[Name] 1on1s.md` |
+| Standalone one-off meeting | `Meetings/Single/YYYY-MM-DD <Name>.md` |
 | Tasks + bullets only | Daily note only |
 | No notes needed | — |
 
@@ -307,13 +309,13 @@ Archive: Static snapshot in Process/Weekly/
 | Question | Destination |
 |----------|-------------|
 | Care across companies? | `Knowledge/` |
-| Someone else's artifact? | `References/` |
+| Someone else's artifact? | `Knowledge/References/` |
 | About a colleague? | `Work/People/` |
 | Personal relationship? | `Life/People/` |
 | Active scoped effort? | `*/Projects/` |
 | Incident-related? | `Work/Incidents/` |
 | Vendor / contract? | `Work/Vendors/` |
-| Recurring meeting with artifacts? | `Meetings/[Series]/[Date]/` |
+| Recurring meeting with artifacts? | `Meetings/Series/[Series]/[Date]/` |
 | Meeting primarily about a project? | `Projects/[Project]/` |
 | 1:1 with a tracked person? | `Meetings/1on1s/[Name] 1on1s.md` |
 | Not sure? | Daily note, mark `>>` |
@@ -333,7 +335,7 @@ cd meridian
 ./src/bin/scaffold-vault.sh --vault /path/to/MyVault
 ```
 
-**Work machine (work vault — omits Northstar, Life, References):**
+**Work machine (work vault — omits Northstar, Life, and top-level Knowledge):**
 ```bash
 ./src/bin/scaffold-vault.sh --vault /path/to/WorkVault --profile work
 ```
@@ -357,6 +359,7 @@ bash .scripts/new-company.sh                # add a new employer/client under Wo
 bash .scripts/new-project.sh                # scaffold a new project under any Projects/ folder
 bash .scripts/new-meeting-series.sh         # scaffold a meeting series instance
 bash .scripts/new-1on1.sh                   # create or append to a 1:1 rolling note
+bash .scripts/new-standalone-meeting.sh     # create a standalone one-off meeting note
 bash .scripts/set-default-company.sh        # set the DefaultCompany used by scripts
 ```
 
@@ -397,13 +400,22 @@ Flags for `new-1on1.sh`:
 --name     person name e.g. "Jane Doe" (optional, or prompted)
 ```
 
+Flags for `new-standalone-meeting.sh`:
+```bash
+--vault    path to vault (required, or prompted)
+--company  company name (optional, auto-resolved)
+--name     meeting name/title (optional, or prompted)
+--date     meeting date YYYY-MM-DD (optional, defaults to today)
+--folder   create a folder + index note instead of a flat file
+```
+
 Flags for `set-default-company.sh`:
 ```bash
 --vault    path to vault (required, or prompted)
 --company  company name to set as default (optional, or prompted from list)
 ```
 
-Or invoke from the Obsidian command palette: **New Company**, **New Project**, **New Meeting Series**, **New 1:1**.
+Or invoke from the Obsidian command palette: **New Company**, **New Project**, **New Meeting Series**, **New 1:1**, **New Meeting**.
 
 ## Repo Utilities (not copied to vault)
 
@@ -440,4 +452,4 @@ python3 .scripts/weekly-snapshot.py <vault> --force      # overwrite existing sn
 | 6 | Linter | Community | Frontmatter | Writes `title` from H1 on save |
 | 7 | Front Matter Timestamps | Community | Frontmatter | Auto-inserts `created` and `modified` |
 | 8 | Scroller | Community | UX | Cursor to bottom on open/rename |
-| 9 | Shell Commands | Community | Automation | Triggers weekly snapshot; palette entries for new-company, new-project, new-meeting-series, new-1on1 |
+| 9 | Shell Commands | Community | Automation | Triggers weekly snapshot; palette entries for new-company, new-project, new-meeting-series, new-1on1, new-standalone-meeting |

@@ -540,12 +540,42 @@ For each stale reference found: fix inline and note it in a brief audit log at t
 
 ---
 
+## Audit Findings
+
+Stale references found and fixed beyond the six primary files:
+
+### `src/documentation/Security.md` — 3 fixes
+
+1. **Layer 1 paragraph:** "`Northstar/`, `Life/`, and `References/` are structurally absent" → updated to remove `References/`; noted that top-level `Knowledge/` is also absent.
+2. **Layer 2 paragraph:** "`Life/`, `Northstar/`, and `References/` are never configured as sync targets" → updated to `Life/`, `Northstar/`, and the top-level `Knowledge/`.
+3. **Security checklist (2 items):** checklist items referencing `References/` as an absent folder → updated to reflect `Northstar/`, `Life/`, and top-level `Knowledge/`.
+
+### `src/documentation/Sync.md` — 3 fixes
+
+1. **What syncs table:** `References/ | Not present | Not in this share` row → replaced with `Knowledge/ (top-level) | Not present | Not in this share`.
+2. **Prerequisites prose:** "This ensures `Northstar/`, `Life/`, and `References/` do not exist on the work machine" → updated to remove `References/`, add top-level `Knowledge/`.
+3. **Full Device Matrix table:** `References/ | Not present | Personal vault sync | Via personal vault sync` → updated to `Knowledge/References/`.
+
+### `src/documentation/Upgrading.md` — clean
+
+No stale references found. No changes made.
+
+### `src/documentation/Design Decision.md` — intentionally skipped
+
+Contains historical design decision entries (DD-01 etc.) that reference `References/` in their original context. Per Meridian convention, design decisions are never retroactively edited. The references in these entries describe the system state at the time each decision was made and are accurate as historical record. No changes made.
+
+### `meridian-system.html` — note on Area 2
+
+The spec called for adding `new-standalone-meeting.sh` to the "script reference section" of the HTML. The HTML has no script reference section — it is a two-page conventions/workflow quick reference only. Instead, the meeting-related filing heuristics table was updated (Area 3) to add `Meetings/Single/` and update `Meetings/Series/` paths. The script is documented in all Markdown docs but not added to the HTML (no appropriate location without restructuring the layout).
+
+---
+
 ## Deliverables Checklist
 
-- [ ] `src/documentation/User Handbook.md` — fully rewritten per new structure
-- [ ] `src/documentation/User Setup.md` — all affected sections updated
-- [ ] `src/documentation/Architecture.md` — vault diagrams and Meetings layer updated
-- [ ] `src/documentation/Reference Guide.md` — vault structure, taxonomy table, filing heuristics updated
-- [ ] `meridian-system.html` — structure, scripts, and meetings areas updated
-- [ ] `README.md` — Quick Start, Features, Daily Operation table updated
-- [ ] Audit complete — all stale `References/` and `Meetings/` path references resolved across all docs
+- [x] `src/documentation/User Handbook.md` — fully rewritten per new structure
+- [x] `src/documentation/User Setup.md` — all affected sections updated
+- [x] `src/documentation/Architecture.md` — vault diagrams and Meetings layer updated
+- [x] `src/documentation/Reference Guide.md` — vault structure, taxonomy table, filing heuristics updated
+- [x] `meridian-system.html` — structure and meetings areas updated (no scripts section exists in HTML)
+- [x] `README.md` — Quick Start, Features, Daily Operation table updated
+- [x] Audit complete — all stale `References/` and `Meetings/` path references resolved across all docs
