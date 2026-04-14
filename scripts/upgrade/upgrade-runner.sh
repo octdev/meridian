@@ -24,38 +24,6 @@
 #
 # Backward compatible: plain version strings are migrated to key=value on first read.
 
-# --- semver helpers ---
-
-# Returns 0 (true) if $1 < $2
-_semver_lt() {
-  local a="$1" b="$2"
-  local a_major a_minor a_patch b_major b_minor b_patch
-  IFS='.' read -r a_major a_minor a_patch <<< "$a"
-  IFS='.' read -r b_major b_minor b_patch <<< "$b"
-  if   (( a_major < b_major )); then return 0
-  elif (( a_major > b_major )); then return 1
-  elif (( a_minor < b_minor )); then return 0
-  elif (( a_minor > b_minor )); then return 1
-  elif (( a_patch < b_patch )); then return 0
-  else return 1
-  fi
-}
-
-# Returns 0 (true) if $1 <= $2
-_semver_lte() {
-  [[ "$1" == "$2" ]] || _semver_lt "$1" "$2"
-}
-
-# Reads X.Y.Z from the known Meridian version.json format.
-_semver_from_version_json() {
-  local json_file="$1"
-  local major minor patch
-  major="$(grep '"major"' "$json_file" | grep -o '[0-9]*')"
-  minor="$(grep '"minor"' "$json_file" | grep -o '[0-9]*')"
-  patch="$(grep '"patch"' "$json_file" | grep -o '[0-9]*')"
-  echo "${major}.${minor}.${patch}"
-}
-
 # Sorts vX.Y.Z.sh basenames by semver order, one per line on stdout.
 _sort_migration_scripts() {
   printf '%s\n' "$@" \
@@ -229,6 +197,8 @@ run_upgrade_to() {
   source "${_repo_dir}/src/lib/vault-select.sh"
   source "${_repo_dir}/src/lib/refresh-vault-docs.sh"
   source "${_repo_dir}/src/lib/shell-exports.sh"
+  source "${_repo_dir}/src/lib/semver.sh"
+  source "${_repo_dir}/src/lib/fetch-docs.sh"
 
   # --- parse --vault ---
   local vault_root=""
@@ -291,7 +261,7 @@ run_upgrade_to() {
   fi
 
   # --- guard: installed newer than target ---
-  if ! _semver_lt "$installed_version" "$target_version"; then
+  if ! semver_lt "$installed_version" "$target_version"; then
     die "upgrade" "Installed version ($installed_version) is newer than target ($target_version)."
   fi
 
@@ -309,8 +279,8 @@ run_upgrade_to() {
     while IFS= read -r script; do
       local script_version="${script#v}"
       script_version="${script_version%.sh}"
-      if _semver_lt "$installed_version" "$script_version" && \
-         _semver_lte "$script_version" "$target_version"; then
+      if semver_lt "$installed_version" "$script_version" && \
+         semver_lte "$script_version" "$target_version"; then
         applicable+=("$script")
       fi
     done < <(_sort_migration_scripts "${all_scripts[@]}")
@@ -383,50 +353,10 @@ run_upgrade_to() {
   # the vault. Falls back to the bundled local docs if GitHub is unreachable or
   # any file fetch fails. No git objects are fetched.
 
-  _RAW_BASE="https://raw.githubusercontent.com/octdev/meridian/main/src/documentation"
-  _API_REF="https://api.github.com/repos/octdev/meridian/git/refs/heads/main"
-  _UPGRADE_DOC_FILES=(
-    "User Setup.md" "User Handbook.md" "Reference Guide.md" "Architecture.md"
-    "Design Decision.md" "Security.md" "Sync.md" "Roadmap.md" "Upgrading.md"
-  )
-  _doc_source="local"
-  _effective_repo_dir="$_repo_dir"
-  _fetch_dir=""
-
-  _api_response=""
-  if _api_response=$(curl -sf "$_API_REF" 2>/dev/null); then
-    _commit=$(echo "$_api_response" \
-      | python3 -c "import sys,json; r=json.load(sys.stdin); print(r['object']['sha'][:7])" \
-      2>/dev/null || echo "unknown")
-    # Fetch into a temp directory so the local repo is never modified.
-    _fetch_dir="$(mktemp -d)"
-    mkdir -p "${_fetch_dir}/src/documentation"
-    _effective_repo_dir="$_fetch_dir"
-    trap 'rm -rf "$_fetch_dir"' EXIT
-    _tmp=$(mktemp)
-    _fetch_errors=0
-    for _f in "${_UPGRADE_DOC_FILES[@]}"; do
-      _encoded=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$_f")
-      if curl -sf "${_RAW_BASE}/${_encoded}" > "$_tmp"; then
-        mv "$_tmp" "${_fetch_dir}/src/documentation/${_f}"
-      else
-        # Fall back to local copy for this file
-        if [[ -f "${_repo_dir}/src/documentation/${_f}" ]]; then
-          cp "${_repo_dir}/src/documentation/${_f}" "${_fetch_dir}/src/documentation/${_f}"
-        fi
-        _fetch_errors=$(( _fetch_errors + 1 ))
-      fi
-    done
-    rm -f "$_tmp"
-    if [[ "$_fetch_errors" -eq 0 ]]; then
-      _doc_source="origin/main @ ${_commit}"
-    else
-      _doc_source="local (remote fetch incomplete)"
-    fi
-  fi
-
-  refresh_vault_docs "$vault_root" "$_effective_repo_dir"
-  _detail "Documentation: ${_doc_source}"
+  fetch_docs_from_remote "$_repo_dir"
+  refresh_vault_docs "$vault_root" "$FETCH_EFFECTIVE_REPO_DIR"
+  [[ "$FETCH_EFFECTIVE_REPO_DIR" != "$_repo_dir" ]] && rm -rf "$FETCH_EFFECTIVE_REPO_DIR"
+  _detail "Documentation: ${FETCH_DOC_SOURCE}"
   echo ""
 
   printf "${_C_GREEN}[meridian] Vault upgraded to %s successfully.${_C_RESET}\n" "$target_version"

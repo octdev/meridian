@@ -8,7 +8,11 @@
 # documentation set. The directory is entirely Meridian-managed.
 #
 # Requires:
-#   logging.sh — sourced before this library (_pass, _warn)
+#   logging.sh   — sourced before this library (_pass, _warn)
+#   fetch-docs.sh — sourced before this library (_MERIDIAN_DOC_FILES, _MERIDIAN_DOC_TITLES)
+
+_refresh_vault_docs_lib_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${_refresh_vault_docs_lib_dir}/fetch-docs.sh"
 
 # Copies all documentation source files into the vault's documentation folder,
 # overwriting any existing files and removing any stale ones. Soft-skips if
@@ -42,15 +46,14 @@ refresh_vault_docs() {
 
   echo "[meridian] Refreshing documentation..."
   echo ""
-  _overwrite_doc "$docs_src/User Setup.md"      "$docs_dest/User Setup.md"      "User Setup"
-  _overwrite_doc "$docs_src/User Handbook.md"   "$docs_dest/User Handbook.md"   "User Handbook"
-  _overwrite_doc "$docs_src/Reference Guide.md" "$docs_dest/Reference Guide.md" "Reference Guide"
-  _overwrite_doc "$docs_src/Architecture.md"    "$docs_dest/Architecture.md"    "Architecture"
-  _overwrite_doc "$docs_src/Design Decision.md" "$docs_dest/Design Decision.md" "Design Decision"
-  _overwrite_doc "$docs_src/Security.md"        "$docs_dest/Security.md"        "Security"
-  _overwrite_doc "$docs_src/Sync.md"            "$docs_dest/Sync.md"            "Sync"
-  _overwrite_doc "$docs_src/Roadmap.md"         "$docs_dest/Roadmap.md"         "Roadmap"
-  _overwrite_doc "$docs_src/Upgrading.md"       "$docs_dest/Upgrading.md"       "Upgrading"
+
+  local i
+  for (( i = 0; i < ${#_MERIDIAN_DOC_FILES[@]}; i++ )); do
+    local _fname="${_MERIDIAN_DOC_FILES[$i]}"
+    local _title="${_MERIDIAN_DOC_TITLES[$i]}"
+    _overwrite_doc "${docs_src}/${_fname}" "${docs_dest}/${_fname}" "$_title"
+  done
+
   if [[ -f "${repo_dir}/Meridian System.pdf" ]]; then
     cp "${repo_dir}/Meridian System.pdf" "$docs_dest/Meridian System.pdf"
     _pass "Updated: Process/Meridian Documentation/Meridian System.pdf"
@@ -59,16 +62,11 @@ refresh_vault_docs() {
   # Remove any files not in the current documentation set.
   # Process/Meridian Documentation/ is entirely Meridian-managed, so stale
   # files from renamed or removed docs should not persist across refreshes.
-  local -a _current=(
-    "User Setup.md" "User Handbook.md" "Reference Guide.md" "Architecture.md"
-    "Design Decision.md" "Security.md" "Sync.md" "Roadmap.md" "Upgrading.md"
-    "Meridian System.pdf"
-  )
   while IFS= read -r -d '' _f; do
     local _base _known
     _base="$(basename "$_f")"
     _known=false
-    for _cf in "${_current[@]}"; do
+    for _cf in "${_MERIDIAN_DOC_FILES[@]}" "Meridian System.pdf"; do
       [[ "$_base" == "$_cf" ]] && _known=true && break
     done
     if [[ "$_known" == false ]]; then

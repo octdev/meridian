@@ -41,6 +41,7 @@ source "$REPO_DIR/src/lib/logging.sh"
 source "$REPO_DIR/src/lib/errors.sh"
 source "$REPO_DIR/src/lib/vault-select.sh"
 source "$REPO_DIR/src/lib/shell-exports.sh"
+source "$REPO_DIR/src/lib/semver.sh"
 
 usage() {
   cat <<EOF
@@ -80,18 +81,6 @@ Examples:
   scaffold-vault.sh --setup-shell --vault ~/Documents/MyVault
 
 EOF
-}
-
-# --- version helper ---
-
-# Reads X.Y.Z from the known Meridian version.json format.
-semver_from_version_json() {
-  local json_file="$1"
-  local major minor patch
-  major="$(grep '"major"' "$json_file" | grep -o '[0-9]*')"
-  minor="$(grep '"minor"' "$json_file" | grep -o '[0-9]*')"
-  patch="$(grep '"patch"' "$json_file" | grep -o '[0-9]*')"
-  echo "${major}.${minor}.${patch}"
 }
 
 # --- argument parsing ---
