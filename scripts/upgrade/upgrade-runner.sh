@@ -179,6 +179,74 @@ _select_companies() {
   done
 }
 
+# ---------------------------------------------------------------------------
+# _backup_vault  VAULT_ROOT  INSTALLED_VERSION
+#   Prompts the user to back up the vault before upgrading. Creates a zip at
+#   .backups/<version>_Vault_Backup.zip (full vault, excluding .backups/).
+#   Prunes backups beyond n-1: keeps at most two total (new + one previous).
+# ---------------------------------------------------------------------------
+_backup_vault() {
+  local _vault_root="$1"
+  local _installed_version="$2"
+  local _backup_dir="${_vault_root}/.backups"
+  local _backup_name="${_installed_version}_Vault_Backup.zip"
+  local _backup_path="${_backup_dir}/${_backup_name}"
+
+  # Prompt — default Yes
+  echo ""
+  if [[ "${MERIDIAN_YES:-}" != "1" ]]; then
+    read -rp "  Back up vault before upgrading? [Y/n]: " _ans
+    echo ""
+    if [[ -n "$_ans" && ! "$_ans" =~ ^[Yy] ]]; then
+      _hint "Skipping backup."
+      echo ""
+      return 0
+    fi
+  fi
+
+  # Safety net: create .backups/ if absent (canonical creation is scaffold-vault.sh)
+  mkdir -p "$_backup_dir"
+
+  # Create backup first (exclude .backups/ directory)
+  _detail "Creating backup: .backups/${_backup_name}"
+  if (cd "$_vault_root" && zip -qr "$_backup_path" . -x ".backups/*"); then
+    _pass "Vault backed up to: .backups/${_backup_name}"
+  else
+    _warn "Backup failed — continuing with upgrade."
+    echo ""
+    return 0
+  fi
+  echo ""
+
+  # Prune backups beyond n-1: keep the 2 most recent (including the one just created)
+  local -a _existing=()
+  while IFS= read -r _f; do
+    [[ -n "$_f" ]] && _existing+=("$_f")
+  done < <(ls -t "${_backup_dir}"/*.zip 2>/dev/null)
+
+  if [[ ${#_existing[@]} -gt 2 ]]; then
+    local -a _to_delete=("${_existing[@]:2}")   # everything after the 2 most recent
+    _warn "The following backups are older than N-1 and will be removed:"
+    for _f in "${_to_delete[@]}"; do
+      _hint "  $(basename "$_f")"
+    done
+    echo ""
+    if [[ "${MERIDIAN_YES:-}" == "1" ]]; then
+      for _f in "${_to_delete[@]}"; do rm -f "$_f"; done
+      _pass "Old backups removed."
+      echo ""
+    else
+      read -rp "  Delete these older backups? [Y/n]: " _del_ans
+      echo ""
+      if [[ -z "$_del_ans" || "$_del_ans" =~ ^[Yy] ]]; then
+        for _f in "${_to_delete[@]}"; do rm -f "$_f"; done
+        _pass "Old backups removed."
+        echo ""
+      fi
+    fi
+  fi
+}
+
 # --- main entry point ---
 
 run_upgrade_to() {
@@ -305,6 +373,9 @@ run_upgrade_to() {
     echo ""
     [[ "$_confirm" =~ ^[Yy] ]] || { echo "  Upgrade cancelled."; echo ""; exit 0; }
   fi
+
+  # --- backup vault ---
+  _backup_vault "$vault_root" "$installed_version"
 
   # --- run global migrations ---
   if [[ ${#applicable[@]} -gt 0 ]]; then

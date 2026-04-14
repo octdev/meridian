@@ -295,6 +295,7 @@ dirs=(
   "_templates"
   ".scripts"
   ".scripts/lib"
+  ".backups"
 )
 
 if [[ "$PROFILE" == "personal" ]]; then
