@@ -21,6 +21,7 @@ LIB_DIR="${SCRIPT_DIR}/../lib"
 source "$LIB_DIR/colors.sh"
 source "$LIB_DIR/logging.sh"
 source "$LIB_DIR/errors.sh"
+source "$LIB_DIR/vault-select.sh"
 
 # ── Write helper (aborts if file already exists) ──────────────────────────────
 
@@ -53,8 +54,18 @@ echo "[meridian] New Project"
 echo ""
 
 if [[ -z "$VAULT" ]]; then
-  read -rp "$(printf "${_C_CYAN}Vault path [.]:${_C_RESET} ")" VAULT
-  VAULT="${VAULT:-.}"
+  if [[ -n "${MERIDIAN_VAULT:-}" ]]; then
+    VAULT="$MERIDIAN_VAULT"
+  else
+    if [[ -d "${SCRIPT_DIR}/../lib" ]]; then
+      REPO_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+    else
+      REPO_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+    fi
+    source "$LIB_DIR/vault-select.sh"
+    select_vault
+    VAULT="${VAULT_ROOT:-}"
+  fi
 fi
 
 VAULT="${VAULT/#\~/$HOME}"
@@ -74,12 +85,49 @@ fi
 # ── Projects directory ────────────────────────────────────────────────────────
 
 if [[ -z "$PROJECTS_DIR" ]]; then
+  # Determine a sensible default:
+  # 1. Active/default company from daily-notes.json or DefaultCompany in .vault-version
+  # 2. Life/Projects (if it exists)
+  # 3. Exactly one Work/*/Projects directory
+  _DEFAULT_PROJECTS_DIR=""
+  _resolved_company=""
+
+  detect_current_company "$VAULT"
+  if [[ -n "$CURRENT_COMPANY" && "$CURRENT_COMPANY" != "CurrentCompany" ]]; then
+    _resolved_company="$CURRENT_COMPANY"
+  else
+    get_default_company "$VAULT"
+    if [[ -n "$DEFAULT_COMPANY" && "$DEFAULT_COMPANY" != "CurrentCompany" ]]; then
+      _resolved_company="$DEFAULT_COMPANY"
+    fi
+  fi
+
+  if [[ -n "$_resolved_company" && -d "$VAULT/Work/$_resolved_company/Projects" ]]; then
+    _DEFAULT_PROJECTS_DIR="$VAULT/Work/$_resolved_company/Projects"
+  elif [[ -d "$VAULT/Life/Projects" ]]; then
+    _DEFAULT_PROJECTS_DIR="$VAULT/Life/Projects"
+  else
+    _work_matches=()
+    for _d in "$VAULT/Work"/*/Projects; do
+      [[ -d "$_d" ]] && _work_matches+=("$_d")
+    done
+    [[ ${#_work_matches[@]} -eq 1 ]] && _DEFAULT_PROJECTS_DIR="${_work_matches[0]}"
+    unset _work_matches _d
+  fi
+  unset _resolved_company
+
   echo ""
   _detail "Expected locations:"
   _detail "  $VAULT/Work/[Company]/Projects/"
   _detail "  $VAULT/Life/Projects/"
   echo ""
-  read -rp "$(printf "${_C_CYAN}Full path to Projects directory:${_C_RESET} ")" PROJECTS_DIR
+  if [[ -n "$_DEFAULT_PROJECTS_DIR" ]]; then
+    read -rp "$(printf "${_C_CYAN}Full path to Projects directory [${_DEFAULT_PROJECTS_DIR}]:${_C_RESET} ")" PROJECTS_DIR
+    PROJECTS_DIR="${PROJECTS_DIR:-$_DEFAULT_PROJECTS_DIR}"
+  else
+    read -rp "$(printf "${_C_CYAN}Full path to Projects directory:${_C_RESET} ")" PROJECTS_DIR
+  fi
+  unset _DEFAULT_PROJECTS_DIR
 fi
 
 PROJECTS_DIR="${PROJECTS_DIR/#\~/$HOME}"

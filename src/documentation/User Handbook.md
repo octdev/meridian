@@ -361,6 +361,131 @@ Open `Work/<Company>/Goals/Current Priorities.md` and update it to reflect what 
 
 ---
 
+## Vault Management Scripts
+
+Four scripts handle vault scaffolding and meeting management. They live in `.scripts/` inside the vault and can be run from a terminal or triggered via the Obsidian command palette (Shell Commands plugin). All scripts accept flags or run fully interactively — if you omit a flag, you will be prompted.
+
+All scripts resolve the vault from `--vault <path>`, the `$MERIDIAN_VAULT` environment variable, or an interactive picker, in that order.
+
+---
+
+### `new-company.sh` — Add a new employer or client
+
+```bash
+bash .scripts/new-company.sh
+bash .scripts/new-company.sh --vault <path> --company <name>
+```
+
+Run this when you start at a new employer or take on a new client. It creates the full company folder structure under `Work/` and seeds two things:
+
+- `Goals/Current Priorities.md` — pre-structured with Annual / Quarter / Month / Week sections
+- `.obsidian/daily-notes.json` — updated to point daily note creation at the new company's `Daily/` folder
+
+**Folders created:**
+```
+Work/<Company>/
+  Daily/    Drafts/    Finances/    General/    Goals/
+  Incidents/    Knowledge/{Technical,Leadership,Industry}
+  Meetings/1on1s/    People/    Projects/    Reference/    Vendors/
+```
+
+The script also sets this company as the `DefaultCompany` in `.scripts/.vault-version`, so subsequent scripts know which company to default to. It checks for an existing company with the same name and requires `[y/N]` confirmation before writing anything.
+
+**After running:** run `new-project.sh` to scaffold your first project.
+
+---
+
+### `new-project.sh` — Scaffold a project
+
+```bash
+bash .scripts/new-project.sh
+bash .scripts/new-project.sh --vault <path> --name <name> --projects-dir <path>
+```
+
+Run this whenever a scoped effort with deliverables starts — under `Work/<Company>/Projects/` or `Life/Projects/`. The script validates the target location and warns if the path doesn't match either expected pattern, allowing you to override.
+
+When prompting for a Projects directory, the script suggests a default in this priority order: the active/default company's `Work/<Company>/Projects/` (resolved from `.obsidian/daily-notes.json` then `DefaultCompany` in `.vault-version`), then `Life/Projects/`, then the only Work company if exactly one exists. You can always type a different path.
+
+**Files created (all with frontmatter):**
+
+| File | Purpose |
+|------|---------|
+| `<ProjectName>.md` | MOC — Dataview file list + Tasks queries for urgent/standard action items and open loops |
+| `Design/architecture.md` | Conceptual model, repo structure, runtime, data flows |
+| `Design/design-decisions.md` | Numbered DD-01, DD-02… entries |
+| `Design/security.md` | Threat model, defense layers, checklist |
+| `Requirements/brd.md` | Problem statement, goals, personas, functional requirements |
+| `Requirements/user-guide.md` | Setup, core workflow, daily operation, maintenance |
+| `Requirements/roadmap.md` | Feature-by-feature current/future/notes |
+| `Prompts/scratch.md` | Freeform scratch space seeded with today's date |
+
+The script aborts if the project directory already exists and requires `[y/N]` confirmation before writing anything.
+
+---
+
+### `new-meeting-series.sh` — Create a meeting series instance
+
+```bash
+bash .scripts/new-meeting-series.sh --vault <path>
+bash .scripts/new-meeting-series.sh --vault <path> --company <name> --series <name> --purpose <text> --cadence <text>
+```
+
+Run this before you start prep work for any recurring meeting — not after. It resolves the active company automatically (from `.obsidian/daily-notes.json` then `DefaultCompany`) unless `--company` is specified.
+
+**What it creates depends on whether the series exists:**
+
+- **New series:** creates `Meetings/<Series>/<Series>.md` (the series index) with Purpose, Cadence, Standing Attendees, and Format/Agenda Template sections. Prompts for purpose and cadence if not passed as flags.
+- **Existing series:** appends a new instance link to the existing series index.
+
+In both cases it creates today's instance at `Meetings/<Series>/YYYY-MM-DD/<Series> YYYY-MM-DD.md` with Purpose, Attendees, Agenda, Key Points, Decisions, Action Items, and Next Meeting sections. The instance links back to the series index and to the daily note for that date.
+
+The two-level structure means: open the series index to understand what the meeting is and see all instances; open the instance to see what happened on a specific date.
+
+---
+
+### `new-1on1.sh` — Create or update a 1:1 note
+
+```bash
+bash .scripts/new-1on1.sh --vault <path>
+bash .scripts/new-1on1.sh --vault <path> --company <name> --name <name>
+```
+
+Run this before a 1:1 — either your first with someone or any subsequent one. Resolves the active company automatically unless `--company` is specified.
+
+**Behavior depends on whether the note already exists:**
+
+- **New note:** creates `Meetings/1on1s/<Name> 1on1s.md` with frontmatter, a link to the person's People note (`[[<Name>]]`), and the first dated entry.
+- **Existing note:** appends a new `---`-separated `## YYYY-MM-DD` entry with Agenda and Notes fields.
+
+One file per person, appended over time. This is intentional — the full arc of a working relationship is more useful in one scrollable document than scattered across per-meeting files. See [[#Meetings: Operational Records at Executive Scale]] for the reasoning behind rolling notes.
+
+---
+
+### `set-default-company.sh` — Change the default company
+
+```bash
+bash .scripts/set-default-company.sh
+bash .scripts/set-default-company.sh --vault <path> --company <name>
+```
+
+Writes `DefaultCompany=<name>` to `.scripts/.vault-version`. The default company is used by `new-project.sh`, `new-meeting-series.sh`, and `new-1on1.sh` when `.obsidian/daily-notes.json` is absent or still set to the placeholder `CurrentCompany`.
+
+`new-company.sh` sets the default automatically when it scaffolds a new company, so in the normal flow you only need this script when correcting a stale or missing value.
+
+---
+
+### Summary
+
+| Script | When to run | Command palette |
+|--------|------------|-----------------|
+| `new-company.sh` | New employer or client | **New Company** |
+| `new-project.sh` | New scoped effort with deliverables | **New Project** |
+| `new-meeting-series.sh` | Before prep for any recurring meeting | **New Meeting Series** |
+| `new-1on1.sh` | Before any 1:1 | **New 1:1** |
+| `set-default-company.sh` | Change which company scripts default to | — |
+
+---
+
 ## Building a Connected Graph Over Time
 
 Meridian's value compounds with use. The most powerful feature isn't any single MOC — it's the graph of links between notes that accumulates over months and years.

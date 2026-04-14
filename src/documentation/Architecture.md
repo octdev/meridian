@@ -100,6 +100,49 @@ meridian/
 
 ---
 
+## Version Tracking
+
+Meridian tracks version at two levels: the project repo and each scaffolded vault.
+
+### Project version
+
+Stored in `config/base/version.json` in the repo. This is the authoritative version of the Meridian software itself.
+
+| Field | Format | Purpose |
+|---|---|---|
+| `semver.major/minor/patch` | `X.Y.Z` | Semantic version |
+| `semver.build` | string | Optional build metadata |
+| `metadata.releaseDate` | `YYYY-MM-DD` | Release date |
+| `metadata.gitCommit` | SHA string | Git commit (`pending` until release) |
+
+### Vault version
+
+Stored in `.scripts/.vault-version` inside each vault. Records which Meridian version scaffolded or last upgraded that vault.
+
+| Key | Example | Purpose |
+|---|---|---|
+| `vault` | `vault=1.4.0` | Global vault version |
+| `DefaultCompany` | `DefaultCompany=AcmeCorp` | Active/default company |
+| `<Company>-vault` | `Acme-vault=1.4.0` | Per-company version |
+
+Per-company entries allow independent upgrade tracking when a vault contains multiple company contexts. The default company at scaffold time is `CurrentCompany` — after the user renames it in the filesystem, the `.vault-version` entry retains the original name. There is no mechanism to detect or reconcile a company rename; all entries are flat and equal.
+
+`new-company.sh` appends a new `<Company>-vault=X.Y.Z` entry when a company is added and automatically sets that company as the default. `DefaultCompany=` records the active company and can be updated with `set-default-company.sh`. `resolve_company` uses it as a fallback when `.obsidian/daily-notes.json` is absent or unset.
+
+**Version file format:** key=value pairs. Older vaults stored a plain version string — `upgrade-runner.sh` migrates these automatically on first upgrade.
+
+### Note-level frontmatter
+
+All vault notes carry per-note timestamps, managed by the frontmatter plugin chain (see [Frontmatter Chain](#frontmatter-chain)).
+
+| Field | Format | Purpose |
+|---|---|---|
+| `title` | string | Note title, synced with H1 and filename |
+| `created` | `YYYY-MM-DD HH:mm:ss` | Set once on creation |
+| `modified` | `YYYY-MM-DD HH:mm:ss` | Updated on every save |
+
+---
+
 ## Scaffold Profiles
 
 The scaffold script supports two profiles via `--profile personal|work`.
@@ -109,7 +152,7 @@ The scaffold script supports two profiles via `--profile personal|work`.
 Full vault. All folders and seed files are created.
 
 ```bash
-$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --vault ~/Documents/Meridian
+src/bin/scaffold-vault.sh --vault ~/Documents/MyVault
 ```
 
 ### Work profile
@@ -117,7 +160,7 @@ $MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --vault ~/Documents/Meridian
 Work-only vault. Creates `Process/`, `Work/`, `_templates/`, and `.scripts/`. Omits `Northstar/`, `Life/`, `References/`, and the top-level `Knowledge/` entirely — they are never written to disk and cannot be accidentally synced to an employer machine. Knowledge generated at work lives at `Work/<Company>/Knowledge/`.
 
 ```bash
-$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
+src/bin/scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
 ```
 
 The daily note template, all MOCs, and the Reflection template are identical between profiles. The plugin stack, hotkeys, and workflow are the same. Only the knowledge layer folders differ.

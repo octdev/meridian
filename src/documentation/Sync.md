@@ -34,8 +34,7 @@ Only your active company folder syncs between the work laptop and personal machi
 The work laptop vault must be scaffolded with `--profile work` before configuring Syncthing:
 
 ```bash
-$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
-export MERIDIAN_VAULT=~/Documents/WorkVault
+./scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
 ```
 
 This ensures `Northstar/`, `Life/`, and `References/` do not exist on the work machine — there is nothing to accidentally sync. See [User Setup.md](User%20Setup.md#work-machine-setup) for the full work machine setup sequence.

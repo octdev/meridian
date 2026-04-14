@@ -91,8 +91,9 @@ DOCS_DEST="$VAULT_ROOT/Process/Meridian Documentation"
 
 _RAW_BASE="https://raw.githubusercontent.com/octdev/meridian/main/src/documentation"
 _API_REF="https://api.github.com/repos/octdev/meridian/git/refs/heads/main"
-_DOCS_SRC="${REPO_DIR}/src/documentation"
 _DOC_SOURCE="local"
+_EFFECTIVE_REPO_DIR="$REPO_DIR"
+_FETCH_DIR=""
 
 if [[ "$FROM_LOCAL" == false ]]; then
   echo "  Fetching documentation from origin/main..."
@@ -110,17 +111,27 @@ if [[ "$FROM_LOCAL" == false ]]; then
       "User Setup.md" "User Handbook.md" "Reference Guide.md" "Architecture.md"
       "Design Decision.md" "Security.md" "Sync.md" "Roadmap.md" "Upgrading.md"
     )
-    # Write to a temp file first; move into place only on success.
-    # This prevents truncating the existing file if curl fails mid-fetch.
+
+    # Fetch into a temp directory so the local repo is never modified.
+    _FETCH_DIR="$(mktemp -d)"
+    mkdir -p "$_FETCH_DIR/src/documentation"
+    _EFFECTIVE_REPO_DIR="$_FETCH_DIR"
+
+    # Write each file to a temp file first; move into place only on success.
+    # This prevents truncating an existing file if curl fails mid-fetch.
     _TMP=$(mktemp)
-    trap 'rm -f "$_TMP"' EXIT
+    trap 'rm -f "$_TMP"; [[ -n "$_FETCH_DIR" ]] && rm -rf "$_FETCH_DIR"' EXIT
     _FETCH_ERRORS=0
     for _f in "${_DOC_FILES[@]}"; do
       _encoded=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$_f")
       if curl -sf "${_RAW_BASE}/${_encoded}" > "$_TMP"; then
-        mv "$_TMP" "${_DOCS_SRC}/${_f}"
+        mv "$_TMP" "${_FETCH_DIR}/src/documentation/${_f}"
       else
-        _warn "Failed to fetch: $_f"
+        # Fall back to local copy for this file
+        if [[ -f "${REPO_DIR}/src/documentation/${_f}" ]]; then
+          cp "${REPO_DIR}/src/documentation/${_f}" "${_FETCH_DIR}/src/documentation/${_f}"
+        fi
+        _warn "Failed to fetch: $_f (using local copy)"
         _FETCH_ERRORS=$(( _FETCH_ERRORS + 1 ))
       fi
     done
@@ -132,13 +143,6 @@ if [[ "$FROM_LOCAL" == false ]]; then
     fi
 
     echo "  Synced to commit: $_COMMIT"
-    _CHANGED=$(git -C "$REPO_DIR" diff --name-only HEAD -- src/documentation/ 2>/dev/null | wc -l | tr -d ' ')
-    if [[ "$_CHANGED" -gt 0 ]]; then
-      echo "  Changed files:"
-      git -C "$REPO_DIR" diff --name-only HEAD -- src/documentation/ | sed 's/^/    ~ /'
-    else
-      echo "  No documentation changes detected."
-    fi
     echo ""
   fi
 fi
@@ -162,7 +166,7 @@ fi
 
 # --- refresh ---
 
-refresh_vault_docs "$VAULT_ROOT" "$REPO_DIR"
+refresh_vault_docs "$VAULT_ROOT" "$_EFFECTIVE_REPO_DIR"
 
 echo "[meridian] Done."
 echo ""

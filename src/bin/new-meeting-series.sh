@@ -15,20 +15,23 @@ LIB_DIR="${SCRIPT_DIR}/../lib"
 source "$LIB_DIR/colors.sh"
 source "$LIB_DIR/logging.sh"
 source "$LIB_DIR/errors.sh"
+source "$LIB_DIR/vault-select.sh"
 
 # ── Argument parsing ──────────────────────────────────────────────────────────
 
 VAULT=""
+COMPANY=""
 SERIES=""
 PURPOSE=""
 CADENCE=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --vault)   VAULT="${2:?--vault requires a path}";      shift 2 ;;
-    --series)  SERIES="${2:?--series requires a name}";    shift 2 ;;
-    --purpose) PURPOSE="${2:?--purpose requires a value}"; shift 2 ;;
-    --cadence) CADENCE="${2:?--cadence requires a value}"; shift 2 ;;
+    --vault)   VAULT="${2:?--vault requires a path}";        shift 2 ;;
+    --company) COMPANY="${2:?--company requires a name}";    shift 2 ;;
+    --series)  SERIES="${2:?--series requires a name}";      shift 2 ;;
+    --purpose) PURPOSE="${2:?--purpose requires a value}";   shift 2 ;;
+    --cadence) CADENCE="${2:?--cadence requires a value}";   shift 2 ;;
     *) die "Unknown argument: $1" "" ;;
   esac
 done
@@ -36,14 +39,43 @@ done
 # ── Vault validation ──────────────────────────────────────────────────────────
 
 if [[ -z "$VAULT" ]]; then
-  read -rp "$(printf "${_C_CYAN}Vault path:${_C_RESET} ")" VAULT
+  if [[ -n "${MERIDIAN_VAULT:-}" ]]; then
+    VAULT="$MERIDIAN_VAULT"
+  else
+    if [[ -d "${SCRIPT_DIR}/../lib" ]]; then
+      REPO_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+    else
+      REPO_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+    fi
+    source "$LIB_DIR/vault-select.sh"
+    select_vault
+    VAULT="${VAULT_ROOT:-}"
+  fi
 fi
 
+VAULT="${VAULT/#\~/$HOME}"
 VAULT="${VAULT%/}"
 [[ -d "$VAULT" ]] || die "Vault not found: $VAULT" ""
 
-MEETINGS_DIR="$VAULT/Work/CurrentCompany/Meetings"
-[[ -d "$MEETINGS_DIR" ]] || die "Meetings directory not found: $MEETINGS_DIR" "Run scaffold-vault.sh first or create Work/CurrentCompany/Meetings/ manually."
+# ── Company resolution ────────────────────────────────────────────────────────
+
+if [[ -z "${REPO_DIR:-}" ]]; then
+  if [[ -d "${SCRIPT_DIR}/../lib" ]]; then
+    REPO_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+  else
+    REPO_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+  fi
+fi
+
+if [[ -n "$COMPANY" ]]; then
+  CURRENT_COMPANY="$COMPANY"
+else
+  resolve_company "$VAULT"
+  [[ -n "$CURRENT_COMPANY" ]] || die "Could not determine active company." ""
+fi
+
+MEETINGS_DIR="$VAULT/Work/$CURRENT_COMPANY/Meetings"
+[[ -d "$MEETINGS_DIR" ]] || die "Meetings directory not found: $MEETINGS_DIR" "Run scaffold-vault.sh first or create Work/$CURRENT_COMPANY/Meetings/ manually."
 
 # ── Series name ───────────────────────────────────────────────────────────────
 

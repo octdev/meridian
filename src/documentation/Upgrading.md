@@ -17,20 +17,17 @@ This document covers how to upgrade an existing Meridian vault, how work vault v
 Before running an upgrade, pull the latest Meridian scripts into your local repo:
 
 ```bash
-cd "$MERIDIAN_PROJECT"
+cd meridian
 git pull
 ```
 
 Your vault — and everything in it — is stored separately and is not affected by this step. The Meridian repo contains only the scripts used to scaffold and upgrade your vault.
 
-If you no longer have the local repo, re-clone it and restore the environment variables:
+If you no longer have the local repo, re-clone it from the parent directory:
 
 ```bash
 git clone --branch latest --depth 1 https://github.com/your-username/meridian.git
 cd meridian
-export MERIDIAN_PROJECT="$(pwd)"
-$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --setup-shell
-source ~/.zshrc
 ```
 
 ---
@@ -40,7 +37,7 @@ source ~/.zshrc
 Upgrades are run from the Meridian repo using `scaffold-vault.sh`. This is the only command you need:
 
 ```bash
-$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --upgrade
+./src/bin/scaffold-vault.sh --upgrade
 ```
 
 The script will:
@@ -60,7 +57,7 @@ The script will:
 To check your current versions at any time:
 
 ```bash
-$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --version
+./src/bin/scaffold-vault.sh --version
 ```
 
 This shows the Meridian project version, your vault's installed version, and the version of each company vault.
@@ -154,7 +151,7 @@ A full upgrade always refreshes `Process/Meridian Documentation/` as part of its
 If you want to pull in minor documentation fixes without running a full upgrade, use the standalone refresh script:
 
 ```bash
-$MERIDIAN_PROJECT/scripts/local/refresh-documentation.sh
+./scripts/local/refresh-documentation.sh
 ```
 
 The script will present your registered vaults for selection, confirm the target before making any changes, and overwrite every file in `Process/Meridian Documentation/` with the current version from the repo. Your own notes are never touched.
@@ -162,7 +159,7 @@ The script will present your registered vaults for selection, confirm the target
 If you prefer to skip the interactive vault selection:
 
 ```bash
-$MERIDIAN_PROJECT/scripts/local/refresh-documentation.sh --vault "$MERIDIAN_VAULT"
+./scripts/local/refresh-documentation.sh --vault ~/Documents/Meridian
 ```
 
 **When this is useful:** Meridian occasionally issues documentation corrections that do not require any structural vault changes — no new files, no config updates, nothing that would justify a full version bump. Rather than waiting for the next release, you can run this script any time to bring your documentation current.
@@ -174,7 +171,7 @@ If you are on the `latest` branch, your local `src/documentation/` only reflects
 To pull the current documentation from `main` directly — without switching branches or fetching any git objects — add `--from-remote`:
 
 ```bash
-$MERIDIAN_PROJECT/scripts/local/refresh-documentation.sh --from-remote
+./scripts/local/refresh-documentation.sh --from-remote
 ```
 
 This fetches each documentation file from GitHub's raw content API into your local `src/documentation/`, reports the commit hash it pulled from, lists any changed files, and then proceeds with the normal vault refresh. Your git history and branch state are not affected.
@@ -182,11 +179,11 @@ This fetches each documentation file from GitHub's raw content API into your loc
 To review what changed before the vault refresh runs:
 
 ```bash
-git -C "$MERIDIAN_PROJECT" diff src/documentation/
+git diff src/documentation/
 ```
 
 To revert to the documentation that shipped with your installed version:
 
 ```bash
-git -C "$MERIDIAN_PROJECT" checkout src/documentation/
+git checkout src/documentation/
 ```

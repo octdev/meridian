@@ -30,8 +30,8 @@ Life/
 References/      external artifacts, source material
 _templates/      Daily Note.md · Generic Note.md · Reflection.md
                  Meeting Instance.md · Meeting Series.md · 1on1.md
-.scripts/        weekly-snapshot.py · new-company.sh · new-project.sh · new-meeting-series.sh
-                 .vault-version
+.scripts/        weekly-snapshot.py · new-company.sh · new-project.sh · new-meeting-series.sh · new-1on1.sh
+                 set-default-company.sh · .vault-version
 ```
 
 **Work vault (`--profile work`) — Northstar, Life, References, top-level Knowledge absent:**
@@ -51,8 +51,8 @@ Work/
       [Series]/      [Series].md · YYYY-MM-DD/ → [Series] YYYY-MM-DD.md
 _templates/      Daily Note.md · Generic Note.md · Reflection.md
                  Meeting Instance.md · Meeting Series.md · 1on1.md
-.scripts/        weekly-snapshot.py · new-company.sh · new-project.sh · new-meeting-series.sh
-                 .vault-version
+.scripts/        weekly-snapshot.py · new-company.sh · new-project.sh · new-meeting-series.sh · new-1on1.sh
+                 set-default-company.sh · .vault-version
 ```
 
 ---
@@ -326,59 +326,89 @@ Archive: Static snapshot in Process/Weekly/
 ```bash
 git clone --branch latest --depth 1 https://github.com/your-username/meridian.git
 cd meridian
-export MERIDIAN_PROJECT="$(pwd)"
 ```
 
 **Personal machine (full vault):**
 ```bash
-$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --vault ~/Documents/Meridian
-export MERIDIAN_VAULT=~/Documents/Meridian
+./src/bin/scaffold-vault.sh --vault /path/to/MyVault
 ```
 
 **Work machine (work vault — omits Northstar, Life, References):**
 ```bash
-$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
-export MERIDIAN_VAULT=~/Documents/WorkVault
+./src/bin/scaffold-vault.sh --vault /path/to/WorkVault --profile work
 ```
 
-The scaffold script automatically copies all scripts into `.scripts/` and all documentation into `Process/Meridian Documentation/`. It will offer to persist `MERIDIAN_PROJECT` and `MERIDIAN_VAULT` to your shell profile — after confirming, run `source ~/.zshrc` (or open a new terminal).
+The scaffold script automatically copies all scripts into `.scripts/` and all documentation into `Process/Meridian Documentation/`.
 
 **Upgrade an existing vault:**
 ```bash
-$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --upgrade
+./src/bin/scaffold-vault.sh --upgrade
 ```
 
 **Check vault and Meridian versions:**
 ```bash
-$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --version
-```
-
-**Set up shell variables for an existing vault (if skipped during scaffold):**
-```bash
-$MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --setup-shell
+./src/bin/scaffold-vault.sh --version
 ```
 
 ## Vault Management Scripts
 
 ```bash
-bash "$MERIDIAN_VAULT/.scripts/new-company.sh"                                       # add a new employer/client under Work/
-bash "$MERIDIAN_VAULT/.scripts/new-project.sh"                                       # scaffold a new project under any Projects/ folder
-bash "$MERIDIAN_VAULT/.scripts/new-meeting-series.sh" --vault "$MERIDIAN_VAULT"      # scaffold a meeting series instance
+bash .scripts/new-company.sh                # add a new employer/client under Work/
+bash .scripts/new-project.sh                # scaffold a new project under any Projects/ folder
+bash .scripts/new-meeting-series.sh         # scaffold a meeting series instance
+bash .scripts/new-1on1.sh                   # create or append to a 1:1 rolling note
+bash .scripts/set-default-company.sh        # set the DefaultCompany used by scripts
+```
+
+All scripts accept `--vault <path>` or read from `$MERIDIAN_VAULT`. All inputs can be passed as flags or will be prompted interactively.
+
+**Company resolution order** (for `new-project.sh`, `new-meeting-series.sh`, `new-1on1.sh`):
+1. `--company` flag (if provided)
+2. Active company from `.obsidian/daily-notes.json`
+3. `DefaultCompany` in `.scripts/.vault-version` (set by `new-company.sh` or `set-default-company.sh`)
+4. Interactive prompt
+
+Flags for `new-company.sh`:
+```bash
+--vault    path to vault (required, or prompted)
+--company  company name used as folder name (optional, or prompted)
+```
+
+Flags for `new-project.sh`:
+```bash
+--vault         path to vault (required, or prompted)
+--name          project name (optional, or prompted)
+--projects-dir  full path to the target Projects/ directory (optional, or prompted)
 ```
 
 Flags for `new-meeting-series.sh`:
 ```bash
---vault   path to vault (required, or prompted)
---series  series name (optional, or prompted)
---date    YYYY-MM-DD (optional, defaults to today)
+--vault    path to vault (required, or prompted)
+--company  company name (optional, auto-resolved)
+--series   series name (optional, or prompted)
+--purpose  series purpose — one line (optional, or prompted on first run)
+--cadence  cadence e.g. Monthly, Biweekly (optional, or prompted on first run)
 ```
 
-Or invoke from the Obsidian command palette: **New Company**, **New Project**, **New Meeting Series**.
+Flags for `new-1on1.sh`:
+```bash
+--vault    path to vault (required, or prompted)
+--company  company name (optional, auto-resolved)
+--name     person name e.g. "Jane Doe" (optional, or prompted)
+```
+
+Flags for `set-default-company.sh`:
+```bash
+--vault    path to vault (required, or prompted)
+--company  company name to set as default (optional, or prompted from list)
+```
+
+Or invoke from the Obsidian command palette: **New Company**, **New Project**, **New Meeting Series**, **New 1:1**.
 
 ## Repo Utilities (not copied to vault)
 
 ```bash
-bash "$MERIDIAN_PROJECT/scripts/local/backfill-timestamps.sh" --vault "$MERIDIAN_VAULT"
+bash scripts/local/backfill-timestamps.sh --vault <path>
 ```
 
 Populates empty `created:` and `modified:` frontmatter fields in all Markdown files in the vault. Only touches fields that are completely empty — existing timestamps are left unchanged. Run once when migrating an existing vault to Meridian or after a bulk import.
@@ -390,10 +420,10 @@ Populates empty `created:` and `modified:` frontmatter fields in all Markdown fi
 The weekly snapshot runs automatically every Monday via the Shell Commands plugin. These flags are available if you need to trigger or inspect it manually:
 
 ```bash
-python3 "$MERIDIAN_VAULT/.scripts/weekly-snapshot.py" "$MERIDIAN_VAULT"              # previous week
-python3 "$MERIDIAN_VAULT/.scripts/weekly-snapshot.py" "$MERIDIAN_VAULT" --dry-run    # preview without writing
-python3 "$MERIDIAN_VAULT/.scripts/weekly-snapshot.py" "$MERIDIAN_VAULT" --date DATE  # specific week
-python3 "$MERIDIAN_VAULT/.scripts/weekly-snapshot.py" "$MERIDIAN_VAULT" --force      # overwrite existing snapshot
+python3 .scripts/weekly-snapshot.py <vault>              # previous week
+python3 .scripts/weekly-snapshot.py <vault> --dry-run    # preview without writing
+python3 .scripts/weekly-snapshot.py <vault> --date DATE  # specific week
+python3 .scripts/weekly-snapshot.py <vault> --force      # overwrite existing snapshot
 ```
 
 ---
@@ -410,4 +440,4 @@ python3 "$MERIDIAN_VAULT/.scripts/weekly-snapshot.py" "$MERIDIAN_VAULT" --force 
 | 6 | Linter | Community | Frontmatter | Writes `title` from H1 on save |
 | 7 | Front Matter Timestamps | Community | Frontmatter | Auto-inserts `created` and `modified` |
 | 8 | Scroller | Community | UX | Cursor to bottom on open/rename |
-| 9 | Shell Commands | Community | Automation | Triggers weekly snapshot; palette entries for new-company, new-project, new-meeting-series |
+| 9 | Shell Commands | Community | Automation | Triggers weekly snapshot; palette entries for new-company, new-project, new-meeting-series, new-1on1 |

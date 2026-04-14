@@ -20,6 +20,7 @@ LIB_DIR="${SCRIPT_DIR}/../lib"
 source "$LIB_DIR/colors.sh"
 source "$LIB_DIR/logging.sh"
 source "$LIB_DIR/errors.sh"
+source "$LIB_DIR/vault-select.sh"
 
 # ── Argument parsing ──────────────────────────────────────────────────────────
 
@@ -41,8 +42,17 @@ echo "[meridian] New Company"
 echo ""
 
 if [[ -z "$VAULT" ]]; then
-  read -rp "$(printf "${_C_CYAN}Vault path [.]:${_C_RESET} ")" VAULT
-  VAULT="${VAULT:-.}"
+  if [[ -n "${MERIDIAN_VAULT:-}" ]]; then
+    VAULT="$MERIDIAN_VAULT"
+  else
+    if [[ -d "${SCRIPT_DIR}/../lib" ]]; then
+      REPO_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+    else
+      REPO_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+    fi
+    select_vault
+    VAULT="${VAULT_ROOT:-}"
+  fi
 fi
 
 VAULT="${VAULT/#\~/$HOME}"
@@ -156,6 +166,11 @@ if [[ -f "$VAULT_VERSION_FILE" ]]; then
     _pass ".vault-version updated: $COMPANY registered at $VAULT_VER"
   fi
 fi
+
+# ── Set as default company ────────────────────────────────────────────────────
+
+set_default_company "$VAULT" "$COMPANY"
+_pass "Default company set to: $COMPANY"
 
 # ── Done ──────────────────────────────────────────────────────────────────────
 

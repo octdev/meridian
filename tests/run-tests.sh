@@ -127,22 +127,13 @@ assert_file_not_contains() {
 # --- temp dir management ---
 TEST_TMPDIR="$(mktemp -d)"
 
-# Preserve config/vaults.txt so scaffold calls during tests don't register
-# temp vault paths as known vaults, which would accumulate as stale entries.
-VAULTS_FILE="$REPO_DIR/config/vaults.txt"
-VAULTS_FILE_BACKUP=""
-if [[ -f "$VAULTS_FILE" ]]; then
-  VAULTS_FILE_BACKUP="$(mktemp)"
-  cp "$VAULTS_FILE" "$VAULTS_FILE_BACKUP"
-fi
+# Redirect vault registry writes to a temp config dir so tests never touch
+# the real config/vaults.txt, even if the process is interrupted.
+export MERIDIAN_CONFIG_DIR="$TEST_TMPDIR/config"
+mkdir -p "$MERIDIAN_CONFIG_DIR"
 
 cleanup() {
   rm -rf "$TEST_TMPDIR"
-  if [[ -n "$VAULTS_FILE_BACKUP" ]]; then
-    mv "$VAULTS_FILE_BACKUP" "$VAULTS_FILE"
-  else
-    rm -f "$VAULTS_FILE"
-  fi
 }
 trap cleanup EXIT
 
@@ -314,7 +305,7 @@ COMPANY_VAULT="$(new_vault)"
 "$SCAFFOLD" --vault "$COMPANY_VAULT" --profile personal > /dev/null 2>&1
 COMPANY_SCRIPT="$COMPANY_VAULT/.scripts/new-company.sh"
 
-printf "%s\n%s\ny\n" "$COMPANY_VAULT" "Acme Corp" | bash "$COMPANY_SCRIPT" > /dev/null 2>&1
+printf "%s\ny\n" "Acme Corp" | bash "$COMPANY_SCRIPT" --vault "$COMPANY_VAULT" > /dev/null 2>&1
 
 for d in "Incidents" "People" "Projects" "Reference" "Vendors" "Goals" \
           "Daily" "Knowledge/Technical" "Knowledge/Leadership" "Knowledge/Industry"; do
@@ -328,10 +319,27 @@ assert_file_contains "  daily-notes.json updated to new company" \
   "$COMPANY_VAULT/.obsidian/daily-notes.json" '"folder": "Work/Acme Corp/Daily"'
 
 # ============================================================
+section "new-company.sh — MERIDIAN_VAULT env var"
+
+MERIDIAN_CO_VAULT="$(new_vault)"
+"$SCAFFOLD" --vault "$MERIDIAN_CO_VAULT" --profile personal > /dev/null 2>&1
+MERIDIAN_CO_SCRIPT="$MERIDIAN_CO_VAULT/.scripts/new-company.sh"
+
+rc=0
+output="$(printf "%s\ny\n" "EnvCo" \
+  | MERIDIAN_VAULT="$MERIDIAN_CO_VAULT" bash "$MERIDIAN_CO_SCRIPT" 2>&1)" || rc=$?
+if [[ $rc -eq 0 ]] && [[ -d "$MERIDIAN_CO_VAULT/Work/EnvCo" ]]; then
+  pass "  MERIDIAN_VAULT used when --vault not passed"
+else
+  fail "  MERIDIAN_VAULT used when --vault not passed"
+  if $VERBOSE; then echo "    output: $output"; fi
+fi
+
+# ============================================================
 section "new-company.sh — error cases"
 
 # Collision
-rc=0; output="$(printf "%s\n%s\n" "$COMPANY_VAULT" "Acme Corp" | bash "$COMPANY_SCRIPT" 2>&1)" || rc=$?
+rc=0; output="$(printf "%s\n" "Acme Corp" | bash "$COMPANY_SCRIPT" --vault "$COMPANY_VAULT" 2>&1)" || rc=$?
 if [[ $rc -eq 1 ]] && echo "$output" | grep -q "already exists"; then
   pass "  collision exits 1 with message"
 else
@@ -339,7 +347,7 @@ else
 fi
 
 # Empty company name
-rc=0; output="$(printf "%s\n%s\n" "$COMPANY_VAULT" "" | bash "$COMPANY_SCRIPT" 2>&1)" || rc=$?
+rc=0; output="$(printf "\n" | bash "$COMPANY_SCRIPT" --vault "$COMPANY_VAULT" 2>&1)" || rc=$?
 if [[ $rc -eq 1 ]] && echo "$output" | grep -q "cannot be empty"; then
   pass "  empty name exits 1"
 else
@@ -347,7 +355,7 @@ else
 fi
 
 # Invalid vault path
-rc=0; output="$(printf "%s\n%s\n" "/nonexistent/path" "TestCo" | bash "$COMPANY_SCRIPT" 2>&1)" || rc=$?
+rc=0; output="$(bash "$COMPANY_SCRIPT" --vault "/nonexistent/path" --company "TestCo" 2>&1)" || rc=$?
 if [[ $rc -eq 1 ]] && echo "$output" | grep -q "not found"; then
   pass "  invalid vault exits 1"
 else
@@ -356,7 +364,7 @@ fi
 
 # Vault without Work/ directory
 NO_WORK_VAULT="$(mktemp -d)"
-rc=0; output="$(printf "%s\n%s\n" "$NO_WORK_VAULT" "TestCo" | bash "$COMPANY_SCRIPT" 2>&1)" || rc=$?
+rc=0; output="$(bash "$COMPANY_SCRIPT" --vault "$NO_WORK_VAULT" --company "TestCo" 2>&1)" || rc=$?
 if [[ $rc -eq 1 ]] && echo "$output" | grep -q "Work/"; then
   pass "  missing Work/ exits 1"
 else
@@ -372,11 +380,11 @@ section "new-project.sh — work project happy path"
 
 PROJECT_VAULT="$(new_vault)"
 "$SCAFFOLD" --vault "$PROJECT_VAULT" --profile personal > /dev/null 2>&1
-printf "%s\n%s\ny\n" "$PROJECT_VAULT" "Acme Corp" | bash "$PROJECT_VAULT/.scripts/new-company.sh" > /dev/null 2>&1
+printf "%s\ny\n" "Acme Corp" | bash "$PROJECT_VAULT/.scripts/new-company.sh" --vault "$PROJECT_VAULT" > /dev/null 2>&1
 PROJECT_SCRIPT="$PROJECT_VAULT/.scripts/new-project.sh"
 
-printf "%s\n%s\n%s\ny\n" "$PROJECT_VAULT" "Alpha Project" "$PROJECT_VAULT/Work/Acme Corp/Projects" \
-  | bash "$PROJECT_SCRIPT" > /dev/null 2>&1
+printf "%s\n%s\ny\n" "Alpha Project" "$PROJECT_VAULT/Work/Acme Corp/Projects" \
+  | bash "$PROJECT_SCRIPT" --vault "$PROJECT_VAULT" > /dev/null 2>&1
 
 PD="$PROJECT_VAULT/Work/Acme Corp/Projects/Alpha Project"
 assert_exists "  project folder created" "$PD"
@@ -413,8 +421,8 @@ assert_file_contains "  MOC has decisions dataview" "$MOC" "design-decisions"
 # ============================================================
 section "new-project.sh — Life project happy path"
 
-printf "%s\n%s\n%s\ny\n" "$PROJECT_VAULT" "Home Reno" "$PROJECT_VAULT/Life/Projects" \
-  | bash "$PROJECT_SCRIPT" > /dev/null 2>&1
+printf "%s\n%s\ny\n" "Home Reno" "$PROJECT_VAULT/Life/Projects" \
+  | bash "$PROJECT_SCRIPT" --vault "$PROJECT_VAULT" > /dev/null 2>&1
 
 LPD="$PROJECT_VAULT/Life/Projects/Home Reno"
 assert_exists "  Life project folder created" "$LPD"
@@ -422,11 +430,29 @@ assert_exists "  Life project MOC created" "$LPD/Home Reno.md"
 assert_file_contains "  Life MOC path is vault-relative" "$LPD/Home Reno.md" 'LIST FROM "Life/Projects/Home Reno"'
 
 # ============================================================
+section "new-project.sh — MERIDIAN_VAULT env var"
+
+MERIDIAN_PROJ_VAULT="$(new_vault)"
+"$SCAFFOLD" --vault "$MERIDIAN_PROJ_VAULT" --profile personal > /dev/null 2>&1
+printf "%s\ny\n" "Acme Corp" \
+  | bash "$MERIDIAN_PROJ_VAULT/.scripts/new-company.sh" --vault "$MERIDIAN_PROJ_VAULT" > /dev/null 2>&1
+
+rc=0
+output="$(printf "%s\n%s\ny\n" "EnvProject" "$MERIDIAN_PROJ_VAULT/Work/Acme Corp/Projects" \
+  | MERIDIAN_VAULT="$MERIDIAN_PROJ_VAULT" bash "$MERIDIAN_PROJ_VAULT/.scripts/new-project.sh" 2>&1)" || rc=$?
+if [[ $rc -eq 0 ]] && [[ -d "$MERIDIAN_PROJ_VAULT/Work/Acme Corp/Projects/EnvProject" ]]; then
+  pass "  MERIDIAN_VAULT used when --vault not passed"
+else
+  fail "  MERIDIAN_VAULT used when --vault not passed"
+  if $VERBOSE; then echo "    output: $output"; fi
+fi
+
+# ============================================================
 section "new-project.sh — error cases"
 
 # Collision
-rc=0; output="$(printf "%s\n%s\n%s\n" "$PROJECT_VAULT" "Alpha Project" "$PROJECT_VAULT/Work/Acme Corp/Projects" \
-  | bash "$PROJECT_SCRIPT" 2>&1)" || rc=$?
+rc=0; output="$(printf "%s\n%s\n" "Alpha Project" "$PROJECT_VAULT/Work/Acme Corp/Projects" \
+  | bash "$PROJECT_SCRIPT" --vault "$PROJECT_VAULT" 2>&1)" || rc=$?
 if [[ $rc -eq 1 ]] && echo "$output" | grep -q "already exists"; then
   pass "  collision exits 1 with message"
 else
@@ -434,8 +460,8 @@ else
 fi
 
 # Empty project name
-rc=0; output="$(printf "%s\n%s\n%s\n" "$PROJECT_VAULT" "" "$PROJECT_VAULT/Work/Acme Corp/Projects" \
-  | bash "$PROJECT_SCRIPT" 2>&1)" || rc=$?
+rc=0; output="$(printf "\n%s\n" "$PROJECT_VAULT/Work/Acme Corp/Projects" \
+  | bash "$PROJECT_SCRIPT" --vault "$PROJECT_VAULT" 2>&1)" || rc=$?
 if [[ $rc -eq 1 ]] && echo "$output" | grep -q "cannot be empty"; then
   pass "  empty name exits 1"
 else
@@ -443,8 +469,8 @@ else
 fi
 
 # Nonexistent projects directory
-rc=0; output="$(printf "%s\n%s\n%s\n" "$PROJECT_VAULT" "TestProj" "$PROJECT_VAULT/Work/Acme Corp/NoSuchDir" \
-  | bash "$PROJECT_SCRIPT" 2>&1)" || rc=$?
+rc=0; output="$(printf "%s\n%s\n" "TestProj" "$PROJECT_VAULT/Work/Acme Corp/NoSuchDir" \
+  | bash "$PROJECT_SCRIPT" --vault "$PROJECT_VAULT" 2>&1)" || rc=$?
 if [[ $rc -eq 1 ]] && echo "$output" | grep -q "not found"; then
   pass "  nonexistent dir exits 1"
 else
@@ -452,8 +478,7 @@ else
 fi
 
 # Invalid vault root
-rc=0; output="$(printf "%s\n%s\n%s\n" "/no/such/vault" "TestProj" "/no/such/vault/Work/Acme Corp/Projects" \
-  | bash "$PROJECT_SCRIPT" 2>&1)" || rc=$?
+rc=0; output="$(bash "$PROJECT_SCRIPT" --vault "/no/such/vault" --name "TestProj" 2>&1)" || rc=$?
 if [[ $rc -eq 1 ]] && echo "$output" | grep -q "not found"; then
   pass "  invalid vault root exits 1"
 else
@@ -463,8 +488,8 @@ fi
 # ============================================================
 section "new-project.sh — unexpected path: abort"
 
-rc=0; output="$(printf "%s\n%s\n%s\nN\n" "$PROJECT_VAULT" "TestProj" "$PROJECT_VAULT/Knowledge/Technical" \
-  | bash "$PROJECT_SCRIPT" 2>&1)" || rc=$?
+rc=0; output="$(printf "%s\n%s\nN\n" "TestProj" "$PROJECT_VAULT/Knowledge/Technical" \
+  | bash "$PROJECT_SCRIPT" --vault "$PROJECT_VAULT" 2>&1)" || rc=$?
 if [[ $rc -eq 1 ]] && echo "$output" | grep -q "Unexpected" && echo "$output" | grep -q "Aborted"; then
   pass "  unexpected path + N aborts with exit 1"
 else
@@ -474,12 +499,182 @@ fi
 # ============================================================
 section "new-project.sh — unexpected path: confirm and proceed"
 
-rc=0; output="$(printf "%s\n%s\n%s\nY\ny\n" "$PROJECT_VAULT" "UnconvProj" "$PROJECT_VAULT/Knowledge/Technical" \
-  | bash "$PROJECT_SCRIPT" 2>&1)" || rc=$?
+rc=0; output="$(printf "%s\n%s\nY\ny\n" "UnconvProj" "$PROJECT_VAULT/Knowledge/Technical" \
+  | bash "$PROJECT_SCRIPT" --vault "$PROJECT_VAULT" 2>&1)" || rc=$?
 if [[ $rc -eq 0 ]] && echo "$output" | grep -q "scaffolded"; then
   pass "  unexpected path + Y proceeds with exit 0"
 else
   fail "  unexpected path + Y proceeds with exit 0"
+fi
+
+# ============================================================
+# new-1on1.sh
+# ============================================================
+
+ONEON1_SCRIPT="$REPO_DIR/src/bin/new-1on1.sh"
+
+section "new-1on1.sh — happy path (new note)"
+
+ONEON1_VAULT="$(new_vault)"
+"$SCAFFOLD" --vault "$ONEON1_VAULT" --profile personal > /dev/null 2>&1
+printf "%s\ny\n" "Acme Corp" \
+  | bash "$ONEON1_VAULT/.scripts/new-company.sh" --vault "$ONEON1_VAULT" > /dev/null 2>&1
+
+printf "y\n" | bash "$ONEON1_SCRIPT" --vault "$ONEON1_VAULT" --name "Jane Doe" > /dev/null 2>&1
+
+ONEON1_FILE="$ONEON1_VAULT/Work/Acme Corp/Meetings/1on1s/Jane Doe 1on1s.md"
+assert_exists "  1:1 note created" "$ONEON1_FILE"
+assert_file_contains "  frontmatter: title" "$ONEON1_FILE" "title: Jane Doe 1on1s"
+assert_file_contains "  frontmatter: created" "$ONEON1_FILE" "created:"
+assert_file_contains "  heading present" "$ONEON1_FILE" "# Jane Doe 1:1s"
+assert_file_contains "  dated entry present" "$ONEON1_FILE" "## $(date +%Y-%m-%d)"
+assert_file_contains "  people note link" "$ONEON1_FILE" "[[Jane Doe]]"
+
+# ============================================================
+section "new-1on1.sh — company resolved from daily-notes.json"
+
+assert_file_contains "  daily-notes.json drives company detection" \
+  "$ONEON1_VAULT/.obsidian/daily-notes.json" '"folder": "Work/Acme Corp/Daily"'
+
+# ============================================================
+section "new-1on1.sh — append to existing note"
+
+printf "y\n" | bash "$ONEON1_SCRIPT" --vault "$ONEON1_VAULT" --name "Jane Doe" > /dev/null 2>&1
+
+agenda_count=$(grep -c "^\*\*Agenda:\*\*" "$ONEON1_FILE" 2>/dev/null || true)
+if [[ "$agenda_count" -ge 2 ]]; then
+  pass "  second run appended new entry"
+else
+  fail "  second run appended new entry (expected >=2 entries, got $agenda_count)"
+fi
+
+# ============================================================
+section "new-1on1.sh — MERIDIAN_VAULT env var"
+
+ONEON1_ENV_VAULT="$(new_vault)"
+"$SCAFFOLD" --vault "$ONEON1_ENV_VAULT" --profile personal > /dev/null 2>&1
+printf "%s\ny\n" "Acme Corp" \
+  | bash "$ONEON1_ENV_VAULT/.scripts/new-company.sh" --vault "$ONEON1_ENV_VAULT" > /dev/null 2>&1
+
+rc=0
+output="$(printf "y\n" \
+  | MERIDIAN_VAULT="$ONEON1_ENV_VAULT" bash "$ONEON1_SCRIPT" --name "Bob Smith" 2>&1)" || rc=$?
+if [[ $rc -eq 0 ]] && \
+   [[ -f "$ONEON1_ENV_VAULT/Work/Acme Corp/Meetings/1on1s/Bob Smith 1on1s.md" ]]; then
+  pass "  MERIDIAN_VAULT used when --vault not passed"
+else
+  fail "  MERIDIAN_VAULT used when --vault not passed"
+  if $VERBOSE; then echo "    output: $output"; fi
+fi
+
+# ============================================================
+section "new-1on1.sh — error cases"
+
+# Missing 1on1s directory (company exists but 1on1s subdir was not created)
+NO_1ON1_VAULT="$(mktemp -d)"
+mkdir -p "$NO_1ON1_VAULT/Work/TestCo/Meetings"
+rc=0; output="$(bash "$ONEON1_SCRIPT" \
+  --vault "$NO_1ON1_VAULT" --company "TestCo" --name "No Dir" 2>&1)" || rc=$?
+if [[ $rc -eq 1 ]] && echo "$output" | grep -q "not found"; then
+  pass "  missing 1on1s dir exits 1"
+else
+  fail "  missing 1on1s dir exits 1"
+fi
+rm -rf "$NO_1ON1_VAULT"
+
+# Invalid vault
+rc=0; output="$(bash "$ONEON1_SCRIPT" \
+  --vault "/no/such/vault" --company "X" --name "Test" 2>&1)" || rc=$?
+if [[ $rc -eq 1 ]] && echo "$output" | grep -q "not found"; then
+  pass "  invalid vault exits 1"
+else
+  fail "  invalid vault exits 1"
+fi
+
+# ============================================================
+# new-meeting-series.sh
+# ============================================================
+
+SERIES_SCRIPT="$REPO_DIR/src/bin/new-meeting-series.sh"
+
+section "new-meeting-series.sh — happy path (new series)"
+
+SERIES_VAULT="$(new_vault)"
+"$SCAFFOLD" --vault "$SERIES_VAULT" --profile personal > /dev/null 2>&1
+printf "%s\ny\n" "Acme Corp" \
+  | bash "$SERIES_VAULT/.scripts/new-company.sh" --vault "$SERIES_VAULT" > /dev/null 2>&1
+SERIES_DATE="$(date +%Y-%m-%d)"
+
+printf "y\n" | bash "$SERIES_SCRIPT" \
+  --vault "$SERIES_VAULT" --series "All Hands" \
+  --purpose "Team sync" --cadence "Weekly" > /dev/null 2>&1
+
+SERIES_DIR="$SERIES_VAULT/Work/Acme Corp/Meetings/All Hands"
+SERIES_INDEX="$SERIES_DIR/All Hands.md"
+INSTANCE_DIR="$SERIES_DIR/$SERIES_DATE"
+INSTANCE_FILE="$INSTANCE_DIR/All Hands $SERIES_DATE.md"
+
+assert_exists "  series directory created" "$SERIES_DIR"
+assert_exists "  series index created" "$SERIES_INDEX"
+assert_exists "  instance directory created" "$INSTANCE_DIR"
+assert_exists "  instance note created" "$INSTANCE_FILE"
+assert_file_contains "  series index has instance link" "$SERIES_INDEX" "[[All Hands $SERIES_DATE]]"
+assert_file_contains "  series index has purpose" "$SERIES_INDEX" "Team sync"
+assert_file_contains "  series index has cadence" "$SERIES_INDEX" "Weekly"
+assert_file_contains "  instance has title frontmatter" "$INSTANCE_FILE" "title: All Hands $SERIES_DATE"
+assert_file_contains "  instance has series backlink" "$INSTANCE_FILE" "[[All Hands]]"
+
+# ============================================================
+section "new-meeting-series.sh — MERIDIAN_VAULT env var"
+
+SERIES_ENV_VAULT="$(new_vault)"
+"$SCAFFOLD" --vault "$SERIES_ENV_VAULT" --profile personal > /dev/null 2>&1
+printf "%s\ny\n" "Acme Corp" \
+  | bash "$SERIES_ENV_VAULT/.scripts/new-company.sh" --vault "$SERIES_ENV_VAULT" > /dev/null 2>&1
+
+rc=0
+output="$(printf "y\n" \
+  | MERIDIAN_VAULT="$SERIES_ENV_VAULT" bash "$SERIES_SCRIPT" \
+    --series "Standup" --purpose "Daily sync" --cadence "Daily" 2>&1)" || rc=$?
+if [[ $rc -eq 0 ]] && [[ -d "$SERIES_ENV_VAULT/Work/Acme Corp/Meetings/Standup" ]]; then
+  pass "  MERIDIAN_VAULT used when --vault not passed"
+else
+  fail "  MERIDIAN_VAULT used when --vault not passed"
+  if $VERBOSE; then echo "    output: $output"; fi
+fi
+
+# ============================================================
+section "new-meeting-series.sh — collision"
+
+rc=0; output="$(bash "$SERIES_SCRIPT" \
+  --vault "$SERIES_VAULT" --series "All Hands" 2>&1)" || rc=$?
+if [[ $rc -eq 1 ]] && echo "$output" | grep -q "already exists"; then
+  pass "  same-day collision exits 1"
+else
+  fail "  same-day collision exits 1"
+fi
+
+# ============================================================
+section "new-meeting-series.sh — error cases"
+
+# Missing Meetings directory (company set explicitly, no Meetings dir created)
+NO_MTG_VAULT="$(mktemp -d)"
+rc=0; output="$(bash "$SERIES_SCRIPT" \
+  --vault "$NO_MTG_VAULT" --company "TestCo" --series "Test" 2>&1)" || rc=$?
+if [[ $rc -eq 1 ]] && echo "$output" | grep -q "not found"; then
+  pass "  missing Meetings dir exits 1"
+else
+  fail "  missing Meetings dir exits 1"
+fi
+rm -rf "$NO_MTG_VAULT"
+
+# Invalid vault
+rc=0; output="$(bash "$SERIES_SCRIPT" \
+  --vault "/no/such/vault" --company "X" --series "Test" 2>&1)" || rc=$?
+if [[ $rc -eq 1 ]] && echo "$output" | grep -q "not found"; then
+  pass "  invalid vault exits 1"
+else
+  fail "  invalid vault exits 1"
 fi
 
 # ============================================================
