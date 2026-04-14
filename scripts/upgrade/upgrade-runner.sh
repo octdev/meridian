@@ -64,21 +64,6 @@ _sort_migration_scripts() {
     | sed 's/^/v/; s/$/.sh/'
 }
 
-# Writes X.Y.Z into the semver fields of version.json, updating releaseDate to today.
-_write_version_json() {
-  local json_file="$1"
-  local version="$2"
-  local major minor patch
-  IFS='.' read -r major minor patch <<< "$version"
-  local today
-  today="$(date '+%Y-%m-%d')"
-  sed -i.bak \
-    -e "s/\"major\":[[:space:]]*[0-9]*/\"major\": $major/" \
-    -e "s/\"minor\":[[:space:]]*[0-9]*/\"minor\": $minor/" \
-    -e "s/\"patch\":[[:space:]]*[0-9]*/\"patch\": $patch/" \
-    -e "s/\"releaseDate\":[[:space:]]*\"[^\"]*\"/\"releaseDate\": \"$today\"/" \
-    "$json_file" && rm -f "${json_file}.bak"
-}
 
 # --- vault version file helpers ---
 
@@ -443,9 +428,6 @@ run_upgrade_to() {
   refresh_vault_docs "$vault_root" "$_effective_repo_dir"
   _detail "Documentation: ${_doc_source}"
   echo ""
-
-  # --- bump repo version ---
-  _write_version_json "${_repo_dir}/config/base/version.json" "$target_version"
 
   printf "${_C_GREEN}[meridian] Vault upgraded to %s successfully.${_C_RESET}\n" "$target_version"
   echo ""
