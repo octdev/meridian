@@ -120,8 +120,8 @@ if [[ ! -f "$SERIES_INDEX" ]]; then
   NEW_SERIES=true
 fi
 echo ""
-read -rp "$(printf "${_C_CYAN}Create? [y/N]:${_C_RESET} ")" CONFIRM
-[[ "$CONFIRM" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
+read -rp "$(printf "${_C_CYAN}Create? [Y/n]:${_C_RESET} ")" CONFIRM
+[[ "$CONFIRM" =~ ^[Nn]$ ]] && { echo "Aborted."; exit 0; }
 
 # ── Create series index if new ────────────────────────────────────────────────
 
@@ -134,7 +134,23 @@ if [[ "$NEW_SERIES" == true ]]; then
     read -rp "$(printf "${_C_CYAN}Series purpose (one line, or Enter to fill in later):${_C_RESET} ")" SERIES_PURPOSE
   fi
   if [[ -z "$SERIES_CADENCE" ]]; then
-    read -rp "$(printf "${_C_CYAN}Cadence (e.g. Monthly, Biweekly, or Enter to fill in later):${_C_RESET} ")" SERIES_CADENCE
+    echo ""
+    _detail "  Cadence:"
+    _detail "  1) Monthly"
+    _detail "  2) Biweekly"
+    _detail "  3) Weekly"
+    _detail "  4) Daily"
+    _detail "  5) Other"
+    echo ""
+    read -rp "$(printf "${_C_CYAN}Select cadence [1-5, or Enter to fill in later]:${_C_RESET} ")" _CADENCE_CHOICE
+    case "$_CADENCE_CHOICE" in
+      1) SERIES_CADENCE="Monthly" ;;
+      2) SERIES_CADENCE="Biweekly" ;;
+      3) SERIES_CADENCE="Weekly" ;;
+      4) SERIES_CADENCE="Daily" ;;
+      5) read -rp "$(printf "${_C_CYAN}Cadence:${_C_RESET} ")" SERIES_CADENCE ;;
+      *) SERIES_CADENCE="" ;;
+    esac
   fi
 
   cat > "$SERIES_INDEX" <<EOF

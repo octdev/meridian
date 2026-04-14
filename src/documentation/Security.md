@@ -4,13 +4,13 @@
 
 Meridian is a personal knowledge system that spans employer-managed and personally-owned machines. The primary security concern is personal information exposure to an employer.
 
-### In scope
+#### In scope
 
 - Personal notes (Life/, Northstar/) appearing on a work machine
 - Personal notes syncing to employer-accessible cloud storage
 - Work machine filesystem scans revealing personal content
 
-### Out of scope
+#### Out of scope
 
 - Vault encryption at rest (Obsidian does not provide this natively)
 - Protection against a compromised personal machine
@@ -20,7 +20,7 @@ Meridian is a personal knowledge system that spans employer-managed and personal
 
 ## Defense Layers
 
-### Layer 1: Work profile scaffold (primary)
+#### Layer 1: Work profile scaffold (primary)
 
 The `--profile work` flag ensures personal folders are never created on the work machine:
 
@@ -30,7 +30,7 @@ The `--profile work` flag ensures personal folders are never created on the work
 
 `Northstar/` and `Life/` are structurally absent — not excluded, not hidden, not gitignored. They do not exist on disk. The top-level `Knowledge/` folder is also absent; work-generated knowledge lives at `Work/<Company>/Knowledge/`. This is the strongest guarantee: content that was never written cannot be exposed.
 
-### Layer 2: Syncthing folder-level access control
+#### Layer 2: Syncthing folder-level access control
 
 The sync configuration ensures `Life/`, `Northstar/`, and the top-level `Knowledge/` are never configured as sync targets on the work machine. Because these folders do not exist on the work machine (Layer 1), they cannot appear in its Syncthing folder list.
 
@@ -40,11 +40,11 @@ Only `Work/<Company>/` syncs bidirectionally — this is the expected work-acces
 
 See [Sync.md](Sync.md) for the full folder sync matrix.
 
-### Layer 3: Personal device sync is outside the Syncthing mesh
+#### Layer 3: Personal device sync is outside the Syncthing mesh
 
 Personal machine to phone/tablet sync (via Yaos or iCloud) is entirely outside the Syncthing mesh. The work laptop has no configuration for personal device sync and is not a peer in that topology.
 
-### Layer 4: No vault on employer cloud storage
+#### Layer 4: No vault on employer cloud storage
 
 The vault is never stored in employer-managed cloud storage (OneDrive, SharePoint, Google Workspace managed accounts). Syncthing is peer-to-peer with no cloud intermediary.
 

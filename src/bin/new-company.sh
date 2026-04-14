@@ -90,8 +90,8 @@ echo ""
 _detail "Company:  $COMPANY"
 _detail "Location: $COMPANY_DIR"
 echo ""
-read -rp "$(printf "${_C_CYAN}Create? [y/N]:${_C_RESET} ")" CONFIRM
-[[ "$CONFIRM" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
+read -rp "$(printf "${_C_CYAN}Create? [Y/n]:${_C_RESET} ")" CONFIRM
+[[ "$CONFIRM" =~ ^[Nn]$ ]] && { echo "Aborted."; exit 0; }
 
 # ── Create folder structure ───────────────────────────────────────────────────
 

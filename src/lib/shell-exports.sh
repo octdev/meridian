@@ -32,7 +32,7 @@ _offer_shell_exports() {
   grep -q 'MERIDIAN_VAULT'   "$rc_file" 2>/dev/null && has_vault=true
 
   if [[ "$has_project" == true && "$has_vault" == true ]]; then
-    _warn "MERIDIAN_PROJECT and MERIDIAN_VAULT already in $rc_file — skipping."
+    _pass "MERIDIAN_PROJECT and MERIDIAN_VAULT already in $rc_file — skipping."
     echo ""
     return
   fi

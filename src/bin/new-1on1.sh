@@ -77,14 +77,65 @@ ONEONS_DIR="$VAULT/Work/$CURRENT_COMPANY/Meetings/1on1s"
 
 if [[ -z "$NAME" ]]; then
   echo ""
-  _detail "Existing 1:1 notes:"
+
   shopt -s nullglob
-  for f in "$ONEONS_DIR"/*.md; do
-    _detail "  $(basename "${f%.md}")"
-  done
+  declare -a _1on1_files=("$ONEONS_DIR"/*.md)
   shopt -u nullglob
-  echo ""
-  read -rp "$(printf "${_C_CYAN}Person name (e.g. Jane Doe):${_C_RESET} ")" NAME
+
+  # Build list sorted by frontmatter `modified` timestamp, most recent first.
+  # Display names have " 1on1s" stripped so they can be used directly as input.
+  declare -a _1on1_names=()
+  if [[ ${#_1on1_files[@]} -gt 0 ]]; then
+    declare -a _1on1_pairs=()
+    for _f in "${_1on1_files[@]}"; do
+      _base="$(basename "${_f%.md}")"
+      _person="${_base% 1on1s}"
+      _ts="$(grep -m1 '^modified:' "$_f" 2>/dev/null | sed 's/^modified:[[:space:]]*//' || true)"
+      [[ -z "$_ts" ]] && _ts="0000-00-00 00:00:00"
+      _1on1_pairs+=("${_ts}|${_person}")
+    done
+    while IFS='|' read -r _ _person; do
+      _1on1_names+=("$_person")
+    done < <(printf '%s\n' "${_1on1_pairs[@]}" | sort -r)
+  fi
+
+  _1on1_total=${#_1on1_names[@]}
+  _1on1_page=14
+
+  _print_1on1_list() {
+    local limit=$1
+    local i
+    for (( i=0; i<limit && i<_1on1_total; i++ )); do
+      printf "  %2d) %s\n" $(( i+1 )) "${_1on1_names[$i]}"
+    done
+    if (( _1on1_total > _1on1_page && limit <= _1on1_page )); then
+      printf "  15) List more...\n"
+    fi
+  }
+
+  if (( _1on1_total > 0 )); then
+    _detail "Existing 1:1 notes:"
+    _print_1on1_list "$_1on1_page"
+    echo ""
+    read -rp "$(printf "${_C_CYAN}Select a number or enter a name:${_C_RESET} ")" _sel
+
+    # Expand the list if the user chose "List more..."
+    if [[ "$_sel" == "15" ]] && (( _1on1_total > _1on1_page )); then
+      echo ""
+      _detail "All 1:1 notes:"
+      _print_1on1_list "$_1on1_total"
+      echo ""
+      read -rp "$(printf "${_C_CYAN}Select a number or enter a name:${_C_RESET} ")" _sel
+    fi
+
+    if [[ "$_sel" =~ ^[0-9]+$ ]] && (( _sel >= 1 && _sel <= _1on1_total )); then
+      NAME="${_1on1_names[$(( _sel - 1 ))]}"
+    else
+      NAME="$_sel"
+    fi
+  else
+    read -rp "$(printf "${_C_CYAN}Person name (e.g. Jane Doe):${_C_RESET} ")" NAME
+  fi
 fi
 
 [[ -n "$NAME" ]] || die "Name cannot be empty." ""
@@ -112,8 +163,8 @@ else
 fi
 
 echo ""
-read -rp "$(printf "${_C_CYAN}Continue? [y/N]:${_C_RESET} ")" CONFIRM
-[[ "$CONFIRM" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
+read -rp "$(printf "${_C_CYAN}Continue? [Y/n]:${_C_RESET} ")" CONFIRM
+[[ "$CONFIRM" =~ ^[Nn]$ ]] && { echo "Aborted."; exit 0; }
 
 # ── Create or append ──────────────────────────────────────────────────────────
 

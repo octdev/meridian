@@ -6,9 +6,7 @@ A personal knowledge management system built on Obsidian. Designed for executive
 
 **1. Clone the repo:**
 ```bash
-git clone --branch latest --depth 1 https://github.com/your-username/meridian.git
-cd meridian
-export MERIDIAN_PROJECT="$(pwd)"
+git clone --branch latest --depth 1 https://github.com/your-username/meridian.git && cd meridian && export MERIDIAN_PROJECT="$(pwd)"
 ```
 
 **2. Personal machine:**

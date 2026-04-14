@@ -12,7 +12,7 @@ Meridian has two distinct sync scenarios with different tools and scope:
 
 ## Work ↔ Personal Sync (Syncthing)
 
-### What syncs
+#### What syncs
 
 Only your active company folder syncs between the work laptop and personal machine. Both vaults have `Work/<Company>/` at the same relative path — Syncthing keeps them in sync bidirectionally.
 
@@ -29,7 +29,7 @@ Only your active company folder syncs between the work laptop and personal machi
 
 `Process/` is not synced. Its contents (MOCs, weekly snapshots, Meridian documentation) are either rebuilt locally from vault content or refreshed on upgrade. Nothing in `Process/` requires cross-machine sync.
 
-### Prerequisites
+#### Prerequisites
 
 The work laptop vault must be scaffolded with `--profile work` before configuring Syncthing:
 
@@ -39,7 +39,7 @@ The work laptop vault must be scaffolded with `--profile work` before configurin
 
 This ensures `Northstar/`, `Life/`, and the top-level `Knowledge/` do not exist on the work machine — there is nothing to accidentally sync. See [User Setup.md](User%20Setup.md#work-machine-setup) for the full work machine setup sequence.
 
-### Install
+#### Install
 
 **macOS (both machines):**
 ```bash
@@ -49,13 +49,13 @@ brew services start syncthing
 
 Open the Syncthing web UI: http://127.0.0.1:8384
 
-### Pair devices
+#### Pair devices
 
 1. On the work laptop: Actions → Show ID → copy the Device ID
 2. On the personal machine: Add Remote Device → paste the ID
 3. Accept the connection request on the work laptop
 
-### Configure the folder share
+#### Configure the folder share
 
 Configure one folder share for `Work/<Company>/`:
 
@@ -64,7 +64,7 @@ Configure one folder share for `Work/<Company>/`:
 
 Configure at the company folder level, not the `Work/` parent. If your personal machine has multiple company folders from previous jobs, only the active company syncs. Previous employer folders are historical records and do not need to be shared.
 
-### Conflict handling
+#### Conflict handling
 
 Syncthing appends `.sync-conflict-YYYYMMDD-HHMMSS-DEVICEID` to conflicting files. Obsidian surfaces these as separate notes. Resolution rule:
 - `Work/<Company>/Daily/` — keep most recent version
@@ -76,7 +76,7 @@ Syncthing appends `.sync-conflict-YYYYMMDD-HHMMSS-DEVICEID` to conflicting files
 
 For syncing your full personal vault across personal machines, phone, and tablet. Yaos is recommended for any setup involving mobile devices.
 
-### Option A: Yaos (recommended)
+#### Option A: Yaos (recommended)
 
 [Yaos](https://yaos.dev) is a self-hosted, real-time sync solution for Obsidian built on Cloudflare Workers. It uses CRDTs (Conflict-free Replicated Data Types) — a class of data structure that merges changes without conflicts. There are no `.sync-conflict` files, no manual resolution, no sync delays.
 
@@ -89,7 +89,7 @@ For syncing your full personal vault across personal machines, phone, and tablet
 
 Yaos is the recommended approach for personal vault sync because it handles mobile cleanly, which neither Syncthing nor iCloud does reliably for Obsidian. Setup instructions are at [yaos.dev](https://yaos.dev).
 
-### Option B: Syncthing
+#### Option B: Syncthing
 
 Syncthing works well for laptop-to-laptop and laptop-to-NAS scenarios. For personal device sync, configure a single share for the vault root — no folder-level access control is needed since all personal devices are trusted.
 
@@ -98,7 +98,7 @@ Syncthing works well for laptop-to-laptop and laptop-to-NAS scenarios. For perso
 
 **Note:** Syncthing does not have a reliable iOS client. For any setup involving iPhone or iPad, use Yaos instead.
 
-### Option C: iCloud (legacy fallback)
+#### Option C: iCloud (legacy fallback)
 
 iCloud syncs the full vault to iPhone via the Obsidian mobile app. It requires no configuration beyond placing the vault in an iCloud-synced directory on macOS.
 

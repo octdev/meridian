@@ -66,13 +66,13 @@ This shows the Meridian project version, your vault's installed version, and the
 
 ## Work Vaults and Version Eligibility
 
-### The Version Contract
+#### The Version Contract
 
 Every company folder under `Work/` has its own tracked version. When you upgrade your vault, you choose which company folders to include. A company is **eligible** for upgrade only if its recorded version matches the vault's current installed version — meaning it has been kept current through every prior upgrade.
 
 A company folder that was skipped during any previous upgrade falls behind and **cannot be upgraded in future versions**. This is by design: migrations are written to transform a known state into the next known state. A folder that missed an intermediate step is in an unknown state and cannot be safely advanced.
 
-### Active vs. Inactive Jobs
+#### Active vs. Inactive Jobs
 
 This constraint is intentional and reflects a practical reality: you will likely use Meridian across multiple employers over time, but you only actively work in one (or occasionally two) at a time.
 
@@ -83,7 +83,7 @@ This constraint is intentional and reflects a practical reality: you will likely
 
 When the upgrade prompt lists eligible companies, it will exclude any that have already fallen behind. If you see a company marked ineligible, it means it was skipped in a previous upgrade. That vault is a read-only historical record at this point — which is usually exactly what you want.
 
-### If You Accidentally Skip a Current Employer
+#### If You Accidentally Skip a Current Employer
 
 If you skip your active employer's vault during an upgrade, you will see a warning before the upgrade proceeds. Take that warning seriously. If you proceed without upgrading the active company, you will need to manually recreate any migration changes in that folder, or accept that it will not receive future upgrades.
 
@@ -91,7 +91,7 @@ If you skip your active employer's vault during an upgrade, you will see a warni
 
 ## How the Upgrade System Works
 
-### Version Tracking
+#### Version Tracking
 
 Each vault contains a version tracking file at `.scripts/.vault-version`. It uses a key=value format:
 
@@ -105,7 +105,7 @@ The `vault=` key tracks the main vault version. Each `[Company]-vault=` key trac
 
 The Meridian repo tracks its current version in `config/base/version.json`. The `--version` flag reads both this file and the vault's `.vault-version` to show you where things stand.
 
-### The Migration Chain
+#### The Migration Chain
 
 Upgrade scripts live in `scripts/upgrade/`. When `scaffold-vault.sh --upgrade` is run, it determines the current Meridian version and delegates to the matching entry point script if one exists, or invokes the runner directly for releases with no structural vault changes:
 
@@ -123,7 +123,7 @@ The runner discovers all migration scripts between the vault's installed version
 
 The vault version in `.vault-version` is updated after **each individual migration step**. If a migration fails mid-chain, the vault is left at the last successfully completed version — not rolled back to the start, and not left in an ambiguous state.
 
-### Global vs. Per-Company Migrations
+#### Global vs. Per-Company Migrations
 
 Each migration script handles two categories of changes, controlled by whether a third argument is passed:
 
@@ -132,13 +132,13 @@ Each migration script handles two categories of changes, controlled by whether a
 
 The runner calls each applicable migration script twice per company: once for global changes (no `$3`), then once per selected company (with `$3` set to the company name).
 
-### Documentation Refresh
+#### Documentation Refresh
 
 After all migrations complete successfully, the runner **always** overwrites every file in `Process/Meridian Documentation/`. This happens regardless of whether there were any migration scripts to run.
 
 The runner first attempts to fetch the current documentation from `origin/main` on GitHub via the raw content API — no git objects are fetched, only the `src/documentation/` files are updated locally. If GitHub is unreachable or any file fetch fails, it falls back silently to the documentation bundled with the installed version. The upgrade output reports which source was used: `Documentation: origin/main @ abc1234` on success, or `Documentation: local` if the remote was unavailable.
 
-### Version Bump
+#### Version Bump
 
 As the final step, the runner updates `config/base/version.json` in the repo to the target version. This keeps the repo version in sync with what has been applied.
 
@@ -164,7 +164,7 @@ If you prefer to skip the interactive vault selection:
 
 **When this is useful:** Meridian occasionally issues documentation corrections that do not require any structural vault changes — no new files, no config updates, nothing that would justify a full version bump. Rather than waiting for the next release, you can run this script any time to bring your documentation current.
 
-### Fetching Documentation from GitHub
+#### Fetching Documentation from GitHub
 
 If you are on the `latest` branch, your local `src/documentation/` only reflects what was current at the time of the last release. Documentation is updated on `main` between releases, but those updates do not land on `latest` until a new version is cut.
 

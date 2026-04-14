@@ -132,7 +132,22 @@ TEST_TMPDIR="$(mktemp -d)"
 export MERIDIAN_CONFIG_DIR="$TEST_TMPDIR/config"
 mkdir -p "$MERIDIAN_CONFIG_DIR"
 
+# --- real vaults.txt guard ---
+# Back up the real vault registry so the cleanup trap can restore it
+# even if MERIDIAN_CONFIG_DIR somehow fails to intercept a write.
+_REAL_VAULTS_FILE="$REPO_DIR/config/vaults.txt"
+_VAULTS_BACKUP="$TEST_TMPDIR/vaults.txt.bak"
+if [[ -f "$_REAL_VAULTS_FILE" ]]; then
+  cp "$_REAL_VAULTS_FILE" "$_VAULTS_BACKUP"
+else
+  touch "$_VAULTS_BACKUP"
+fi
+
 cleanup() {
+  # Restore the real vault registry if tests modified it
+  if ! diff -q "$_VAULTS_BACKUP" "$_REAL_VAULTS_FILE" > /dev/null 2>&1; then
+    cp "$_VAULTS_BACKUP" "$_REAL_VAULTS_FILE"
+  fi
   rm -rf "$TEST_TMPDIR"
 }
 trap cleanup EXIT
@@ -960,6 +975,95 @@ assert_file_contains "  upgrade-runner sources refresh-vault-docs.sh" \
   "$REPO_DIR/scripts/upgrade/upgrade-runner.sh" "refresh-vault-docs.sh"
 assert_file_not_contains "  upgrade-runner no longer defines _refresh_vault_docs()" \
   "$REPO_DIR/scripts/upgrade/upgrade-runner.sh" "_refresh_vault_docs()"
+
+# ============================================================
+# set-default-vault.sh
+# ============================================================
+
+SET_DEFAULT_VAULT_SCRIPT="$REPO_DIR/src/bin/set-default-vault.sh"
+
+section "set-default-vault.sh — argument errors"
+
+check "  unknown flag exits 1" 1 "Unknown argument" -- \
+  bash "$SET_DEFAULT_VAULT_SCRIPT" --unknown
+check "  --vault with no value exits 1" 1 "--vault requires a path" -- \
+  bash "$SET_DEFAULT_VAULT_SCRIPT" --vault
+
+# ============================================================
+section "set-default-vault.sh — vault validation"
+
+check "  nonexistent vault exits 1" 1 "not found" -- \
+  bash "$SET_DEFAULT_VAULT_SCRIPT" --vault "/nonexistent/path"
+
+rc=0; output="$(MERIDIAN_CONFIG_DIR="$(mktemp -d)" bash "$SET_DEFAULT_VAULT_SCRIPT" 2>&1)" || rc=$?
+if [[ $rc -eq 1 ]] && echo "$output" | grep -q "No known vaults"; then
+  pass "  empty registry exits 1 with message"
+else
+  fail "  empty registry exits 1 with message"
+  if $VERBOSE; then echo "    output: $output"; fi
+fi
+
+# ============================================================
+section "set-default-vault.sh — happy path"
+
+SDV_VAULT_A="$(new_vault)"
+SDV_VAULT_B="$(new_vault)"
+"$SCAFFOLD" --vault "$SDV_VAULT_A" --profile personal > /dev/null 2>&1
+"$SCAFFOLD" --vault "$SDV_VAULT_B" --profile personal > /dev/null 2>&1
+
+rc=0; output="$(bash "$SET_DEFAULT_VAULT_SCRIPT" --vault "$SDV_VAULT_A" 2>&1)" || rc=$?
+if [[ $rc -eq 0 ]] && echo "$output" | grep -q "Default vault set to"; then
+  pass "  exits 0 with confirmation message"
+else
+  fail "  exits 0 with confirmation message"
+  if $VERBOSE; then echo "    output: $output"; fi
+fi
+
+_sdv_vaults_file="$MERIDIAN_CONFIG_DIR/vaults.txt"
+if [[ -f "$_sdv_vaults_file" ]] && head -1 "$_sdv_vaults_file" | grep -qF "$SDV_VAULT_A"; then
+  pass "  vault A is first in registry"
+else
+  fail "  vault A is first in registry"
+fi
+
+# Promote vault B — it should move to the top
+bash "$SET_DEFAULT_VAULT_SCRIPT" --vault "$SDV_VAULT_B" > /dev/null 2>&1
+if head -1 "$_sdv_vaults_file" | grep -qF "$SDV_VAULT_B"; then
+  pass "  vault B promoted to first after second call"
+else
+  fail "  vault B promoted to first after second call"
+fi
+if grep -qF "$SDV_VAULT_A" "$_sdv_vaults_file"; then
+  pass "  vault A still present after vault B promoted"
+else
+  fail "  vault A still present after vault B promoted"
+fi
+
+# ============================================================
+section "set-default-vault.sh — MERIDIAN_VAULT env var"
+
+SDV_ENV_VAULT="$(new_vault)"
+"$SCAFFOLD" --vault "$SDV_ENV_VAULT" --profile personal > /dev/null 2>&1
+
+rc=0; output="$(MERIDIAN_VAULT="$SDV_ENV_VAULT" bash "$SET_DEFAULT_VAULT_SCRIPT" 2>&1)" || rc=$?
+if [[ $rc -eq 0 ]] && echo "$output" | grep -q "Default vault set to"; then
+  pass "  MERIDIAN_VAULT used when --vault not passed"
+else
+  fail "  MERIDIAN_VAULT used when --vault not passed"
+  if $VERBOSE; then echo "    output: $output"; fi
+fi
+
+# ============================================================
+# vault registry isolation check
+# ============================================================
+
+section "test isolation — vault registry not modified"
+
+if diff -q "$_VAULTS_BACKUP" "$_REAL_VAULTS_FILE" > /dev/null 2>&1; then
+  pass "  config/vaults.txt unchanged by tests"
+else
+  fail "  config/vaults.txt was modified by tests (leak detected)"
+fi
 
 # ============================================================
 # Summary

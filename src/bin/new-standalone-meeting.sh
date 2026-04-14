@@ -138,8 +138,8 @@ _detail "Meeting: $NAME"
 _detail "Date:    $DATE"
 _detail "File:    $TARGET_FILE"
 echo ""
-read -rp "$(printf "${_C_CYAN}Create? [y/N]:${_C_RESET} ")" CONFIRM
-[[ "$CONFIRM" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
+read -rp "$(printf "${_C_CYAN}Create? [Y/n]:${_C_RESET} ")" CONFIRM
+[[ "$CONFIRM" =~ ^[Nn]$ ]] && { echo "Aborted."; exit 0; }
 
 # ── Write note ────────────────────────────────────────────────────────────────
 

@@ -93,7 +93,7 @@ It contains seven files:
 | `Goals.md` | What are the concrete targets, with timelines? |
 | `Career.md` | Where am I professionally, and where am I going? |
 
-### Setting It Up
+#### Setting It Up
 
 These files ship empty with placeholder prompts. Fill them in before you start using the rest of the vault. A few sentences per file is enough to start — the point is to make the implicit explicit, not to write a manifesto.
 
@@ -111,7 +111,7 @@ Work outward from the most stable to the most concrete:
 
 6. **Career** is an ongoing reference. Keep it current as your trajectory evolves.
 
-### Using the Northstar Daily
+#### Using the Northstar Daily
 
 You don't open these files every morning. They anchor two things you do touch every day:
 
@@ -120,7 +120,7 @@ You don't open these files every morning. They anchor two things you do touch ev
 
 Review the Northstar once a quarter. Update Mission and Goals if things have shifted. Purpose and Values rarely change.
 
-### Northstar vs. Work Goals
+#### Northstar vs. Work Goals
 
 The Northstar and your work goals are related but distinct systems operating at different scopes.
 
@@ -184,11 +184,11 @@ A note belongs in Work if it is specific to your current employer. If you leave 
 
 **When you leave a company:** Run `new-company.sh` to scaffold the new one. The old company's folder stays in place — it's a record, not a live system. Move any notes from `Work/People/` for colleagues you'll stay in touch with over to `Life/People/`. Backlinks update automatically.
 
-### Meetings
+#### Meetings
 
 At executive scale, meetings are not incidental to work — they are a primary work surface. Decisions get made in them. Commitments get recorded in them. Artifacts get produced for them. The Meetings layer exists to make those records findable and connected, without forcing a filing decision in the middle of every calendar day.
 
-#### Which meetings get files
+##### Which meetings get files
 
 Not every meeting needs a note outside the daily note. The decision:
 
@@ -209,7 +209,7 @@ Meetings/
 
 If you're unsure: does this meeting need a record you'd look for outside the daily note, and is it not primarily about a project? If yes, use Meetings.
 
-#### Series index and instance index
+##### Series index and instance index
 
 Every recurring meeting in the Meetings layer has two levels of note.
 
@@ -219,7 +219,7 @@ The **instance index** lives at `Meetings/Series/[Series]/[Date]/[Series] [Date]
 
 This two-level structure means: to understand what the meeting is, open the series index. To find what happened on a specific date, open the instance index. To find all instances, the series index lists them.
 
-#### Rolling 1:1 notes
+##### Rolling 1:1 notes
 
 For direct reports and peers where you maintain an ongoing record, use a rolling note at `Meetings/1on1s/[Name] 1on1s.md`. Each meeting appends a new `## YYYY-MM-DD` section with Agenda and Notes. The file grows over time — this is intentional. The full arc of a working relationship is more useful than a collection of isolated per-meeting snapshots.
 
@@ -230,7 +230,7 @@ The rolling note links to the People note (`[[Name]]`). The People note links ba
 
 When a colleague leaves the company (or you do), move their People note from `Work/CurrentCompany/People/` to `Life/People/`. The 1:1 rolling note stays in place as a historical record — or moves with the People note if you expect the relationship to continue.
 
-#### What does not belong in Meetings
+##### What does not belong in Meetings
 
 - **Project meeting notes** — file under the project
 - **People profiles** — file under `Work/CurrentCompany/People/`
@@ -262,7 +262,7 @@ References/   External artifacts — source material, not yet synthesized
 
 **Work vault:** Work accrued knowledge starts at `Work/<Company>/Knowledge/` (Technical, Leadership, Industry) and is promoted to personal `Knowledge/` by deliberate choice. This scoping is intentional — work-generated knowledge is context-specific until you decide it is transferable.
 
-### The Test
+#### The Test
 
 Before filing a note, ask: *would I want this if I started at a new company tomorrow?*
 
@@ -275,11 +275,11 @@ Before filing a note, ask: *would I want this if I started at a new company tomo
 
 The distinction is *specific context* (Work) versus *transferable understanding* (Knowledge). When in doubt, leave the note in the daily note with a `>>` marker and decide at weekly review.
 
-### Promoting Work Knowledge
+#### Promoting Work Knowledge
 
 Knowledge that started as work-scoped can graduate to your personal `Knowledge/` folder when you are confident it is transferable — patterns you'd apply at a future employer, mental models that outlast any single job. This is a manual move: copy or rename the file from `Work/<Company>/Knowledge/` to `Knowledge/`. Obsidian updates backlinks automatically.
 
-### Promoting Insights
+#### Promoting Insights
 
 The `&` marker is the mechanism for Knowledge promotion. When you have a realization mid-day — in a meeting, during a problem-solving session, in a conversation — mark it with `&`:
 
@@ -325,13 +325,16 @@ All scripts resolve the vault from `--vault <path>`, the `$MERIDIAN_VAULT` envir
 | `new-1on1.sh` | Before any 1:1 | **New 1:1** |
 | `new-standalone-meeting.sh` | Before any one-off meeting needing its own note | **New Meeting** |
 | `set-default-company.sh` | Change which company scripts default to | — |
+| `set-default-vault.sh` | Change which vault is the default in the registry | — |
 
 ---
 
-### `new-company.sh` — Add a new employer or client
+#### `new-company.sh` — Add a new employer or client
 
 ```bash
 bash .scripts/new-company.sh
+```
+```bash
 bash .scripts/new-company.sh --vault <path> --company <name>
 ```
 
@@ -354,10 +357,12 @@ The script also sets this company as the `DefaultCompany` in `.scripts/.vault-ve
 
 ---
 
-### `new-project.sh` — Scaffold a project
+#### `new-project.sh` — Scaffold a project
 
 ```bash
 bash .scripts/new-project.sh
+```
+```bash
 bash .scripts/new-project.sh --vault <path> --name <name> --projects-dir <path>
 ```
 
@@ -382,10 +387,12 @@ The script aborts if the project directory already exists and requires `[y/N]` c
 
 ---
 
-### `new-meeting-series.sh` — Create a meeting series instance
+#### `new-meeting-series.sh` — Create a meeting series instance
 
 ```bash
 bash .scripts/new-meeting-series.sh --vault <path>
+```
+```bash
 bash .scripts/new-meeting-series.sh --vault <path> --company <name> --series <name> --purpose <text> --cadence <text>
 ```
 
@@ -402,10 +409,12 @@ The two-level structure means: open the series index to understand what the meet
 
 ---
 
-### `new-1on1.sh` — Create or update a 1:1 note
+#### `new-1on1.sh` — Create or update a 1:1 note
 
 ```bash
 bash .scripts/new-1on1.sh --vault <path>
+```
+```bash
 bash .scripts/new-1on1.sh --vault <path> --company <name> --name <name>
 ```
 
@@ -420,10 +429,12 @@ One file per person, appended over time. This is intentional — the full arc of
 
 ---
 
-### `new-standalone-meeting.sh` — Create a standalone meeting note
+#### `new-standalone-meeting.sh` — Create a standalone meeting note
 
 ```bash
 bash .scripts/new-standalone-meeting.sh
+```
+```bash
 bash .scripts/new-standalone-meeting.sh --vault <path> --name <name> --date <YYYY-MM-DD> [--folder]
 ```
 
@@ -445,10 +456,12 @@ No series backlink. The note links to the daily note for the meeting date.
 
 ---
 
-### `set-default-company.sh` — Change the default company
+#### `set-default-company.sh` — Change the default company
 
 ```bash
 bash .scripts/set-default-company.sh
+```
+```bash
 bash .scripts/set-default-company.sh --vault <path> --company <name>
 ```
 
@@ -458,9 +471,24 @@ Writes `DefaultCompany=<name>` to `.scripts/.vault-version`. The default company
 
 ---
 
+#### `set-default-vault.sh` — Change the default vault
+
+```bash
+bash src/bin/set-default-vault.sh
+```
+```bash
+bash src/bin/set-default-vault.sh --vault <path>
+```
+
+Moves the chosen vault to the top of `config/vaults.txt` in the Meridian repo. The first entry in that file is the default shown by `select_vault` — the vault that interactive scripts pre-select when you press Enter without typing a path.
+
+Run this when you have multiple vaults registered and want to change which one scripts default to. If `$MERIDIAN_VAULT` is set in your shell, that still takes priority over the registry order.
+
+---
+
 ## Running a Meeting
 
-### Preparing for a Meeting
+#### Preparing for a Meeting
 
 Choose the scenario that matches your meeting type:
 
@@ -483,7 +511,7 @@ Choose the scenario that matches your meeting type:
 
 For all script-created notes: fill in Purpose and Attendees before the meeting. Add Key Points, Decisions, and Action Items during or immediately after.
 
-### Linking During a Meeting
+#### Linking During a Meeting
 
 In the instance index, link people and projects inline as you normally would in a daily note:
 
@@ -503,13 +531,13 @@ The system's long-term health depends on a weekly review. Without it, `>>` items
 
 The weekly review has five parts, in order:
 
-### 1. Scan the Weekly Outtake (~5 min)
+#### 1. Scan the Weekly Outtake (~5 min)
 
 The Weekly Outtake MOC shows everything you completed in the last 7 days. Open it and read through. Note patterns: were most things urgent (`!!`)? Were there items you marked done but didn't actually finish? Did anything ship that you haven't acknowledged?
 
 The static weekly snapshot (`Process/Weekly/`) is the historical archive — one file per week, written Monday morning. The Outtake MOC is the live rolling view.
 
-### 2. Process the Review Queue (~5 min)
+#### 2. Process the Review Queue (~5 min)
 
 Open `Process/Review Queue.md`. Every `>>` item you marked during the week is here. For each one:
 
@@ -520,15 +548,15 @@ Open `Process/Review Queue.md`. Every `>>` item you marked during the week is he
 
 The goal is to reach an empty queue by end of review.
 
-### 3. Sweep Action Items (~5 min)
+#### 3. Sweep Action Items (~5 min)
 
 Open `Process/Action Items.md`. Look at everything in Urgent and Standard. Anything overdue? Either do it, re-date it with a realistic deadline, or accept that it's not happening and close it. Stale action items are worse than no action items — they create noise that buries real work.
 
-### 4. Check Open Loops (~2 min)
+#### 4. Check Open Loops (~2 min)
 
 Open `Process/Open Loops.md`. These are the `~` items — things waiting on someone else. Did any of them resolve? Were any forgotten? Follow up on anything that's been sitting more than a week.
 
-### 5. Update Current Priorities (~3 min)
+#### 5. Update Current Priorities (~3 min)
 
 Open `Work/<Company>/Goals/Current Priorities.md` and update it to reflect what actually matters this coming week. Compare it against your Northstar goals (`Northstar/Goals.md`). If you're consistently busy but your priorities don't connect to your goals, something needs to change — either the goals aren't real or you're not working on the right things.
 

@@ -263,7 +263,7 @@ Archive: Static snapshot in Process/Weekly/
 
 ---
 
-## Morning Triage (~2 min)
+## Morning Triage (~5-10 min)
 
 1. Open today's daily note via `Cmd+D` — located at `Life/Daily/YYYY-MM-DD.md` (personal) or `Work/<Company>/Daily/YYYY-MM-DD.md` (work)
 2. Glance at calendar → drop meeting headings into Log section
@@ -278,7 +278,7 @@ Archive: Static snapshot in Process/Weekly/
 
 > **The core rule:** Things that *happen to you* go in the daily note. Things you *intentionally create* go directly where they belong.
 
-## End of Day (~5 min)
+## End of Day (~5-10 min)
 
 1. Final comms sweep — catch anything that came in late
 2. Quick scan: any `!!` urgent items missed?
@@ -420,10 +420,20 @@ Or invoke from the Obsidian command palette: **New Company**, **New Project**, *
 ## Repo Utilities (not copied to vault)
 
 ```bash
+bash src/bin/set-default-vault.sh          # set the default vault in config/vaults.txt
 bash scripts/local/backfill-timestamps.sh --vault <path>
 ```
 
-Populates empty `created:` and `modified:` frontmatter fields in all Markdown files in the vault. Only touches fields that are completely empty — existing timestamps are left unchanged. Run once when migrating an existing vault to Meridian or after a bulk import.
+Flags for `set-default-vault.sh`:
+```bash
+--vault    path to the vault to make default (optional, or selected from list)
+```
+
+Moves the chosen vault to the top of `config/vaults.txt`. The first entry is the default pre-selected by `select_vault` in interactive scripts. Respects `$MERIDIAN_VAULT` if set.
+
+---
+
+`backfill-timestamps.sh` populates empty `created:` and `modified:` frontmatter fields in all Markdown files in the vault. Only touches fields that are completely empty — existing timestamps are left unchanged. Run once when migrating an existing vault to Meridian or after a bulk import.
 
 ---
 

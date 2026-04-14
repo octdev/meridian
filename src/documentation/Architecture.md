@@ -106,7 +106,7 @@ meridian/
 
 Meridian tracks version at two levels: the project repo and each scaffolded vault.
 
-### Project version
+#### Project version
 
 Stored in `config/base/version.json` in the repo. This is the authoritative version of the Meridian software itself.
 
@@ -117,7 +117,7 @@ Stored in `config/base/version.json` in the repo. This is the authoritative vers
 | `metadata.releaseDate` | `YYYY-MM-DD` | Release date |
 | `metadata.gitCommit` | SHA string | Git commit (`pending` until release) |
 
-### Vault version
+#### Vault version
 
 Stored in `.scripts/.vault-version` inside each vault. Records which Meridian version scaffolded or last upgraded that vault.
 
@@ -133,7 +133,7 @@ Per-company entries allow independent upgrade tracking when a vault contains mul
 
 **Version file format:** key=value pairs. Older vaults stored a plain version string — `upgrade-runner.sh` migrates these automatically on first upgrade.
 
-### Note-level frontmatter
+#### Note-level frontmatter
 
 All vault notes carry per-note timestamps, managed by the frontmatter plugin chain (see [Frontmatter Chain](#frontmatter-chain)).
 
@@ -149,7 +149,7 @@ All vault notes carry per-note timestamps, managed by the frontmatter plugin cha
 
 The scaffold script supports two profiles via `--profile personal|work`.
 
-### Personal profile (default)
+#### Personal profile (default)
 
 Full vault. All folders and seed files are created.
 
@@ -157,7 +157,7 @@ Full vault. All folders and seed files are created.
 src/bin/scaffold-vault.sh --vault ~/Documents/MyVault
 ```
 
-### Work profile
+#### Work profile
 
 Work-only vault. Creates `Process/`, `Work/`, `_templates/`, and `.scripts/`. Omits `Northstar/`, `Life/`, and the top-level `Knowledge/` entirely — they are never written to disk and cannot be accidentally synced to an employer machine. Knowledge generated at work lives at `Work/<Company>/Knowledge/`.
 
@@ -171,7 +171,7 @@ The daily note template, all MOCs, and the Reflection template are identical bet
 
 ## Vault Structure (generated)
 
-### Personal vault
+#### Personal vault
 
 ```
 vault/
@@ -267,7 +267,7 @@ vault/
     General/
 ```
 
-### Work vault (`--profile work`)
+#### Work vault (`--profile work`)
 
 ```
 vault/
@@ -383,7 +383,7 @@ The 100ms delay in Front Matter Timestamps is a timing dependency, not an event-
 
 ## Data Flows
 
-### Task lifecycle
+#### Task lifecycle
 
 ```
 Daily note → Tasks query (MOC) → completion stamp → Recently Completed view
@@ -392,11 +392,11 @@ Daily note → Tasks query (MOC) → completion stamp → Recently Completed vie
           → weekly-snapshot.py → Process/Weekly/ static archive
 ```
 
-### Weekly snapshot script
+#### Weekly snapshot script
 
 The script runs on vault open and every 4 hours via Shell Commands. It discovers all `Daily/` directories across domain folders (`Life/Daily/`, `Work/*/Daily/`, and legacy `Process/Daily/`), extracts completed tasks by marker category for the previous Monday–Sunday, and writes a static Markdown report. It is idempotent — it exits immediately if the output file already exists. Use `--force` to regenerate.
 
-### Sync data flow (v1)
+#### Sync data flow (v1)
 
 ```
 Work laptop ──Syncthing──► Personal machine ──Yaos/iCloud──► Phone/Tablet
@@ -410,7 +410,7 @@ See [Sync.md](Sync.md) for full configuration.
 
 ## Key Specifications
 
-### Frontmatter schema (all notes)
+#### Frontmatter schema (all notes)
 
 ```yaml
 ---
@@ -420,15 +420,15 @@ modified:   YYYY-MM-DD HH:mm:ss — updated on every save
 ---
 ```
 
-### Tasks query syntax note
+#### Tasks query syntax note
 
 Tasks plugin uses its own query language. `sort by filename reverse` is correct. `sort by file.name` is Dataview syntax and causes a query error in Tasks blocks.
 
-### Daily note filename format
+#### Daily note filename format
 
 `YYYY-MM-DD.md` — ISO 8601 date. Sorting by filename gives chronological order.
 
-### Weekly snapshot filename format
+#### Weekly snapshot filename format
 
 Same-month week: `YYYY-MM-DD–DD Weekly Outtake.md` (e.g. `2026-03-02–08 Weekly Outtake.md`)
 Cross-month week: `YYYY-MM-DD–MM-DD Weekly Outtake.md`
@@ -437,7 +437,7 @@ Cross-month week: `YYYY-MM-DD–MM-DD Weekly Outtake.md`
 
 ## Meetings Layer
 
-### Meeting taxonomy
+#### Meeting taxonomy
 
 Not all meetings generate files. The decision rule:
 
@@ -450,19 +450,19 @@ Not all meetings generate files. The decision rule:
 | Daily-note-sufficient meeting | Timestamped `###` heading in daily note only |
 | No notes required | Nothing |
 
-### Series index vs. instance index
+#### Series index vs. instance index
 
 The **series index** (`Meetings/Series/[Series]/[Series].md`) is the permanent record of what the meeting is: its purpose, cadence, standing attendees, and format. It lists every instance as a wikilink. It is created once by `new-meeting-series.sh` on first use.
 
 The **instance index** (`Meetings/Series/[Series]/[Date]/[Series] [Date].md`) is the canonical record of a single meeting: what was discussed, decided, and assigned. All prep materials and output artifacts are co-located in the same date folder and linked from this note.
 
-### Rolling 1:1 notes
+#### Rolling 1:1 notes
 
 A rolling 1:1 note is a single file per person, located at `Meetings/1on1s/[Name] 1on1s.md`. Each meeting appends a new `## YYYY-MM-DD` section. The file is never split. This keeps the full relationship history in one searchable document.
 
 The 1:1 rolling note links to the People note (`Work/CurrentCompany/People/[Name].md`). The People note links back. They serve different purposes: the People note captures who the person is; the 1:1 note captures your working history together.
 
-### Linking model
+#### Linking model
 
 ```
 Daily note (YYYY-MM-DD)
@@ -483,6 +483,6 @@ People note (Name)
   └─ [[Name 1on1s]]                 link to 1:1 rolling note
 ```
 
-### Action items from meetings
+#### Action items from meetings
 
 Action items captured in an instance index use standard Meridian task markers (`- [ ] !`, `- [ ] !!`). They surface in the Action Items MOC automatically. The Tasks plugin scans all vault files, including files nested inside `Meetings/` — no additional configuration required.

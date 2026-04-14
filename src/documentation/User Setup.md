@@ -51,7 +51,7 @@ python3 --version
 
 ## Initial Setup
 
-### Step 1: Run the scaffold script
+#### Step 1: Run the scaffold script
 
 **Clone the repo:**
 ```bash
@@ -86,7 +86,7 @@ Default path is `~/Documents/Meridian` if `--vault` is omitted (the script will 
 
 The scaffold script automatically copies all scripts (`weekly-snapshot.py`, `new-company.sh`, `new-project.sh`, `new-meeting-series.sh`) into `.scripts/` and copies the full documentation suite into `Process/Meridian Documentation/`, including a PDF of the quick reference.
 
-### Upgrading an existing vault
+#### Upgrading an existing vault
 
 **Close Obsidian before running an upgrade.** Some migrations update `.obsidian/app.json`. If Obsidian is open, it will overwrite that file with its cached settings when it closes, discarding the migration changes.
 
@@ -98,11 +98,11 @@ $MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --upgrade
 
 The script will prompt you to select a vault and which company folders to upgrade. See [[Upgrading]] for the full upgrade guide.
 
-### Step 2: Open the vault in Obsidian
+#### Step 2: Open the vault in Obsidian
 
 Obsidian → Open folder as vault → select the vault root.
 
-### Step 3: Rename CurrentCompany
+#### Step 3: Rename CurrentCompany
 
 In the file explorer, rename `Work/CurrentCompany/` to your actual company name.
 
@@ -111,7 +111,7 @@ In the file explorer, rename `Work/CurrentCompany/` to your actual company name.
 ## Work Machine Setup
 
 Meridian is designed to run on both personal and work machines simultaneously, with the full vault on your personal machines and a subset of that vault on your work machines.  The `--profile work` flag is the starting point for work machine setup.  This allows the Meridian capture system to be used across your personal and work time, while keeping your personal knowledge management separate from your work systems and intellectual property.
-### What the work profile includes
+#### What the work profile includes
 
 | Folder | Personal vault | Work vault |
 |--------|---------------|------------|
@@ -125,7 +125,7 @@ Meridian is designed to run on both personal and work machines simultaneously, w
 
 The two omitted folders (`Northstar/` and `Life/`) are intentionally absent — not excluded by a setting, not gitignored, not hidden. They simply do not exist on the work machine. The top-level `Knowledge/` folder is also absent from the work vault; work-generated knowledge lives at `Work/<Company>/Knowledge/`. `References/` no longer exists as a top-level folder in either profile — it lives at `Knowledge/References/` in the personal vault only. Syncthing is configured to never introduce personal folders on the work machine.
 
-### Work machine scaffold
+#### Work machine scaffold
 
 ```bash
 $MERIDIAN_PROJECT/src/bin/scaffold-vault.sh --vault ~/Documents/WorkVault --profile work
@@ -134,7 +134,7 @@ export MERIDIAN_VAULT=~/Documents/WorkVault
 
 Then follow the standard setup from [Step 1: Run the scaffold script](#initial-setup) → [Appearance Settings](#appearance-settings) onward. The plugin stack, hotkeys, and daily workflow are identical between profiles — the only difference is which folders exist.
 
-### Syncthing configuration for the work machine
+#### Syncthing configuration for the work machine
 
 Only the active company folder syncs between the work machine and personal machine. Configure a single Syncthing share for `Work/<Company>/` — not the `Work/` parent.
 
@@ -194,7 +194,7 @@ The scaffold sets **Default location for new notes** and **Default location for 
 
 ## Core Plugins
 
-### Daily Notes
+#### Daily Notes
 
 Settings → Core Plugins → Daily Notes → ON
 
@@ -204,7 +204,7 @@ Settings → Core Plugins → Daily Notes → ON
 | New file location | `Life/Daily` (personal) or `Work/<Company>/Daily` (work) |
 | Template file location | `_templates/Daily Note` |
 
-### Templates
+#### Templates
 
 Settings → Core Plugins → Templates → ON
 
@@ -222,7 +222,7 @@ Settings → Community Plugins → Enable community plugins → Browse
 
 Install in this order.
 
-### 1. Tasks
+#### 1. Tasks
 
 Search "Tasks" → Install → Enable
 
@@ -231,7 +231,7 @@ Search "Tasks" → Install → Enable
 | Set created date on every added task | ON |
 | Auto-suggest | ON |
 
-### 2. Dataview
+#### 2. Dataview
 
 Search "Dataview" → Install → Enable
 
@@ -240,7 +240,7 @@ Search "Dataview" → Install → Enable
 | Enable JavaScript Queries | OFF |
 | Enable Inline Queries | ON |
 
-### 3. Filename Heading Sync
+#### 3. Filename Heading Sync
 
 Search "Filename Heading Sync" → Install → Enable
 
@@ -256,7 +256,7 @@ Search "Filename Heading Sync" → Install → Enable
 
 The `_templates` exclusion is required. Without it, Filename Heading Sync renames template files to match their placeholder H1 content, corrupting them.
 
-### 4. Linter
+#### 4. Linter
 
 Search "Linter" → Install → Enable
 
@@ -283,7 +283,7 @@ The `_templates` exclusion is required. Without it, Linter resolves placeholder 
 | Title Key | `title` |
 | Mode | `First Heading or Filename` |
 
-### 5. Front Matter Timestamps
+#### 5. Front Matter Timestamps
 
 Search "Front Matter Timestamps" → Install → Enable
 
@@ -302,13 +302,13 @@ The 100ms delay gives Obsidian time to initialize the new file before timestamps
 
 **Note:** "Save current file" may not appear in the Execute command dropdown in all plugin versions. Search the dropdown for "save" — if it is absent, leave the field blank and trigger Linter manually (`Ctrl+Alt+L`) until the issue is resolved.
 
-### 6. Editing Toolbar
+#### 6. Editing Toolbar
 
 Search "Editing Toolbar" → Install → Enable
 
-No additional configuration required.
+**Toolbar Commands → H3:** Change to H4. In Obsidian's rendered view, H3 headings are visually too close to H2 to distinguish at a glance — the size difference is subtle enough to cause misreads when skimming a note. Setting the toolbar button to H4 keeps the heading hierarchy distinct and matches the heading levels used throughout this documentation.
 
-### 7. Hider
+#### 7. Hider
 
 Search "Hider" → Install → Enable
 
@@ -316,11 +316,11 @@ Search "Hider" → Install → Enable
 |---------|-------|
 | Hide properties in Reading view | ON |
 
-### 8. Shell Commands
+#### 8. Shell Commands
 
 Search "Shell commands" → Install → Enable
 
-#### Command 1: Weekly Outtake (automatic)
+##### Command 1: Weekly Outtake (automatic)
 
 1. Click **New command**
 2. Enter: `python3 {{vault_path}}/.scripts/weekly-snapshot.py {{vault_path}}`
@@ -332,7 +332,7 @@ Search "Shell commands" → Install → Enable
 
 If Python 3 is not in PATH, use the full path: `/usr/bin/python3`
 
-#### Command 2: New Meeting Series (palette)
+##### Command 2: New Meeting Series (palette)
 
 1. Click **New command**
 2. Enter: `bash "{{vault_path}}/.scripts/new-meeting-series.sh" --vault "{{vault_path}}"`
@@ -343,7 +343,7 @@ If Python 3 is not in PATH, use the full path: `/usr/bin/python3`
 
 After adding: open the command palette (`Cmd+P`) and confirm **New Meeting Series** appears. Run it once against your vault to verify the series and instance folders are created correctly before relying on it in a live meeting prep flow.
 
-#### Command 3: New 1:1 (palette)
+##### Command 3: New 1:1 (palette)
 
 1. Click **New command**
 2. Enter: `bash "{{vault_path}}/.scripts/new-1on1.sh" --vault "{{vault_path}}"`
@@ -354,7 +354,7 @@ After adding: open the command palette (`Cmd+P`) and confirm **New Meeting Serie
 
 After adding: open the command palette (`Cmd+P`) and confirm **New 1:1** appears. The script creates a new note on first run for a given person, and appends a dated entry on subsequent runs — so the same command handles both first-time setup and recurring meetings.
 
-#### Command 4: New Company (palette)
+##### Command 4: New Company (palette)
 
 1. Click **New command**
 2. Enter: `bash "{{vault_path}}/.scripts/new-company.sh" --vault "{{vault_path}}"`
@@ -363,7 +363,7 @@ After adding: open the command palette (`Cmd+P`) and confirm **New 1:1** appears
 5. **Output** tab → Output channel for stdout: **Show in notification** (or **Ask after execution**)
 6. Set alias: "New Company"
 
-#### Command 5: New Project (palette)
+##### Command 5: New Project (palette)
 
 1. Click **New command**
 2. Enter: `bash "{{vault_path}}/.scripts/new-project.sh" --vault "{{vault_path}}"`
@@ -372,7 +372,7 @@ After adding: open the command palette (`Cmd+P`) and confirm **New 1:1** appears
 5. **Output** tab → Output channel for stdout: **Show in notification** (or **Ask after execution**)
 6. Set alias: "New Project"
 
-#### Command 6: New Meeting (palette)
+##### Command 6: New Meeting (palette)
 
 1. Click **New command**
 2. Enter: `bash "{{vault_path}}/.scripts/new-standalone-meeting.sh" --vault "{{vault_path}}"`
@@ -381,7 +381,7 @@ After adding: open the command palette (`Cmd+P`) and confirm **New 1:1** appears
 5. **Output** tab → Output channel for stdout: **Show in notification** (or **Ask after execution**)
 6. Set alias: "New Meeting"
 
-#### Troubleshooting Shell Commands
+##### Troubleshooting Shell Commands
 
 If a command silently does nothing when run from the palette, the most common cause is that Shell Commands is not configured to open a terminal. Interactive scripts (anything that prompts for input) require a real terminal session:
 
@@ -392,7 +392,7 @@ If a command silently does nothing when run from the palette, the most common ca
 
 Re-run from the palette — a terminal window should open and display the prompts.
 
-### 9. Scroller
+#### 9. Scroller
 
 Search "Scroller" → Install → Enable
 
@@ -405,7 +405,7 @@ Scroller moves the cursor to the bottom of a note on open and after tab title re
 
 **Note:** Install Scroller last. Installing other plugins afterward can interfere with it — if auto-scroll stops working, disable and re-enable Scroller to restore it.
 
-### Restart Obsidian
+#### Restart Obsidian
 
 Restart once after all plugins are installed.
 
@@ -430,7 +430,7 @@ Assign the Templates hotkey to quickly insert the Reflection template at end of 
 
 ## Vault Updates
 
-### Upgrading an existing vault
+#### Upgrading an existing vault
 
 To upgrade an existing vault to the latest Meridian version:
 
@@ -455,7 +455,7 @@ source ~/.zshrc   # or ~/.bash_profile for bash
 
 See [[Upgrading]] for the full upgrade guide, including what happens when upgrading across multiple versions and how per-company version tracking works.
 
-### Rename CurrentCompany
+#### Rename CurrentCompany
 
 The scaffold creates a placeholder folder at `Work/CurrentCompany/`. Rename it to your actual company name before you start using the vault.
 
@@ -486,14 +486,14 @@ Work through these checks after setup.
 
 ## Daily Workflow
 
-### Morning (~2 minutes)
+#### Morning (~2 minutes)
 
 1. Open today's daily note via `Cmd+D`
 2. Glance at calendar — drop meeting headings into Log
 3. Fill in Top 3 Goals
 4. First comms triage — scan email and Teams
 
-### Throughout the day
+#### Throughout the day
 
 - Capture meeting notes under time-stamped `###` headings
 - Add comms action items inline as they arrive
@@ -502,13 +502,13 @@ Work through these checks after setup.
 
 The core rule: things that *happen to you* go in the daily note. Things you *intentionally create* go directly where they belong.
 
-### End of day (~5 minutes)
+#### End of day (~5 minutes)
 
 - Final comms sweep
 - Quick scan: any `!!` items missed?
 - Optional: insert the Reflection template via `Cmd+Shift+T`. The template adds structured prompts for what went well, what was hard, what you'd do differently, and what to carry forward.
 
-### Weekly review (~15–20 minutes)
+#### Weekly review (~15–20 minutes)
 
 1. **Weekly Outtake** — scan what shipped. Note patterns, wins, gaps.
 2. **Action Items MOC** — anything overdue or stale? Close it or re-date it.
@@ -522,7 +522,7 @@ The core rule: things that *happen to you* go in the daily note. Things you *int
 
 ## Markers and Conventions
 
-### Markers
+#### Markers
 
 Markers go at the start of a bullet, after the checkbox if present. Actionable items use checkboxes. Observations are plain bullets.
 
@@ -549,7 +549,7 @@ Examples:
 - * Told [[Jane Doe]] her RFC was strong
 ```
 
-### Source tags
+#### Source tags
 
 Source tags record where an action item came from. Add one at the end of a bullet when the origin matters for follow-up or context.
 
@@ -558,14 +558,14 @@ Source tags record where an action item came from. Add one at the end of a bulle
 — [[teams]]   action item originated from Teams
 ```
 
-### Due dates
+#### Due dates
 
 Only add when there is a real deadline:
 ```
 - [ ] !! Ship v2 API {{2026-03-15}}
 ```
 
-### Links
+#### Links
 
 ```
 [[First Last]]     person
@@ -573,7 +573,7 @@ Only add when there is a real deadline:
 [[Topic Name]]     knowledge topic
 ```
 
-### Status tags
+#### Status tags
 
 ```
 #open        unresolved
@@ -694,7 +694,7 @@ The script warns if the Projects directory you provide doesn't match the expecte
 
 Meridian has three types of meeting notes — series instances, 1:1 rolling notes, and standalone single notes — and three scripts to manage them. All are available from the Obsidian command palette via Shell Commands and can also be run directly from a terminal.
 
-### Meeting series and instances
+#### Meeting series and instances
 
 Run **New Meeting Series** from the command palette (or `new-meeting-series.sh`) when scheduling a recurring meeting — the first time for a new series, or any time you need to prep an instance of an existing one.
 
@@ -708,7 +708,7 @@ The script prompts for series name and date, then creates or updates:
 
 If the instance folder already exists, the script aborts without modifying any files.
 
-### 1:1 notes
+#### 1:1 notes
 
 Run **New 1:1** from the command palette (or `new-1on1.sh`) to create or update a running 1:1 note for a person.
 
@@ -722,7 +722,7 @@ The script prompts for the person's name and meeting date, then:
 
 Unlike meeting-series instances (one file per date), a 1:1 note is a single rolling document per person. Each meeting adds an `## YYYY-MM-DD` section with Agenda and Notes fields. Open the note before the meeting to fill in the agenda; add notes during or after.
 
-### Standalone meeting notes
+#### Standalone meeting notes
 
 Run **New Meeting** from the command palette (or `new-standalone-meeting.sh`) for any meeting that warrants its own record but is not a recurring series or 1:1.
 
@@ -738,7 +738,7 @@ bash "$MERIDIAN_VAULT/.scripts/new-standalone-meeting.sh" --vault "$MERIDIAN_VAU
 
 No series index is created. The note links back to the daily note for the meeting date.
 
-### Why not use the Templates plugin for meeting notes?
+#### Why not use the Templates plugin for meeting notes?
 
 The meeting templates in `_templates/` use placeholders like `{{NAME}}` and `{{SERIES}}` that the core Templates plugin does not substitute (it only handles `{{date}}`, `{{time}}`, and `{{title}}`). Inserting them via `Cmd+Shift+T` into a new note also creates an H1 conflict with the heading that Filename Heading Sync adds automatically. The shell scripts bypass both problems by creating the file directly with the correct content and frontmatter.
 
@@ -764,15 +764,15 @@ Work/People → Life/People migration: when you or a colleague leaves the compan
 
 ## Maintenance
 
-### If title stops populating on new notes
+#### If title stops populating on new notes
 
 Increase the delay in Front Matter Timestamps by 50ms increments until it stabilizes. This chain is timing-dependent and may need adjustment after plugin updates.
 
-### If a MOC shows a query error
+#### If a MOC shows a query error
 
 Check that the query uses `sort by filename reverse` (Tasks syntax), not `sort by file.name reverse` (Dataview syntax). These are not interchangeable.
 
-### Python not found
+#### Python not found
 
 Use the full path in the Shell Commands entry: `/usr/bin/python3`
 
@@ -794,7 +794,7 @@ The full documentation suite is copied into `Process/Meridian Documentation/` in
 | `Roadmap.md` | Deferred features |
 | `Meridian System.pdf` | Printable quick reference |
 
-### Quick Reference PDF
+#### Quick Reference PDF
 
 `meridian-system.html` is an HTML source file used to generate the PDF and is not copied to the vault.  It is designed to be printed as one double-sided hardcopy: one side covers conventions and structure (vault layout, markers, filing heuristics, task lifecycle), the other covers daily and weekly workflow.
 
