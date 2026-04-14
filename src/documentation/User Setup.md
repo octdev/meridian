@@ -335,7 +335,7 @@ If Python 3 is not in PATH, use the full path: `/usr/bin/python3`
 ##### Command 2: New Meeting Series (palette)
 
 1. Click **New command**
-2. Enter: `bash "{{vault_path}}/.scripts/new-meeting-series.sh" --vault "{{vault_path}}"`
+2. Enter: `bash "{{vault_path}}/.scripts/new-meeting-series.sh" --vault "{{vault_path}}" --series "{{input:Series name}}" --yes`
 3. Set **Working directory**: `{{vault_path}}`
 4. Click gear icon → **Events** tab: leave all disabled (palette-only, not automatic)
 5. **Output** tab → Output channel for stdout: **Show in notification** (or **Ask after execution**)
@@ -343,10 +343,12 @@ If Python 3 is not in PATH, use the full path: `/usr/bin/python3`
 
 After adding: open the command palette (`Cmd+P`) and confirm **New Meeting Series** appears. Run it once against your vault to verify the series and instance folders are created correctly before relying on it in a live meeting prep flow.
 
+When run from the palette, Obsidian will show a small input dialog for the series name before executing. The first time a series name is used, purpose and cadence fields are left blank in the series index — fill them in afterward in Obsidian.
+
 ##### Command 3: New 1:1 (palette)
 
 1. Click **New command**
-2. Enter: `bash "{{vault_path}}/.scripts/new-1on1.sh" --vault "{{vault_path}}"`
+2. Enter: `bash "{{vault_path}}/.scripts/new-1on1.sh" --vault "{{vault_path}}" --name "{{input:Person name}}" --yes`
 3. Set **Working directory**: `{{vault_path}}`
 4. Click gear icon → **Events** tab: leave all disabled (palette-only, not automatic)
 5. **Output** tab → Output channel for stdout: **Show in notification** (or **Ask after execution**)
@@ -357,7 +359,7 @@ After adding: open the command palette (`Cmd+P`) and confirm **New 1:1** appears
 ##### Command 4: New Company (palette)
 
 1. Click **New command**
-2. Enter: `bash "{{vault_path}}/.scripts/new-company.sh" --vault "{{vault_path}}"`
+2. Enter: `bash "{{vault_path}}/.scripts/new-company.sh" --vault "{{vault_path}}" --company "{{input:Company name}}" --yes`
 3. Set **Working directory**: `{{vault_path}}`
 4. Click gear icon → **Events** tab: leave all disabled (palette-only, not automatic)
 5. **Output** tab → Output channel for stdout: **Show in notification** (or **Ask after execution**)
@@ -366,7 +368,7 @@ After adding: open the command palette (`Cmd+P`) and confirm **New 1:1** appears
 ##### Command 5: New Project (palette)
 
 1. Click **New command**
-2. Enter: `bash "{{vault_path}}/.scripts/new-project.sh" --vault "{{vault_path}}"`
+2. Enter: `bash "{{vault_path}}/.scripts/new-project.sh" --vault "{{vault_path}}" --name "{{input:Project name}}" --yes`
 3. Set **Working directory**: `{{vault_path}}`
 4. Click gear icon → **Events** tab: leave all disabled (palette-only, not automatic)
 5. **Output** tab → Output channel for stdout: **Show in notification** (or **Ask after execution**)
@@ -375,22 +377,25 @@ After adding: open the command palette (`Cmd+P`) and confirm **New 1:1** appears
 ##### Command 6: New Meeting (palette)
 
 1. Click **New command**
-2. Enter: `bash "{{vault_path}}/.scripts/new-standalone-meeting.sh" --vault "{{vault_path}}"`
+2. Enter: `bash "{{vault_path}}/.scripts/new-standalone-meeting.sh" --vault "{{vault_path}}" --name "{{input:Meeting name}}" --yes`
 3. Set **Working directory**: `{{vault_path}}`
 4. Click gear icon → **Events** tab: leave all disabled (palette-only, not automatic)
 5. **Output** tab → Output channel for stdout: **Show in notification** (or **Ask after execution**)
 6. Set alias: "New Meeting"
 
+##### How `{{input:...}}` works
+
+The `{{input:...}}` variable causes Shell Commands to show a small dialog in Obsidian before running the command. Type the value and press Enter — the script receives it as a flag and runs without any further prompts. The `--yes` flag suppresses the confirmation step.
+
 ##### Troubleshooting Shell Commands
 
-If a command silently does nothing when run from the palette, the most common cause is that Shell Commands is not configured to open a terminal. Interactive scripts (anything that prompts for input) require a real terminal session:
+If a command silently does nothing, check that the command string matches exactly what is shown above — in particular, that `--yes` is present and the `{{input:...}}` variable is correctly formatted.
 
-1. Open Shell Commands settings → find the command → click the gear icon
-2. Go to the **Environments** tab
-3. Under **Shell**, confirm it is set to your system shell (e.g. `/bin/bash` or `/bin/zsh`)
-4. Under **Execute in**, select **New terminal** (not "Background")
+If you want to run a script interactively with all prompts (e.g. to browse existing 1:1 notes by number), run it directly from a terminal instead:
 
-Re-run from the palette — a terminal window should open and display the prompts.
+```bash
+bash "$MERIDIAN_VAULT/.scripts/new-1on1.sh" --vault "$MERIDIAN_VAULT"
+```
 
 #### 9. Scroller
 

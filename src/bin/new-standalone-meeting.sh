@@ -38,6 +38,7 @@ COMPANY=""
 NAME=""
 DATE=""
 FOLDER_MODE=false
+YES=false
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -46,12 +47,15 @@ while [[ $# -gt 0 ]]; do
     --name)    NAME="${2:?--name requires a value}";      shift 2 ;;
     --date)    DATE="${2:?--date requires a value}";      shift 2 ;;
     --folder)  FOLDER_MODE=true; shift ;;
+    --yes|-y)  YES=true; shift ;;
     --help|-h)
       sed -n '2,/^$/p' "$0" | grep '^#' | sed 's/^# \{0,1\}//'
       exit 0 ;;
     *) die "Unknown argument: $1" "" ;;
   esac
 done
+
+[[ "$YES" == true ]] && MERIDIAN_YES=1
 
 # ── Vault validation ──────────────────────────────────────────────────────────
 
@@ -138,8 +142,10 @@ _detail "Meeting: $NAME"
 _detail "Date:    $DATE"
 _detail "File:    $TARGET_FILE"
 echo ""
-read -rp "$(printf "${_C_CYAN}Create? [Y/n]:${_C_RESET} ")" CONFIRM
-[[ "$CONFIRM" =~ ^[Nn]$ ]] && { echo "Aborted."; exit 0; }
+if [[ "$YES" == false ]]; then
+  read -rp "$(printf "${_C_CYAN}Create? [Y/n]:${_C_RESET} ")" CONFIRM
+  [[ "$CONFIRM" =~ ^[Nn]$ ]] && { echo "Aborted."; exit 0; }
+fi
 
 # ── Write note ────────────────────────────────────────────────────────────────
 

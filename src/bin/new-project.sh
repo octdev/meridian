@@ -37,15 +37,19 @@ write_file() {
 VAULT=""
 PROJECT_NAME=""
 PROJECTS_DIR=""
+YES=false
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --vault)        VAULT="${2:?--vault requires a path}";              shift 2 ;;
     --name)         PROJECT_NAME="${2:?--name requires a value}";       shift 2 ;;
     --projects-dir) PROJECTS_DIR="${2:?--projects-dir requires a path}"; shift 2 ;;
+    --yes|-y)       YES=true; shift ;;
     *) die "Unknown argument: $1" "" ;;
   esac
 done
+
+[[ "$YES" == true ]] && MERIDIAN_YES=1
 
 # ── Vault validation ──────────────────────────────────────────────────────────
 
@@ -147,8 +151,10 @@ if [[ "$PROJECTS_DIR" != "$LIFE_PATTERN" ]] && \
   _warn "Unexpected Projects path: $PROJECTS_DIR"
   _hint "Expected: $VAULT/Work/[Company]/Projects/ or $VAULT/Life/Projects/"
   echo ""
-  read -rp "$(printf "${_C_CYAN}Continue anyway? [Y/n]:${_C_RESET} ")" _override
-  [[ "$_override" =~ ^[Nn]$ ]] && { echo "Aborted."; exit 1; }
+  if [[ "$YES" == false ]]; then
+    read -rp "$(printf "${_C_CYAN}Continue anyway? [Y/n]:${_C_RESET} ")" _override
+    [[ "$_override" =~ ^[Nn]$ ]] && { echo "Aborted."; exit 1; }
+  fi
 fi
 
 # ── Collision check ───────────────────────────────────────────────────────────
@@ -165,8 +171,10 @@ echo ""
 _detail "Project:  $PROJECT_NAME"
 _detail "Location: $PROJECT_DIR"
 echo ""
-read -rp "$(printf "${_C_CYAN}Create? [Y/n]:${_C_RESET} ")" CONFIRM
-[[ "$CONFIRM" =~ ^[Nn]$ ]] && { echo "Aborted."; exit 0; }
+if [[ "$YES" == false ]]; then
+  read -rp "$(printf "${_C_CYAN}Create? [Y/n]:${_C_RESET} ")" CONFIRM
+  [[ "$CONFIRM" =~ ^[Nn]$ ]] && { echo "Aborted."; exit 0; }
+fi
 
 # ── Scaffold ──────────────────────────────────────────────────────────────────
 

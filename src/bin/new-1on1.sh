@@ -22,15 +22,19 @@ source "$LIB_DIR/vault-select.sh"
 VAULT=""
 COMPANY=""
 NAME=""
+YES=false
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --vault)   VAULT="${2:?--vault requires a path}";   shift 2 ;;
     --company) COMPANY="${2:?--company requires a name}"; shift 2 ;;
     --name)    NAME="${2:?--name requires a value}";    shift 2 ;;
+    --yes|-y)  YES=true; shift ;;
     *) die "Unknown argument: $1" "" ;;
   esac
 done
+
+[[ "$YES" == true ]] && MERIDIAN_YES=1
 
 # ── Vault validation ──────────────────────────────────────────────────────────
 
@@ -163,8 +167,10 @@ else
 fi
 
 echo ""
-read -rp "$(printf "${_C_CYAN}Continue? [Y/n]:${_C_RESET} ")" CONFIRM
-[[ "$CONFIRM" =~ ^[Nn]$ ]] && { echo "Aborted."; exit 0; }
+if [[ "$YES" == false ]]; then
+  read -rp "$(printf "${_C_CYAN}Continue? [Y/n]:${_C_RESET} ")" CONFIRM
+  [[ "$CONFIRM" =~ ^[Nn]$ ]] && { echo "Aborted."; exit 0; }
+fi
 
 # ── Create or append ──────────────────────────────────────────────────────────
 

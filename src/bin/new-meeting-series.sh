@@ -25,6 +25,7 @@ COMPANY=""
 SERIES=""
 PURPOSE=""
 CADENCE=""
+YES=false
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -33,9 +34,12 @@ while [[ $# -gt 0 ]]; do
     --series)  SERIES="${2:?--series requires a name}";      shift 2 ;;
     --purpose) PURPOSE="${2:?--purpose requires a value}";   shift 2 ;;
     --cadence) CADENCE="${2:?--cadence requires a value}";   shift 2 ;;
+    --yes|-y)  YES=true; shift ;;
     *) die "Unknown argument: $1" "" ;;
   esac
 done
+
+[[ "$YES" == true ]] && MERIDIAN_YES=1
 
 # ── Vault validation ──────────────────────────────────────────────────────────
 
@@ -120,8 +124,10 @@ if [[ ! -f "$SERIES_INDEX" ]]; then
   NEW_SERIES=true
 fi
 echo ""
-read -rp "$(printf "${_C_CYAN}Create? [Y/n]:${_C_RESET} ")" CONFIRM
-[[ "$CONFIRM" =~ ^[Nn]$ ]] && { echo "Aborted."; exit 0; }
+if [[ "$YES" == false ]]; then
+  read -rp "$(printf "${_C_CYAN}Create? [Y/n]:${_C_RESET} ")" CONFIRM
+  [[ "$CONFIRM" =~ ^[Nn]$ ]] && { echo "Aborted."; exit 0; }
+fi
 
 # ── Create series index if new ────────────────────────────────────────────────
 
@@ -130,10 +136,10 @@ if [[ "$NEW_SERIES" == true ]]; then
 
   SERIES_PURPOSE="$PURPOSE"
   SERIES_CADENCE="$CADENCE"
-  if [[ -z "$SERIES_PURPOSE" ]]; then
+  if [[ -z "$SERIES_PURPOSE" && "$YES" == false ]]; then
     read -rp "$(printf "${_C_CYAN}Series purpose (one line, or Enter to fill in later):${_C_RESET} ")" SERIES_PURPOSE
   fi
-  if [[ -z "$SERIES_CADENCE" ]]; then
+  if [[ -z "$SERIES_CADENCE" && "$YES" == false ]]; then
     echo ""
     _detail "  Cadence:"
     _detail "  1) Monthly"

@@ -165,6 +165,11 @@ resolve_company() {
 
   # Fall back to listing Work/ directories
   detect_companies "$vault_root"
+  if [[ "${MERIDIAN_YES:-}" == "1" ]]; then
+    # Headless mode: auto-select the first detected company, or leave empty for caller to die.
+    [[ ${#DETECTED_COMPANIES[@]} -gt 0 ]] && CURRENT_COMPANY="${DETECTED_COMPANIES[0]}"
+    return 0
+  fi
   if [[ ${#DETECTED_COMPANIES[@]} -gt 0 ]]; then
     echo "  Known companies:"
     for _i in "${!DETECTED_COMPANIES[@]}"; do
@@ -194,6 +199,11 @@ resolve_company() {
 # Caller is responsible for validating that VAULT_ROOT exists afterward.
 select_vault() {
   load_known_vaults
+  if [[ "${MERIDIAN_YES:-}" == "1" ]]; then
+    # Headless mode: auto-select the first known vault, or leave empty for caller to die.
+    [[ ${#KNOWN_VAULTS[@]} -gt 0 ]] && VAULT_ROOT="${KNOWN_VAULTS[0]}"
+    return 0
+  fi
   if [[ ${#KNOWN_VAULTS[@]} -gt 0 ]]; then
     echo "  Known vaults:"
     for _i in "${!KNOWN_VAULTS[@]}"; do
