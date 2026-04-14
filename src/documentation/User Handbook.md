@@ -260,7 +260,7 @@ References/   External artifacts — source material, not yet synthesized
 
 **References** (`Knowledge/References/`) is an unstructured subfolder for external artifacts — source material, whitepapers, PDFs, documents you collected but didn't write. It is the raw input layer; Knowledge is the synthesis layer. Unlike the other Knowledge subfolders, References has no internal structure — filing decisions inside it are not Meridian's concern.
 
-**Work vault:** knowledge starts at `Work/<Company>/Knowledge/` (Technical, Leadership, Industry) and is promoted to personal `Knowledge/` by deliberate choice. This scoping is intentional — work-generated knowledge is context-specific until you decide it is transferable.
+**Work vault:** Work accrued knowledge starts at `Work/<Company>/Knowledge/` (Technical, Leadership, Industry) and is promoted to personal `Knowledge/` by deliberate choice. This scoping is intentional — work-generated knowledge is context-specific until you decide it is transferable.
 
 ### The Test
 
@@ -294,7 +294,7 @@ These are searchable in the daily notes. During the weekly review, scan for `&` 
 
 ## People Notes: When to Move Them
 
-People notes deserve special attention because they span both Work and Life, and they outlast the context in which you first created them.
+People notes deserve special attention because they can span both Work and Life, and may outlast the context in which you first created them.
 
 Start a person note the moment you have a meaningful interaction that you'll want to remember. A colleague's communication style, the context they gave you in a 1:1, a commitment they made, a pattern you've noticed — these are ephemeral in memory and durable in notes.
 
@@ -305,7 +305,7 @@ Start a person note the moment you have a meaningful interaction that you'll wan
 
 **When to move them:**
 
-When a colleague leaves the company (or when you leave), move their note from `Work/People/` to `Life/People/`. The relationship outlasts the professional context. Obsidian updates backlinks automatically.
+When a colleague leaves the company (or when you leave), move their note from `Work/People/` to `Life/People/` if the relationship will outlast the initial professional context. Obsidian updates backlinks automatically.
 
 The move preserves the history: your notes about working with someone at one company become the foundation of understanding them as a person, not just as a colleague.
 
@@ -316,6 +316,15 @@ The move preserves the history: your notes about working with someone at one com
 Six scripts handle vault scaffolding and meeting management. They live in `.scripts/` inside the vault and can be run from a terminal or triggered via the Obsidian command palette (Shell Commands plugin). All scripts accept flags or run fully interactively — if you omit a flag, you will be prompted.
 
 All scripts resolve the vault from `--vault <path>`, the `$MERIDIAN_VAULT` environment variable, or an interactive picker, in that order.
+
+| Script | When to run | Command palette |
+|--------|------------|-----------------|
+| `new-company.sh` | New employer or client | **New Company** |
+| `new-project.sh` | New scoped effort with deliverables | **New Project** |
+| `new-meeting-series.sh` | Before prep for any recurring meeting | **New Meeting Series** |
+| `new-1on1.sh` | Before any 1:1 | **New 1:1** |
+| `new-standalone-meeting.sh` | Before any one-off meeting needing its own note | **New Meeting** |
+| `set-default-company.sh` | Change which company scripts default to | — |
 
 ---
 
@@ -446,19 +455,6 @@ bash .scripts/set-default-company.sh --vault <path> --company <name>
 Writes `DefaultCompany=<name>` to `.scripts/.vault-version`. The default company is used by `new-project.sh`, `new-meeting-series.sh`, and `new-1on1.sh` when `.obsidian/daily-notes.json` is absent or still set to the placeholder `CurrentCompany`.
 
 `new-company.sh` sets the default automatically when it scaffolds a new company, so in the normal flow you only need this script when correcting a stale or missing value.
-
----
-
-### Summary
-
-| Script | When to run | Command palette |
-|--------|------------|-----------------|
-| `new-company.sh` | New employer or client | **New Company** |
-| `new-project.sh` | New scoped effort with deliverables | **New Project** |
-| `new-meeting-series.sh` | Before prep for any recurring meeting | **New Meeting Series** |
-| `new-1on1.sh` | Before any 1:1 | **New 1:1** |
-| `new-standalone-meeting.sh` | Before any one-off meeting needing its own note | **New Meeting** |
-| `set-default-company.sh` | Change which company scripts default to | — |
 
 ---
 
