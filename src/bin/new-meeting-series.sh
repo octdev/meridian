@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # new-meeting-series.sh — scaffold a meeting series instance in Meridian
-# Usage: new-meeting-series.sh --vault <path> [--series <name>] [--date <YYYY-MM-DD>]
+# Usage: new-meeting-series.sh --vault <path> [--company <name>] [--series <name>] [--purpose <text>] [--cadence <text>]
+# Creates or updates a meeting series instance at Meetings/Series/<Series>/<Date>/
 
 set -euo pipefail
 
@@ -82,8 +83,7 @@ MEETINGS_DIR="$VAULT/Work/$CURRENT_COMPANY/Meetings"
 if [[ -z "$SERIES" ]]; then
   echo ""
   _detail "Existing series:"
-  for d in "$MEETINGS_DIR"/*/; do
-    [[ "$d" == *"1on1s/"* ]] && continue
+  for d in "$MEETINGS_DIR/Series"/*/; do
     [[ -d "$d" ]] && _detail "  $(basename "$d")"
   done
   echo ""
@@ -96,7 +96,7 @@ fi
 
 DATE=$(date +%Y-%m-%d)
 
-SERIES_DIR="$MEETINGS_DIR/$SERIES"
+SERIES_DIR="$MEETINGS_DIR/Series/$SERIES"
 INSTANCE_DIR="$SERIES_DIR/$DATE"
 INSTANCE_FILE="$INSTANCE_DIR/$SERIES $DATE.md"
 SERIES_INDEX="$SERIES_DIR/$SERIES.md"

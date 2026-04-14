@@ -296,6 +296,8 @@ dirs=(
   "Work/$COMPANY/General"
   "Work/$COMPANY/Meetings"
   "Work/$COMPANY/Meetings/1on1s"
+  "Work/$COMPANY/Meetings/Series"
+  "Work/$COMPANY/Meetings/Single"
   "Work/$COMPANY/Daily"
   "Work/$COMPANY/Drafts"
   "Work/$COMPANY/Knowledge/Technical"
@@ -323,7 +325,7 @@ if [[ "$PROFILE" == "personal" ]]; then
     "Knowledge/Leadership"
     "Knowledge/Industry"
     "Knowledge/General"
-    "References"
+    "Knowledge/References"
   )
 fi
 
@@ -426,7 +428,7 @@ mkdir -p "$VAULT_ROOT/.obsidian"
 if [[ "$PROFILE" == "personal" ]]; then
   DAILY_FOLDER="Life/Daily"
   DRAFTS_FOLDER="Life/Drafts"
-  ATTACHMENTS_FOLDER="References"
+  ATTACHMENTS_FOLDER="Knowledge/References"
 else
   DAILY_FOLDER="Work/$COMPANY/Daily"
   DRAFTS_FOLDER="Work/$COMPANY/Drafts"
@@ -461,17 +463,20 @@ echo "[meridian] Copying scripts..."
 copy_if_new "$REPO_DIR/src/bin/weekly-snapshot.py"      "$VAULT_ROOT/.scripts/weekly-snapshot.py"
 copy_if_new "$REPO_DIR/src/bin/new-company.sh"          "$VAULT_ROOT/.scripts/new-company.sh"
 copy_if_new "$REPO_DIR/src/bin/new-project.sh"          "$VAULT_ROOT/.scripts/new-project.sh"
-copy_if_new "$REPO_DIR/src/bin/new-meeting-series.sh"   "$VAULT_ROOT/.scripts/new-meeting-series.sh"
-copy_if_new "$REPO_DIR/src/bin/new-1on1.sh"             "$VAULT_ROOT/.scripts/new-1on1.sh"
+copy_if_new "$REPO_DIR/src/bin/new-meeting-series.sh"      "$VAULT_ROOT/.scripts/new-meeting-series.sh"
+copy_if_new "$REPO_DIR/src/bin/new-1on1.sh"                "$VAULT_ROOT/.scripts/new-1on1.sh"
+copy_if_new "$REPO_DIR/src/bin/new-standalone-meeting.sh"  "$VAULT_ROOT/.scripts/new-standalone-meeting.sh"
 
-copy_if_new "$REPO_DIR/src/lib/colors.sh"  "$VAULT_ROOT/.scripts/lib/colors.sh"
-copy_if_new "$REPO_DIR/src/lib/logging.sh" "$VAULT_ROOT/.scripts/lib/logging.sh"
-copy_if_new "$REPO_DIR/src/lib/errors.sh"  "$VAULT_ROOT/.scripts/lib/errors.sh"
+copy_if_new "$REPO_DIR/src/lib/colors.sh"       "$VAULT_ROOT/.scripts/lib/colors.sh"
+copy_if_new "$REPO_DIR/src/lib/logging.sh"      "$VAULT_ROOT/.scripts/lib/logging.sh"
+copy_if_new "$REPO_DIR/src/lib/errors.sh"       "$VAULT_ROOT/.scripts/lib/errors.sh"
+copy_if_new "$REPO_DIR/src/lib/vault-select.sh" "$VAULT_ROOT/.scripts/lib/vault-select.sh"
 
 chmod +x "$VAULT_ROOT/.scripts/new-company.sh"        2>/dev/null || true
 chmod +x "$VAULT_ROOT/.scripts/new-project.sh"        2>/dev/null || true
-chmod +x "$VAULT_ROOT/.scripts/new-meeting-series.sh" 2>/dev/null || true
-chmod +x "$VAULT_ROOT/.scripts/new-1on1.sh"           2>/dev/null || true
+chmod +x "$VAULT_ROOT/.scripts/new-meeting-series.sh"     2>/dev/null || true
+chmod +x "$VAULT_ROOT/.scripts/new-1on1.sh"               2>/dev/null || true
+chmod +x "$VAULT_ROOT/.scripts/new-standalone-meeting.sh" 2>/dev/null || true
 
 echo ""
 
@@ -514,7 +519,7 @@ echo ""
 printf "${_C_GREEN}[meridian] Vault scaffolded successfully.${_C_RESET}\n"
 echo ""
 if [[ "$PROFILE" == "work" ]]; then
-  _warn "Work profile: Northstar/, Life/, and References/ were not created."
+  _warn "Work profile: Northstar/, Life/, and top-level Knowledge/ were not created."
   _hint "These folders are intentionally absent — never add them to Syncthing on this machine."
   echo ""
 fi

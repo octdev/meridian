@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 # new-1on1.sh — create or update a 1:1 note in Meridian
-# Usage: new-1on1.sh --vault <path> [--name <name>] [--date <YYYY-MM-DD>]
-#
-# If the person's 1:1 note does not exist, creates it with a full header.
-# If it already exists, appends a new dated entry to the bottom.
+# Usage: new-1on1.sh --vault <path> [--company <name>] [--name <name>]
+# Creates a new 1:1 rolling note or appends a dated entry to an existing one.
+# Notes are created at Meetings/1on1s/<Name> 1on1s.md
 
 set -euo pipefail
 

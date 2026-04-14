@@ -177,9 +177,10 @@ done
 
 # Personal-only folders
 for d in "Northstar" "Life/Projects" "Life/People" "Life/Health" \
-          "Life/Finances" "Life/Social" "Life/Development" "Life/Fun" "References" \
+          "Life/Finances" "Life/Social" "Life/Development" "Life/Fun" \
           "Life/Daily" \
-          "Knowledge/Technical" "Knowledge/Leadership" "Knowledge/Industry" "Knowledge/General"; do
+          "Knowledge/Technical" "Knowledge/Leadership" "Knowledge/Industry" "Knowledge/General" \
+          "Knowledge/References"; do
   assert_exists "  personal folder: $d" "$PERSONAL_VAULT/$d"
 done
 
@@ -275,6 +276,34 @@ assert_file_contains "  work daily-notes.json: folder" "$WORK_VAULT/.obsidian/da
 # Scripts and docs still present
 assert_exists "  scripts deployed on work profile" "$WORK_VAULT/.scripts/new-company.sh"
 assert_exists "  docs deployed on work profile" "$WORK_VAULT/Process/Meridian Documentation/User Setup.md"
+
+# ============================================================
+section "scaffold-vault.sh — v1.5.0 structure (personal vault)"
+
+assert_exists  "  Knowledge/References/ exists" \
+  "$PERSONAL_VAULT/Knowledge/References"
+assert_absent  "  References/ does not exist at root" \
+  "$PERSONAL_VAULT/References"
+assert_exists  "  Meetings/1on1s/ exists" \
+  "$PERSONAL_VAULT/Work/CurrentCompany/Meetings/1on1s"
+assert_exists  "  Meetings/Series/ exists" \
+  "$PERSONAL_VAULT/Work/CurrentCompany/Meetings/Series"
+assert_exists  "  Meetings/Single/ exists" \
+  "$PERSONAL_VAULT/Work/CurrentCompany/Meetings/Single"
+
+# ============================================================
+section "scaffold-vault.sh — v1.5.0 structure (work vault)"
+
+assert_absent  "  References/ does not exist at root" \
+  "$WORK_VAULT/References"
+assert_absent  "  Knowledge/ does not exist at root" \
+  "$WORK_VAULT/Knowledge"
+assert_exists  "  Meetings/1on1s/ exists" \
+  "$WORK_VAULT/Work/CurrentCompany/Meetings/1on1s"
+assert_exists  "  Meetings/Series/ exists" \
+  "$WORK_VAULT/Work/CurrentCompany/Meetings/Series"
+assert_exists  "  Meetings/Single/ exists" \
+  "$WORK_VAULT/Work/CurrentCompany/Meetings/Single"
 
 # ============================================================
 section "scaffold-vault.sh — idempotency (re-run skips existing files)"
@@ -609,7 +638,7 @@ printf "y\n" | bash "$SERIES_SCRIPT" \
   --vault "$SERIES_VAULT" --series "All Hands" \
   --purpose "Team sync" --cadence "Weekly" > /dev/null 2>&1
 
-SERIES_DIR="$SERIES_VAULT/Work/Acme Corp/Meetings/All Hands"
+SERIES_DIR="$SERIES_VAULT/Work/Acme Corp/Meetings/Series/All Hands"
 SERIES_INDEX="$SERIES_DIR/All Hands.md"
 INSTANCE_DIR="$SERIES_DIR/$SERIES_DATE"
 INSTANCE_FILE="$INSTANCE_DIR/All Hands $SERIES_DATE.md"
@@ -636,7 +665,7 @@ rc=0
 output="$(printf "y\n" \
   | MERIDIAN_VAULT="$SERIES_ENV_VAULT" bash "$SERIES_SCRIPT" \
     --series "Standup" --purpose "Daily sync" --cadence "Daily" 2>&1)" || rc=$?
-if [[ $rc -eq 0 ]] && [[ -d "$SERIES_ENV_VAULT/Work/Acme Corp/Meetings/Standup" ]]; then
+if [[ $rc -eq 0 ]] && [[ -d "$SERIES_ENV_VAULT/Work/Acme Corp/Meetings/Series/Standup" ]]; then
   pass "  MERIDIAN_VAULT used when --vault not passed"
 else
   fail "  MERIDIAN_VAULT used when --vault not passed"
@@ -676,6 +705,110 @@ if [[ $rc -eq 1 ]] && echo "$output" | grep -q "not found"; then
 else
   fail "  invalid vault exits 1"
 fi
+
+# ============================================================
+# new-standalone-meeting.sh
+# ============================================================
+
+STANDALONE_SCRIPT="$REPO_DIR/src/bin/new-standalone-meeting.sh"
+
+section "new-standalone-meeting.sh — basic creation"
+
+STANDALONE_VAULT="$(new_vault)"
+"$SCAFFOLD" --vault "$STANDALONE_VAULT" --profile personal > /dev/null 2>&1
+printf "%s\ny\n" "Acme Corp" \
+  | bash "$STANDALONE_VAULT/.scripts/new-company.sh" --vault "$STANDALONE_VAULT" > /dev/null 2>&1
+STANDALONE_DATE="$(date +%Y-%m-%d)"
+
+rc=0
+output="$(printf "y\n" | bash "$STANDALONE_SCRIPT" \
+  --vault "$STANDALONE_VAULT" --company "Acme Corp" \
+  --name "Test Meeting" 2>&1)" || rc=$?
+if [[ $rc -eq 0 ]] && echo "$output" | grep -q "Meetings/Single/"; then
+  pass "  creates note in Meetings/Single/"
+else
+  fail "  creates note in Meetings/Single/"
+  if $VERBOSE; then echo "    output: $output"; fi
+fi
+
+STANDALONE_FILE="$STANDALONE_VAULT/Work/Acme Corp/Meetings/Single/$STANDALONE_DATE Test Meeting.md"
+assert_exists "  standalone note at correct path" "$STANDALONE_FILE"
+assert_file_contains "  frontmatter: title" "$STANDALONE_FILE" "title: $STANDALONE_DATE Test Meeting"
+assert_file_contains "  daily note backlink" "$STANDALONE_FILE" "[[$STANDALONE_DATE]]"
+
+# ============================================================
+section "new-standalone-meeting.sh — folder mode"
+
+rc=0
+output="$(printf "y\n" | bash "$STANDALONE_SCRIPT" \
+  --vault "$STANDALONE_VAULT" --company "Acme Corp" \
+  --name "Folder Meeting" --folder 2>&1)" || rc=$?
+if [[ $rc -eq 0 ]]; then
+  pass "  --folder exits 0"
+else
+  fail "  --folder exits 0"
+  if $VERBOSE; then echo "    output: $output"; fi
+fi
+
+FOLDER_DIR="$STANDALONE_VAULT/Work/Acme Corp/Meetings/Single/$STANDALONE_DATE Folder Meeting"
+FOLDER_FILE="$FOLDER_DIR/$STANDALONE_DATE Folder Meeting.md"
+assert_exists "  folder created at Meetings/Single/" "$FOLDER_DIR"
+assert_exists "  index note inside folder" "$FOLDER_FILE"
+
+# ============================================================
+section "new-standalone-meeting.sh — collision check"
+
+rc=0
+output="$(printf "y\n" | bash "$STANDALONE_SCRIPT" \
+  --vault "$STANDALONE_VAULT" --company "Acme Corp" \
+  --name "Test Meeting" 2>&1)" || rc=$?
+if [[ $rc -eq 1 ]] && echo "$output" | grep -q "Already exists"; then
+  pass "  duplicate note exits 1 with message"
+else
+  fail "  duplicate note exits 1 with message"
+  if $VERBOSE; then echo "    output: $output"; fi
+fi
+
+# ============================================================
+# migration — v1.5.0
+# ============================================================
+
+MIGRATION_SCRIPT="$REPO_DIR/scripts/upgrade/migrations/v1.5.0.sh"
+
+section "migration v1.5.0 — global: References/ move"
+
+MIGRATE_VAULT="$(new_vault)"
+"$SCAFFOLD" --vault "$MIGRATE_VAULT" --profile personal > /dev/null 2>&1
+# Simulate legacy state: remove Knowledge/References/, create top-level References/
+rm -rf "$MIGRATE_VAULT/Knowledge/References"
+mkdir -p "$MIGRATE_VAULT/References"
+echo "test content" > "$MIGRATE_VAULT/References/test-artifact.md"
+
+bash "$MIGRATION_SCRIPT" "$MIGRATE_VAULT" "$REPO_DIR" > /dev/null 2>&1
+
+assert_absent  "  References/ removed from root after migration" \
+  "$MIGRATE_VAULT/References"
+assert_exists  "  Knowledge/References/ exists after migration" \
+  "$MIGRATE_VAULT/Knowledge/References"
+assert_exists  "  test file preserved in Knowledge/References/" \
+  "$MIGRATE_VAULT/Knowledge/References/test-artifact.md"
+
+# ============================================================
+section "migration v1.5.0 — per-company: series move"
+
+MIGRATE_CO_VAULT="$(new_vault)"
+"$SCAFFOLD" --vault "$MIGRATE_CO_VAULT" --profile personal > /dev/null 2>&1
+printf "%s\ny\n" "Acme Corp" \
+  | bash "$MIGRATE_CO_VAULT/.scripts/new-company.sh" --vault "$MIGRATE_CO_VAULT" > /dev/null 2>&1
+# Simulate legacy state: create a series folder directly under Meetings/
+mkdir -p "$MIGRATE_CO_VAULT/Work/Acme Corp/Meetings/LegacySeries"
+
+bash "$MIGRATION_SCRIPT" "$MIGRATE_CO_VAULT" "$REPO_DIR" "Acme Corp" > /dev/null 2>&1
+
+assert_absent  "  legacy series folder removed from Meetings/ root" \
+  "$MIGRATE_CO_VAULT/Work/Acme Corp/Meetings/LegacySeries"
+assert_exists  "  legacy series folder moved to Meetings/Series/" \
+  "$MIGRATE_CO_VAULT/Work/Acme Corp/Meetings/Series/LegacySeries"
 
 # ============================================================
 # Documentation alignment
