@@ -106,6 +106,8 @@ Obsidian → Open folder as vault → select the vault root.
 
 In the file explorer, rename `Work/CurrentCompany/` to your actual company name.
 
+> **Deploying to iOS?** See [[iOS Setup]] in Meridian Documentation after completing this guide. The Shell Commands plugin (Step 8) can be skipped when setting up on iOS.
+
 ---
 
 ## Work Machine Setup
@@ -797,6 +799,7 @@ The full documentation suite is copied into `Process/Meridian Documentation/` in
 | `Security.md` | Threat model and work/personal boundary |
 | `Sync.md` | Syncthing setup and folder sync matrix |
 | `Roadmap.md` | Deferred features |
+| `iOS Setup.md` | iOS deployment: what works, what doesn't, and step-by-step setup |
 | `Meridian System.pdf` | Printable quick reference |
 
 #### Quick Reference PDF

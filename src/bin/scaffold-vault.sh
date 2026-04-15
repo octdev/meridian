@@ -500,6 +500,7 @@ copy_doc_with_frontmatter "$DOCS_SRC/Security.md"        "$DOCS_DEST/Security.md
 copy_doc_with_frontmatter "$DOCS_SRC/Sync.md"            "$DOCS_DEST/Sync.md"            "Sync"              "$_now"
 copy_doc_with_frontmatter "$DOCS_SRC/Roadmap.md"         "$DOCS_DEST/Roadmap.md"         "Roadmap"           "$_now"
 copy_doc_with_frontmatter "$DOCS_SRC/Upgrading.md"       "$DOCS_DEST/Upgrading.md"       "Upgrading"         "$_now"
+copy_doc_with_frontmatter "$DOCS_SRC/iOS Setup.md"       "$DOCS_DEST/iOS Setup.md"       "iOS Setup"         "$_now"
 copy_if_new "$REPO_DIR/Meridian System.pdf" "$DOCS_DEST/Meridian System.pdf"
 
 echo ""

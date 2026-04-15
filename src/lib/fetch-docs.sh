@@ -17,6 +17,7 @@ _MERIDIAN_DOC_FILES=(
   "Sync.md"
   "Roadmap.md"
   "Upgrading.md"
+  "iOS Setup.md"
 )
 
 # Vault titles corresponding to _MERIDIAN_DOC_FILES (same order).
@@ -30,6 +31,7 @@ _MERIDIAN_DOC_TITLES=(
   "Sync"
   "Roadmap"
   "Upgrading"
+  "iOS Setup"
 )
 
 # Fetches the current documentation from origin/main via the GitHub raw API

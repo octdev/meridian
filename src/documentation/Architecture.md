@@ -77,6 +77,7 @@ meridian/
       Sync.md
       Roadmap.md
       Upgrading.md                  upgrade system: user guide and developer reference
+      iOS Setup.md                  iOS deployment guide
   scripts/
     ci/
       release.sh                  version tagging and README update script
@@ -223,6 +224,7 @@ vault/
       Sync.md
       Roadmap.md
       Upgrading.md
+      iOS Setup.md
       Meridian System.pdf
   Knowledge/
     Technical/
@@ -302,7 +304,7 @@ vault/
     Weekly Outtake.md             Tasks MOC (rolling 7-day)
     email.md                      source tag note
     teams.md                      source tag note
-    Meridian Documentation/       (same docs as personal vault, including Upgrading.md)
+    Meridian Documentation/       (same docs as personal vault, including Upgrading.md and iOS Setup.md)
   Work/
     CurrentCompany/
       Projects/
